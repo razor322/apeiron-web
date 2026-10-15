@@ -1,0 +1,470 @@
+<!doctype html>
+<html lang="id">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Apeiron — Kamu ada di sini</title>
+<meta name="description" content="Perjalanan menjauh dari tempatmu berdiri, sampai seluruh Tata Surya menjadi noktah kecil.">
+<link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Inter:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+/* Tema ini sengaja gelap di semua mode: langit malam adalah isi halamannya. */
+:root{
+  color-scheme:dark;
+  --bg:#05060A; --ink:#E8E4DC; --ink2:#9A9CA6; --ink3:#5A5D68; --accent:#E8A15B; --line:rgba(232,228,220,.16);
+  --serif:"Instrument Serif",Georgia,"Times New Roman",serif;
+  --sans:Inter,system-ui,-apple-system,"Segoe UI",sans-serif;
+  box-sizing:border-box;
+  padding-top:env(safe-area-inset-top,0px);
+  padding-bottom:env(safe-area-inset-bottom,0px);
+}
+html{scroll-padding-top:env(safe-area-inset-top,0px);background:var(--bg)}
+*,*::before,*::after{box-sizing:inherit}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--sans);-webkit-font-smoothing:antialiased}
+:focus-visible{outline:2px solid var(--accent);outline-offset:3px}
+
+#c{position:fixed;inset:0;width:100%;height:100%;display:block;z-index:0}
+.scrim{position:fixed;left:0;right:0;bottom:0;height:52vh;z-index:1;pointer-events:none;
+  background:linear-gradient(to top,rgba(5,6,10,.9),rgba(5,6,10,.55) 45%,rgba(5,6,10,0))}
+#track{height:1000vh}
+
+.nav{position:fixed;top:0;left:0;right:0;z-index:5;display:flex;justify-content:space-between;align-items:center;
+  padding:calc(env(safe-area-inset-top,0px) + 18px) clamp(18px,3vw,36px) 18px}
+.logo{display:flex;align-items:baseline;gap:.7rem}
+.logo b{font:400 1.6rem/1 var(--serif);letter-spacing:.01em}
+.logo span{font:italic 400 1.05rem/1 var(--serif);color:var(--ink3)}
+.nav .r{display:flex;gap:1rem;align-items:center;font-size:.75rem;color:var(--ink3)}
+#calm{font:500 .75rem var(--sans);color:var(--ink2);background:transparent;border:1px solid var(--line);
+  border-radius:999px;padding:.45rem .9rem;cursor:pointer}
+#calm:hover{color:var(--ink);border-color:var(--ink3)}
+
+.panel{position:fixed;z-index:3;left:clamp(20px,6vw,96px);
+  bottom:calc(env(safe-area-inset-bottom,0px) + clamp(40px,11vh,110px));
+  width:min(34rem,calc(100% - 40px));opacity:0;pointer-events:none}
+.fig{font:400 clamp(3.2rem,9vw,7.5rem)/.95 var(--serif);letter-spacing:-.01em;margin:0 0 1rem}
+.hd{font:400 clamp(1.25rem,2.1vw,1.75rem)/1.25 var(--serif);margin:0 0 .8rem;max-width:26em}
+.bd{font:300 1rem/1.65 var(--sans);color:var(--ink2);margin:0;max-width:28rem}
+.soon{margin:1.4rem 0 0;font:400 .8125rem/1.4 var(--sans);color:var(--ink3)}
+
+.hero{left:0;right:0;width:auto;bottom:auto;top:calc(env(safe-area-inset-top,0px) + 19vh);text-align:center;padding:0 20px}
+.hero h1{font:400 clamp(3.4rem,11vw,9.5rem)/.92 var(--serif);letter-spacing:-.015em;margin:0 0 1.3rem}
+.hero p{margin:0;font:300 1rem/1.6 var(--sans);color:var(--ink2)}
+.cue{display:block;width:1px;height:44px;margin:1.6rem auto 0;background:linear-gradient(var(--ink3),transparent)}
+.mid{left:0;right:0;width:auto;bottom:auto;top:calc(env(safe-area-inset-top,0px) + 22vh);text-align:center;padding:0 20px}
+.mid p{margin:0;font:italic 400 clamp(1.8rem,4.2vw,3.4rem)/1.1 var(--serif)}
+
+.ruler{position:fixed;z-index:2;right:clamp(18px,2.4vw,30px);top:50%;height:54vh;width:150px;transform:translateY(-50%);pointer-events:none}
+.ruler::before{content:"";position:absolute;right:0;top:0;bottom:0;width:1px;background:var(--line)}
+.tk{position:absolute;right:0;width:6px;height:1px;background:var(--ink3)}
+.tk.mj{width:12px;background:var(--ink2)}
+.tk em{position:absolute;right:18px;top:-6px;font:400 10px/12px var(--sans);font-style:normal;color:var(--ink3);font-variant-numeric:tabular-nums}
+.lm{position:absolute;right:58px;transform:translateY(50%);font:400 11px/1 var(--sans);color:var(--ink3);white-space:nowrap;transition:color .3s}
+.lm.on{color:var(--accent)}
+.mk{position:absolute;right:-5px;width:22px;height:2px;background:var(--accent);box-shadow:0 0 10px var(--accent);transform:translateY(50%)}
+
+.readout{position:fixed;z-index:2;right:clamp(18px,3vw,36px);bottom:calc(env(safe-area-inset-bottom,0px) + clamp(40px,11vh,110px));
+  text-align:right;font-size:.75rem;line-height:1.5;color:var(--ink3);max-width:15rem;pointer-events:none}
+.readout strong{display:block;font:400 1.6rem/1.1 var(--serif);color:var(--ink)}
+
+@media (max-width:720px){
+  .lm{display:none}
+  .ruler{width:60px;right:12px}
+  .tk em{right:16px}
+  .readout{bottom:auto;top:calc(env(safe-area-inset-top,0px) + 64px);right:18px}
+  .panel{left:20px;bottom:calc(env(safe-area-inset-bottom,0px) + 32px)}
+  .scrim{height:62vh}
+}
+@media (prefers-reduced-motion:reduce){*{scroll-behavior:auto!important}}
+</style>
+</head>
+<body>
+<canvas id="c" aria-hidden="true"></canvas>
+<div class="scrim"></div>
+
+<header class="nav">
+  <div class="logo"><b>Apeiron</b><span>ἄπειρον</span></div>
+  <div class="r"><span>prototipe</span><button id="calm" type="button" aria-pressed="false">Gerak penuh</button></div>
+</header>
+
+<aside class="ruler" id="ruler" aria-hidden="true"></aside>
+<div class="readout" aria-hidden="true">
+  Lebar layar<strong id="rv">2 m</strong><span id="rl"></span>
+</div>
+
+<main>
+  <section class="panel hero" data-r="0,0,0.05,0.09" aria-label="Pembuka">
+    <h1>Kamu ada di sini.</h1>
+    <p>Gulir pelan-pelan. Kita akan menjauh.</p>
+    <span class="cue"></span>
+  </section>
+
+  <section class="panel mid" data-r="0.09,0.12,0.15,0.19" aria-label="Transisi">
+    <p>Sekarang, kita naik.</p>
+  </section>
+
+  <section class="panel" data-r="0.26,0.30,0.36,0.40" aria-label="Bumi">
+    <p class="fig">12.742 km</p>
+    <h2 class="hd">Lebar Bumi. Seluruh dunia yang kamu kenal ada di permukaannya.</h2>
+    <p class="bd">Setiap kota, setiap lautan, setiap orang yang pernah hidup.</p>
+  </section>
+
+  <section class="panel" data-r="0.47,0.51,0.56,0.60" aria-label="Bulan">
+    <p class="fig">384.400 km</p>
+    <h2 class="hd">Jarak ke Bulan. Bumi sudah menjadi titik.</h2>
+    <p class="bd">Sekitar 30 kali lebar Bumi. Hanya dua belas manusia yang pernah berjalan di sana.</p>
+  </section>
+
+  <section class="panel" data-r="0.65,0.69,0.74,0.78" aria-label="Matahari">
+    <p class="fig">8:20</p>
+    <h2 class="hd">Menit dan detik yang dibutuhkan cahaya Matahari untuk sampai ke sini.</h2>
+    <p class="bd">Jaraknya sekitar 149,6 juta km, dan hampir seluruhnya hampa.</p>
+  </section>
+
+  <section class="panel" data-r="0.82,0.87,0.92,0.95" aria-label="Tata Surya">
+    <p class="fig">4,2 jam</p>
+    <h2 class="hd">Waktu tempuh cahaya dari Matahari ke Neptunus.</h2>
+    <p class="bd">Delapan planet, satu bintang, dan ruang kosong yang jauh lebih luas dari semuanya. Salah satu noktah itu adalah rumahmu.</p>
+  </section>
+
+  <section class="panel" data-r="0.95,0.98,1.1,1.2" aria-label="Berlanjut">
+    <p class="fig">4,2 tahun</p>
+    <h2 class="hd">Cahaya ke bintang terdekat, Proxima Centauri.</h2>
+    <p class="bd">Sekitar 4.400 kali lebar orbit Neptunus. Perjalanan ini baru dimulai.</p>
+    <p class="soon">Bagian berikutnya, bintang dan Bimasakti, menyusul.</p>
+  </section>
+</main>
+
+<div id="track"></div>
+<noscript><p style="position:fixed;inset:auto 20px 20px;color:#9A9CA6">Halaman ini membutuhkan JavaScript.</p></noscript>
+
+<script>
+(function(){
+'use strict';
+const TAU=Math.PI*2;
+const clamp=(x,a=0,b=1)=>x<a?a:x>b?b:x;
+const sm=(a,b,x)=>{const t=clamp((x-a)/(b-a));return t*t*(3-2*t)};
+const lerp=(a,b,t)=>a+(b-a)*t;
+
+/* Ukuran nyata, dalam meter */
+const AU=1.496e11, RE=6.371e6, RS=6.957e8, LM=3.844e8, RM=1.737e6, C=299792458;
+const ACC='#E8A15B';
+const PLANETS=[
+  {n:'Merkurius',a:5.79e10, r:2.44e6,ang:2.2},
+  {n:'Venus',    a:1.082e11,r:6.05e6,ang:4.1},
+  {n:'Mars',     a:2.279e11,r:3.39e6,ang:1.15},
+  {n:'Yupiter',  a:7.785e11,r:6.99e7,ang:2.65,lab:1},
+  {n:'Saturnus', a:1.434e12,r:5.82e7,ang:5.1, lab:1},
+  {n:'Uranus',   a:2.871e12,r:2.54e7,ang:0.6, lab:1},
+  {n:'Neptunus', a:4.495e12,r:2.46e7,ang:3.7, lab:1}
+];
+const ORBITS=[5.79e10,1.082e11,AU,2.279e11,7.785e11,1.434e12,2.871e12,4.495e12];
+
+/* Kanvas */
+const cv=document.getElementById('c'), ctx=cv.getContext('2d');
+let cw=0, ch=0;
+function resize(){
+  const d=Math.min(window.devicePixelRatio||1,2);
+  cw=cv.clientWidth; ch=cv.clientHeight;
+  cv.width=Math.round(cw*d); cv.height=Math.round(ch*d);
+  ctx.setTransform(d,0,0,d,0,0);
+}
+window.addEventListener('resize',resize); resize();
+
+/* Data acak yang stabil */
+function rng(a){return function(){a|=0;a=a+0x6D2B79F5|0;let t=Math.imul(a^a>>>15,1|a);t=t+Math.imul(t^t>>>7,61|t)^t;return((t^t>>>14)>>>0)/4294967296}}
+const R1=rng(42), stars=[];
+for(let i=0;i<460;i++){
+  const big=R1()<.07;
+  stars.push({x:R1(),y:R1(),s:big?1.6:(R1()<.5?1:.7),a:.25+R1()*.65,w:R1()<.06,sp:.4+R1()*1.6,ph:R1()*TAU});
+}
+const R2=rng(7), blobs=[];
+const BC=['rgba(110,140,115,.20)','rgba(110,140,115,.16)','rgba(235,240,255,.08)','rgba(8,16,34,.28)'];
+for(let i=0;i<80;i++){
+  const a=R2()*TAU, r=Math.sqrt(R2())*.92, rx=.04+R2()*.18;
+  blobs.push({x:Math.cos(a)*r,y:Math.sin(a)*r,rx:rx,ry:rx*(.35+R2()*.65),rot:R2()*Math.PI,c:BC[(R2()*BC.length)|0]});
+}
+
+/* Perjalanan: posisi scroll (0..1) -> eksponen skala (lebar layar = 10^e meter) */
+const KF=[[0,.3],[.07,.3],[.17,5.2],[.28,7.2],[.38,7.2],[.5,9.2],[.57,9.2],[.68,11.3],[.74,11.3],[.86,13.05],[1,13.05]];
+function expAt(p){
+  for(let i=0;i<KF.length-1;i++){
+    const p0=KF[i][0],e0=KF[i][1],p1=KF[i+1][0],e1=KF[i+1][1];
+    if(p<=p1){
+      const t=clamp((p-p0)/(p1-p0));
+      return e0+(e1-e0)*(t*.35+t*t*(3-2*t)*.65);
+    }
+  }
+  return KF[KF.length-1][1];
+}
+
+/* Panel teks */
+const panels=[].slice.call(document.querySelectorAll('.panel')).map(el=>({el:el,r:el.dataset.r.split(',').map(Number)}));
+function updatePanels(p){
+  panels.forEach(o=>{
+    const a=o.r[0],b=o.r[1],c=o.r[2],d=o.r[3];
+    let v=p<b?(b>a?(p-a)/(b-a):1):(p<=c?1:(d-p)/(d-c));
+    v=clamp(v);
+    o.el.style.opacity=v.toFixed(3);
+    o.el.setAttribute('aria-hidden',v<.05?'true':'false');
+  });
+}
+
+/* Penggaris skala */
+const ruler=document.getElementById('ruler');
+const SUPS='⁰¹²³⁴⁵⁶⁷⁸⁹', sup=n=>String(n).split('').map(d=>SUPS[+d]).join('');
+const LMK=[['manusia',.23],['Bumi',7.1],['orbit Bulan',8.89],['orbit Bumi',11.48],['orbit Neptunus',12.95]];
+(function(){
+  let h='';
+  for(let i=0;i<=14;i++){
+    h+='<span class="tk'+(i%2?'':' mj')+'" style="bottom:'+(i/14*100)+'%">'+(i%2?'':'<em>10'+sup(i)+'</em>')+'</span>';
+  }
+  LMK.forEach(m=>{h+='<span class="lm" data-e="'+m[1]+'" style="bottom:'+(m[1]/14*100)+'%">'+m[0]+'</span>'});
+  h+='<span class="mk" id="mk"></span>';
+  ruler.innerHTML=h;
+})();
+const mk=document.getElementById('mk'), lms=[].slice.call(ruler.querySelectorAll('.lm'));
+const rv=document.getElementById('rv'), rl=document.getElementById('rl');
+const nf=new Intl.NumberFormat('id-ID',{maximumFractionDigits:1});
+const nf0=new Intl.NumberFormat('id-ID',{maximumFractionDigits:0});
+function sig2(x){const m=Math.pow(10,Math.floor(Math.log10(x))-1);return Math.round(x/m)*m}
+function fmtLen(m){
+  m=sig2(m);
+  if(m<1000) return nf0.format(m)+' m';
+  const km=m/1000;
+  if(km<1e6) return nf0.format(km)+' km';
+  if(km<1e9) return nf.format(km/1e6)+' juta km';
+  return nf.format(km/1e9)+' miliar km';
+}
+function fmtTime(s){
+  if(s<1) return 'kurang dari 1 detik';
+  if(s<60) return nf0.format(Math.round(s))+' detik';
+  if(s<3600) return nf.format(Math.round(s/6)/10)+' menit';
+  return nf.format(Math.round(s/360)/10)+' jam';
+}
+
+/* Gerak tenang */
+const mq=window.matchMedia('(prefers-reduced-motion: reduce)');
+let calm=mq.matches;
+const calmBtn=document.getElementById('calm');
+function setCalm(v){calm=v;calmBtn.textContent=v?'Gerak tenang':'Gerak penuh';calmBtn.setAttribute('aria-pressed',v?'true':'false')}
+setCalm(calm);
+calmBtn.addEventListener('click',()=>setCalm(!calm));
+if(mq.addEventListener) mq.addEventListener('change',()=>setCalm(mq.matches));
+
+/* Gambar */
+function label(txt,x,y,a,col,align){
+  if(a<.02) return;
+  ctx.globalAlpha=a; ctx.fillStyle=col||'#E8E4DC'; ctx.textAlign=align||'left';
+  ctx.fillText(txt,x,y); ctx.globalAlpha=1;
+}
+
+function render(p,t){
+  const e=expAt(p), W=Math.pow(10,e), S=Math.min(cw,ch), ppm=S/W;
+
+  /* kamera */
+  const a=.08-.30*sm(3,7,e);
+  let camy=Math.max(0,RE+a*W)*(1-sm(6.5,7.2,e));
+  const mO=sm(8,9.2,e)*(1-sm(9.2,10.4,e));
+  const t1=sm(9.6,11.3,e), t2=sm(11.3,13.05,e);
+  const camx=AU*(1-.5*t1-.5*t2)+1.6e8*mO;
+  camy+=6e7*mO-.08*W*sm(6.8,7.4,e);
+  const P=(wx,wy)=>[cw/2+(wx-camx)*ppm, ch/2-(wy-camy)*ppm];
+
+  const sp=P(0,0), ep=P(AU,0), yp=P(AU,RE);
+  const sx=sp[0], sy=sp[1], ex=ep[0], ey=ep[1], yx=yp[0], yy=yp[1];
+  const Rpx=RE*ppm;
+
+  ctx.fillStyle='#05060A'; ctx.fillRect(0,0,cw,ch);
+  ctx.font='11px Inter, system-ui, sans-serif'; ctx.textBaseline='alphabetic';
+  if('letterSpacing' in ctx) ctx.letterSpacing='.2px';
+
+  /* bintang latar */
+  const zf=clamp(1+(7-e)*.012,.9,1.08), sa=.55+.45*sm(3,5.5,e);
+  for(let i=0;i<stars.length;i++){
+    const s=stars[i];
+    let al=s.a*sa; if(!calm) al*=.75+.25*Math.sin(t*s.sp+s.ph);
+    ctx.globalAlpha=al; ctx.fillStyle=s.w?'#F3C99A':'#E8E4DC';
+    ctx.fillRect(cw/2+(s.x-.5)*cw*zf, ch/2+(s.y-.5)*ch*zf, s.s, s.s);
+  }
+  ctx.globalAlpha=1;
+
+  /* cahaya langit dekat cakrawala */
+  const skyA=(1-sm(2,5.5,e))*.3;
+  if(skyA>.003){
+    const g=ctx.createLinearGradient(0,yy-.5*S,0,yy);
+    g.addColorStop(0,'rgba(40,70,130,0)'); g.addColorStop(1,'rgba(70,110,190,'+skyA+')');
+    ctx.fillStyle=g; ctx.fillRect(0,yy-.5*S,cw,.5*S);
+  }
+
+  /* Matahari */
+  const sunA=sm(10,10.8,e);
+  if(sunA>.01){
+    const rc=Math.max(RS*ppm,1.8), rg=rc*3.5+14;
+    ctx.save(); ctx.globalAlpha=sunA;
+    const g=ctx.createRadialGradient(sx,sy,0,sx,sy,rg);
+    g.addColorStop(0,'rgba(255,241,218,1)'); g.addColorStop(.18,'rgba(232,161,91,.85)'); g.addColorStop(1,'rgba(232,161,91,0)');
+    ctx.fillStyle=g; ctx.beginPath(); ctx.arc(sx,sy,rg,0,TAU); ctx.fill();
+    ctx.fillStyle='#FFF1DA'; ctx.beginPath(); ctx.arc(sx,sy,rc,0,TAU); ctx.fill();
+    ctx.restore();
+  }
+
+  /* orbit dan planet */
+  const orbA=.11*sm(11,12,e);
+  if(orbA>.004){
+    ctx.strokeStyle='rgba(232,228,220,'+orbA+')'; ctx.lineWidth=1;
+    for(let i=0;i<ORBITS.length;i++){
+      const r=ORBITS[i]*ppm; if(r<4||r>8000) continue;
+      ctx.beginPath(); ctx.arc(sx,sy,r,0,TAU); ctx.stroke();
+    }
+  }
+  const plA=sm(11.6,12.4,e);
+  if(plA>.01){
+    for(let i=0;i<PLANETS.length;i++){
+      const pl=PLANETS[i], q=P(pl.a*Math.cos(pl.ang),pl.a*Math.sin(pl.ang));
+      ctx.globalAlpha=plA*.9; ctx.fillStyle='#CFCBC2';
+      ctx.beginPath(); ctx.arc(q[0],q[1],Math.max(pl.r*ppm,1.3),0,TAU); ctx.fill();
+      if(pl.lab) label(pl.n,q[0]+7,q[1]-7,plA*.8,'#9A9CA6');
+    }
+    ctx.globalAlpha=1;
+  }
+
+  /* garis Matahari-Bumi dan denyut cahaya */
+  const lnA=sm(10.3,11,e)*(1-sm(12.3,13,e));
+  if(lnA>.01){
+    ctx.save(); ctx.strokeStyle='rgba(232,161,91,'+(.4*lnA)+')'; ctx.lineWidth=1; ctx.setLineDash([2,5]);
+    ctx.beginPath(); ctx.moveTo(sx,sy); ctx.lineTo(ex,ey); ctx.stroke(); ctx.restore();
+    if(!calm){
+      const f=(t*.16)%1, px=lerp(sx,ex,f), py=lerp(sy,ey,f);
+      ctx.save(); ctx.globalAlpha=lnA; ctx.shadowColor=ACC; ctx.shadowBlur=14; ctx.fillStyle='#FFE7C2';
+      ctx.beginPath(); ctx.arc(px,py,2.4,0,TAU); ctx.fill(); ctx.restore();
+    }
+    const mx=(sx+ex)/2, my=(sy+ey)/2;
+    label('149,6 juta km',mx,my-12,lnA*.9,'#9A9CA6','center');
+    label('cahaya: 8 menit 20 detik',mx,my+20,lnA*.9,ACC,'center');
+  }
+
+  /* Bulan */
+  const mA=sm(8,8.6,e)*(1-sm(10,10.8,e));
+  if(mA>.01){
+    const mp=P(AU+LM*Math.cos(.35),LM*Math.sin(.35)), mr=LM*ppm;
+    if(mr<20000){
+      ctx.strokeStyle='rgba(232,228,220,'+(.14*mA)+')'; ctx.lineWidth=1;
+      ctx.beginPath(); ctx.arc(ex,ey,mr,0,TAU); ctx.stroke();
+    }
+    ctx.save(); ctx.strokeStyle='rgba(232,228,220,'+(.28*mA)+')'; ctx.setLineDash([2,5]);
+    ctx.beginPath(); ctx.moveTo(ex,ey); ctx.lineTo(mp[0],mp[1]); ctx.stroke(); ctx.restore();
+    ctx.globalAlpha=mA; ctx.fillStyle='#CFCBC2';
+    ctx.beginPath(); ctx.arc(mp[0],mp[1],Math.max(RM*ppm,1.7),0,TAU); ctx.fill(); ctx.globalAlpha=1;
+    label('Bulan',mp[0]+9,mp[1]-8,mA*.9);
+    label('384.400 km',(ex+mp[0])/2,(ey+mp[1])/2-10,mA*.8,'#9A9CA6','center');
+  }
+
+  /* Bumi */
+  function topPath(){
+    const x0=-20,x1=cw+20,n=64;
+    ctx.beginPath();
+    for(let i=0;i<=n;i++){
+      const x=x0+(x1-x0)*i/n, dx=x-ex;
+      const y=yy+dx*dx/(Rpx+Math.sqrt(Math.max(0,Rpx*Rpx-dx*dx)));
+      if(i) ctx.lineTo(x,y); else ctx.moveTo(x,y);
+    }
+  }
+  if(Rpx<1.6){
+    ctx.fillStyle='#8FB0E8'; ctx.beginPath(); ctx.arc(ex,ey,1.6,0,TAU); ctx.fill();
+  }else{
+    const disc=Rpx<2000;
+    ctx.save();
+    if(disc){
+      const g=ctx.createLinearGradient(0,ey-Rpx,0,ey+Rpx);
+      g.addColorStop(0,'#14213a'); g.addColorStop(1,'#05070d');
+      ctx.fillStyle=g; ctx.beginPath(); ctx.arc(ex,ey,Rpx,0,TAU); ctx.fill();
+      if(Rpx>60){
+        const f=clamp((2000-Rpx)/1200);
+        ctx.save(); ctx.beginPath(); ctx.arc(ex,ey,Rpx,0,TAU); ctx.clip(); ctx.globalAlpha=f;
+        for(let i=0;i<blobs.length;i++){
+          const b=blobs[i]; ctx.fillStyle=b.c; ctx.beginPath();
+          ctx.ellipse(ex+b.x*Rpx,ey+b.y*Rpx,b.rx*Rpx,b.ry*Rpx,b.rot,0,TAU); ctx.fill();
+        }
+        ctx.strokeStyle='rgba(180,205,255,.08)'; ctx.lineWidth=1;
+        for(let l=-60;l<=60;l+=30){
+          const rad=l*Math.PI/180, rx=Rpx*Math.cos(rad);
+          ctx.beginPath(); ctx.ellipse(ex,ey-Rpx*Math.sin(rad),rx,rx*.22,0,0,Math.PI); ctx.stroke();
+        }
+        for(let m=0;m<6;m++){
+          ctx.beginPath(); ctx.ellipse(ex,ey,Rpx*Math.abs(Math.cos(m*Math.PI/6)),Rpx,0,0,TAU); ctx.stroke();
+        }
+        const tg=ctx.createLinearGradient(ex-Rpx,0,ex+Rpx,0);
+        tg.addColorStop(0,'rgba(5,6,10,0)'); tg.addColorStop(.45,'rgba(5,6,10,.15)'); tg.addColorStop(1,'rgba(5,6,10,.88)');
+        ctx.fillStyle=tg; ctx.fillRect(ex-Rpx,ey-Rpx,2*Rpx,2*Rpx);
+        ctx.restore();
+      }
+      ctx.shadowColor='rgba(120,165,240,.6)'; ctx.shadowBlur=Math.min(18,6+Rpx*.02);
+      ctx.strokeStyle='rgba(150,185,245,.55)'; ctx.lineWidth=1.2;
+      ctx.beginPath(); ctx.arc(ex,ey,Rpx,0,TAU); ctx.stroke();
+    }else{
+      const g=ctx.createLinearGradient(0,yy,0,yy+.6*S);
+      g.addColorStop(0,'#14213a'); g.addColorStop(1,'#05070d');
+      topPath(); ctx.lineTo(cw+20,ch+40); ctx.lineTo(-20,ch+40); ctx.closePath();
+      ctx.fillStyle=g; ctx.fill();
+      ctx.shadowColor='rgba(120,165,240,.6)'; ctx.shadowBlur=14;
+      ctx.strokeStyle='rgba(150,185,245,.55)'; ctx.lineWidth=1.2;
+      topPath(); ctx.stroke();
+    }
+    ctx.restore();
+  }
+  label('Bumi',ex,ey+Math.max(Rpx,3)+18,sm(8.3,8.9,e)*(1-sm(10,10.8,e))*.9,'#E8E4DC','center');
+
+  /* penanda "kamu" */
+  const k=sm(7.4,8.4,e), ph=(t*.45)%1;
+  if(k<.98){
+    ctx.save(); ctx.globalAlpha=1-k;
+    ctx.shadowColor=ACC; ctx.shadowBlur=12; ctx.fillStyle=ACC;
+    ctx.beginPath(); ctx.arc(yx,yy,3,0,TAU); ctx.fill(); ctx.shadowBlur=0;
+    if(!calm){
+      ctx.strokeStyle='rgba(232,161,91,'+(.5*(1-ph))+')'; ctx.lineWidth=1;
+      ctx.beginPath(); ctx.arc(yx,yy,3+ph*16,0,TAU); ctx.stroke();
+    }
+    ctx.restore();
+  }
+  if(k>.02){
+    ctx.save(); ctx.globalAlpha=k; ctx.strokeStyle=ACC; ctx.lineWidth=1.2;
+    ctx.beginPath(); ctx.arc(ex,ey,8,0,TAU); ctx.stroke();
+    if(!calm){
+      ctx.strokeStyle='rgba(232,161,91,'+(.45*(1-ph))+')';
+      ctx.beginPath(); ctx.arc(ex,ey,8+ph*18,0,TAU); ctx.stroke();
+    }
+    ctx.restore();
+  }
+  label('kamu di sini',yx+12,yy+4,sm(4.6,5.6,e)*(1-sm(7.7,8.3,e)),ACC);
+  const a2=sm(11.9,12.6,e);
+  if(a2>.02){
+    ctx.save(); ctx.globalAlpha=a2*.7; ctx.strokeStyle=ACC; ctx.lineWidth=1;
+    ctx.beginPath(); ctx.moveTo(ex+6,ey+6); ctx.lineTo(ex+30,ey+30); ctx.stroke(); ctx.restore();
+    label('Bumi, kamu di sini',ex+34,ey+34,a2,ACC);
+  }
+  label('Matahari',sx,sy-(Math.max(RS*ppm,1.8)*3.5+22),sm(10.3,11,e)*(1-sm(12.2,12.9,e))*.9,'#E8E4DC','center');
+
+  /* penggaris dan keterangan skala */
+  mk.style.bottom=(e/14*100)+'%';
+  lms.forEach(el=>el.classList.toggle('on',Math.abs(+el.dataset.e-e)<.8));
+  const v='≈ '+fmtLen(W);
+  if(rv.textContent!==v) rv.textContent=v;
+  const l='Cahaya menyeberanginya dalam '+fmtTime(W/C);
+  if(rl.textContent!==l) rl.textContent=l;
+}
+
+/* Loop */
+let cur=0, last=performance.now();
+function frame(now){
+  const dt=Math.min(.05,(now-last)/1000); last=now;
+  const max=document.documentElement.scrollHeight-window.innerHeight;
+  const target=max>0?clamp(window.scrollY/max):0;
+  cur=calm?target:cur+(target-cur)*(1-Math.exp(-dt*6));
+  updatePanels(cur);
+  render(cur,now/1000);
+  requestAnimationFrame(frame);
+}
+requestAnimationFrame(frame);
+})();
+</script>
+</body>
+</html>
