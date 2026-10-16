@@ -199,6 +199,73 @@ export const en = {
         "Rotation curve: a galaxy's speed with distance, the clue dark matter explains.",
       ],
     },
+    planet: {
+      heading: "The planets",
+      intro:
+        "The eight worlds bound to our Sun, each with its own size, distance, and pace.",
+      backToExplore: "Back to Explore",
+      facts: "Key numbers",
+      narrative: "About this world",
+      related: "Other planets",
+      allPlanets: "All planets",
+    },
+    planetMetrics: {
+      diameter: "Diameter",
+      distanceFromSun: "Distance from the Sun",
+      orbitalPeriod: "Orbital period",
+      meanTemp: "Mean temperature",
+      moons: "Known moons",
+    },
+    planets: {
+      mercury: {
+        name: "Mercury",
+        tagline: "The smallest planet, racing around the Sun in 88 days.",
+        narrative:
+          "Mercury has almost no atmosphere, so its surface swings from scorching day to freezing night. It is the closest planet to the Sun and the fastest to orbit it.",
+      },
+      venus: {
+        name: "Venus",
+        tagline: "Earth's twin in size, wrapped in a runaway greenhouse.",
+        narrative:
+          "A thick carbon-dioxide atmosphere traps heat, making Venus the hottest planet, hotter even than Mercury. It spins backwards, and one day lasts longer than its year.",
+      },
+      earth: {
+        name: "Earth",
+        tagline: "The only world known to hold liquid-water oceans and life.",
+        narrative:
+          "Earth sits in the zone where water stays liquid, with an atmosphere and a magnetic field that shield its surface. Its Moon steadies the tilt that gives us seasons.",
+      },
+      mars: {
+        name: "Mars",
+        tagline: "The red planet, rusted by iron dust and scarred by ancient water.",
+        narrative:
+          "Iron minerals in the soil oxidise to a rusty red. Dry riverbeds and polar ice hint at a wetter past, and two tiny moons, Phobos and Deimos, circle close to the surface.",
+      },
+      jupiter: {
+        name: "Jupiter",
+        tagline: "The giant of the Solar System, heavy enough to bend its neighbours.",
+        narrative:
+          "Jupiter is a ball of hydrogen and helium, banded by fast winds and a storm, the Great Red Spot, wider than Earth. Dozens of moons orbit it, four of them large and bright.",
+      },
+      saturn: {
+        name: "Saturn",
+        tagline: "A giant ringed by ice, the least dense planet of all.",
+        narrative:
+          "Saturn's rings are countless chunks of ice and rock, held in thin bands by gravity. The planet is so light for its size that it would float in water, and its moon Titan has a thick atmosphere.",
+      },
+      uranus: {
+        name: "Uranus",
+        tagline: "An ice giant tipped on its side, rolling around the Sun.",
+        narrative:
+          "Uranus orbits on a tilt of almost 98 degrees, likely knocked over by an ancient collision, so its poles take turns facing the Sun. Methane in its atmosphere gives it a pale blue-green colour.",
+      },
+      neptune: {
+        name: "Neptune",
+        tagline: "The farthest planet, windiest of them all.",
+        narrative:
+          "Neptune is a cold, blue ice giant where winds reach the fastest speeds in the Solar System. It was found by mathematics before it was seen, from the tug it pulled on Uranus.",
+      },
+    },
   },
   journey: {
     navLabel: "Journey stages",

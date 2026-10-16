@@ -201,6 +201,73 @@ export const id: Dictionary = {
         "Kurva rotasi: kecepatan galaksi terhadap jarak, petunjuk yang dijelaskan materi gelap.",
       ],
     },
+    planet: {
+      heading: "Planet-planet",
+      intro:
+        "Delapan dunia yang terikat pada Matahari kita, masing-masing dengan ukuran, jarak, dan kecepatannya sendiri.",
+      backToExplore: "Kembali ke Jelajah",
+      facts: "Angka kunci",
+      narrative: "Tentang dunia ini",
+      related: "Planet lain",
+      allPlanets: "Semua planet",
+    },
+    planetMetrics: {
+      diameter: "Diameter",
+      distanceFromSun: "Jarak dari Matahari",
+      orbitalPeriod: "Periode orbit",
+      meanTemp: "Suhu rata-rata",
+      moons: "Bulan yang diketahui",
+    },
+    planets: {
+      mercury: {
+        name: "Merkurius",
+        tagline: "Planet terkecil, mengelilingi Matahari dalam 88 hari.",
+        narrative:
+          "Merkurius hampir tak punya atmosfer, sehingga permukaannya berganti antara siang yang terik dan malam yang membeku. Ia planet terdekat dengan Matahari dan tercepat mengorbitnya.",
+      },
+      venus: {
+        name: "Venus",
+        tagline: "Kembaran Bumi dalam ukuran, terbungkus efek rumah kaca yang lepas kendali.",
+        narrative:
+          "Atmosfer karbon dioksida yang tebal memerangkap panas, menjadikan Venus planet terpanas, bahkan lebih panas dari Merkurius. Ia berputar terbalik, dan satu harinya lebih lama dari satu tahunnya.",
+      },
+      earth: {
+        name: "Bumi",
+        tagline: "Satu-satunya dunia yang diketahui memiliki samudra air cair dan kehidupan.",
+        narrative:
+          "Bumi berada di zona tempat air tetap cair, dengan atmosfer dan medan magnet yang melindungi permukaannya. Bulannya menstabilkan kemiringan yang memberi kita musim.",
+      },
+      mars: {
+        name: "Mars",
+        tagline: "Planet merah, berkarat oleh debu besi dan berbekas air purba.",
+        narrative:
+          "Mineral besi di tanahnya teroksidasi menjadi merah berkarat. Dasar sungai kering dan es di kutub memberi petunjuk masa lalu yang basah, dan dua bulan mungil, Phobos dan Deimos, mengorbit dekat permukaannya.",
+      },
+      jupiter: {
+        name: "Jupiter",
+        tagline: "Raksasa Tata Surya, cukup berat untuk membelokkan tetangganya.",
+        narrative:
+          "Jupiter adalah bola hidrogen dan helium, berbalut angin cepat dan sebuah badai, Bintik Merah Raksasa, yang lebih lebar dari Bumi. Puluhan bulan mengorbitnya, empat di antaranya besar dan terang.",
+      },
+      saturn: {
+        name: "Saturnus",
+        tagline: "Raksasa bercincin es, planet paling ringan dari semuanya.",
+        narrative:
+          "Cincin Saturnus adalah bongkahan es dan batu yang tak terhitung, tertahan gravitasi dalam pita tipis. Planetnya begitu ringan untuk ukurannya sehingga akan mengapung di air, dan bulannya Titan punya atmosfer tebal.",
+      },
+      uranus: {
+        name: "Uranus",
+        tagline: "Raksasa es yang miring ke samping, menggelinding mengelilingi Matahari.",
+        narrative:
+          "Uranus mengorbit dengan kemiringan hampir 98 derajat, kemungkinan terbalik karena tumbukan purba, sehingga kutubnya bergantian menghadap Matahari. Metana di atmosfernya memberinya warna hijau-biru pucat.",
+      },
+      neptune: {
+        name: "Neptunus",
+        tagline: "Planet terjauh, paling berangin dari semuanya.",
+        narrative:
+          "Neptunus adalah raksasa es biru yang dingin, tempat angin mencapai kecepatan tercepat di Tata Surya. Ia ditemukan lewat matematika sebelum terlihat, dari tarikan yang dilakukannya pada Uranus.",
+      },
+    },
   },
   journey: {
     navLabel: "Tahapan perjalanan",

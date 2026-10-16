@@ -2,6 +2,7 @@ import { describe, it, expect } from "vitest";
 import { LOCALES, DEFAULT_LOCALE } from "@/i18n/config";
 import { en } from "@/i18n/en";
 import { id } from "@/i18n/id";
+import { PLANETS } from "@/features/explorer/planets";
 
 describe("i18n", () => {
   it("has en and id with en as default", () => {
@@ -20,6 +21,27 @@ describe("i18n", () => {
   it("no dictionary value contains an em dash", () => {
     for (const dict of [en, id]) {
       expect(JSON.stringify(dict)).not.toContain("\u2014");
+    }
+  });
+});
+
+describe("planet copy", () => {
+  it("defines name, tagline, and narrative for every planet in both locales", () => {
+    const read = (dict: unknown, key: string) =>
+      key.split(".").reduce<unknown>(
+        (acc, part) =>
+          acc && typeof acc === "object" ? (acc as Record<string, unknown>)[part] : undefined,
+        dict,
+      );
+    for (const dict of [en, id]) {
+      for (const planet of PLANETS) {
+        for (const key of [planet.nameKey, planet.taglineKey, planet.narrativeKey]) {
+          expect(typeof read(dict, key), `${key}`).toBe("string");
+        }
+      }
+      for (const metricKey of ["diameter", "distanceFromSun", "orbitalPeriod", "meanTemp", "moons"]) {
+        expect(typeof read(dict, `explore.planetMetrics.${metricKey}`)).toBe("string");
+      }
     }
   });
 });
