@@ -39,5 +39,6 @@ export type AstronomySnapshot<T> = {
   retrievedAt: string;
   computedFor?: string;
   stale: boolean;
+  cacheHit?: boolean;
   attribution?: string;
 };

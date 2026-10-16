@@ -24,4 +24,26 @@ describe("cached", () => {
   it("throws when there is no cached fallback", async () => {
     await expect(cached("n", 0, async () => { throw new Error("x"); })).rejects.toThrow("x");
   });
+
+  it("marks the first fetch as a cache miss", async () => {
+    clearCache();
+    const snap = await cached("k", 1000, async () => "v");
+    expect(snap.cacheHit).toBe(false);
+  });
+  it("marks a served-from-store result as a cache hit", async () => {
+    clearCache();
+    await cached("k2", 1000, async () => "v");
+    let calls = 0;
+    const snap = await cached("k2", 1000, async () => { calls++; return "v2"; });
+    expect(snap.cacheHit).toBe(true);
+    expect(calls).toBe(0);
+  });
+  it("marks a stale fallback as a cache hit", async () => {
+    clearCache();
+    await cached("k3", 1, async () => "v");
+    await new Promise((r) => setTimeout(r, 5));
+    const snap = await cached("k3", 1, async () => { throw new Error("down"); });
+    expect(snap.cacheHit).toBe(true);
+    expect(snap.stale).toBe(true);
+  });
 });

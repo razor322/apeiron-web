@@ -18,16 +18,16 @@ export async function cached<T>(
   const entry = store.get(key);
 
   if (entry && now - entry.storedAt < ttlMs) {
-    return snapshot<T>(entry.data as T, entry.storedAt);
+    return { ...snapshot<T>(entry.data as T, entry.storedAt), cacheHit: true };
   }
 
   try {
     const data = await fetcher();
     store.set(key, { data, storedAt: Date.now() });
-    return snapshot(data, Date.now());
+    return { ...snapshot(data, Date.now()), cacheHit: false };
   } catch (err) {
     if (entry) {
-      return { ...snapshot<T>(entry.data as T, entry.storedAt), stale: true };
+      return { ...snapshot<T>(entry.data as T, entry.storedAt), stale: true, cacheHit: true };
     }
     throw err;
   }
