@@ -27,6 +27,97 @@ export const en = {
     apodLabel: "NASA APOD",
     apodUrl: "https://apod.nasa.gov",
   },
+  explore: {
+    heading: "Explore",
+    intro:
+      "Eight kinds of object, from the planet under your feet to the dark matter that holds the galaxies together.",
+    browse: "Browse categories",
+    detail: {
+      definition: "Definition",
+      facts: "Key numbers",
+      terms: "Terms",
+      related: "Related topics",
+      backToExplore: "Back to Explore",
+      notFoundTitle: "No such category",
+      notFoundHint: "That topic does not exist yet.",
+    },
+    categories: {
+      planet: {
+        name: "Planets",
+        summary:
+          "Worlds bound to a star: rocky, icy, or wrapped in gas, each one globed by its own gravity.",
+      },
+      star: {
+        name: "Stars",
+        summary:
+          "Self-luminous spheres of plasma that fuse hydrogen into light and hold whole planetary systems.",
+      },
+      "black-hole": {
+        name: "Black Holes",
+        summary:
+          "Regions where gravity collapses spacetime, so nothing, not even light, can climb back out.",
+      },
+      nebula: {
+        name: "Nebulae",
+        summary:
+          "Vast clouds of gas and dust, the cradles where stars are born and the shroud where they die.",
+      },
+      galaxy: {
+        name: "Galaxies",
+        summary:
+          "Gravitationally bound cities of stars, gas, and dark matter, turning slowly across millions of years.",
+      },
+      exoplanet: {
+        name: "Exoplanets",
+        summary:
+          "Planets orbiting stars other than the Sun, detected mostly by the shadow or tug they cast.",
+      },
+      "comet-asteroid": {
+        name: "Comets and Asteroids",
+        summary:
+          "Leftover debris from the formation of the Solar System, icy or rocky, tracing long orbits.",
+      },
+      "dark-matter": {
+        name: "Dark Matter",
+        summary:
+          "Unseen mass that shapes galaxies by gravity, inferred from how things move, never yet seen directly.",
+      },
+    },
+    terms: {
+      planet: [
+        "Orbit: the path a body takes around a star.",
+        "Terrestrial: a small, rocky planet like Earth or Mars.",
+      ],
+      star: [
+        "Fusion: the merging of atomic nuclei, the engine of every star.",
+        "Light-year: the distance light travels in one year.",
+      ],
+      "black-hole": [
+        "Event horizon: the boundary past which nothing can escape.",
+        "Singularity: the centre where our physics stops describing space.",
+      ],
+      nebula: [
+        "Interstellar medium: the gas and dust between the stars.",
+        "Emission nebula: gas that glows from the light of nearby stars.",
+      ],
+      galaxy: [
+        "Milky Way: the galaxy that contains the Sun and Earth.",
+        "Spiral arm: a dense wave of stars winding out from a galaxy's centre.",
+      ],
+      exoplanet: [
+        "Transit: a planet crossing its star, dimming it briefly.",
+        "Habitable zone: the orbital band where liquid water could exist.",
+      ],
+      "comet-asteroid": [
+        "Comet: an icy body that grows a glowing tail near the Sun.",
+        "Asteroid belt: the rocky ring between Mars and Jupiter.",
+      ],
+      "dark-matter": [
+        "Dark matter: mass that does not shine but bends light and gravity.",
+        "Rotation curve: a galaxy's speed with distance, the clue dark matter explains.",
+      ],
+    },
+  },
   journey: {
     navLabel: "Journey stages",
     rulerTitle: "Conceptual scale",
