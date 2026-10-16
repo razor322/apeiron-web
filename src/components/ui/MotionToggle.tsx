@@ -8,14 +8,18 @@ type MotionToggleProps = {
   dict: Dictionary;
 };
 
+const noopSubscribe = () => () => {};
+
 // A labelled button that flips between full and calm motion. It honors the OS
 // setting first: if the OS forces reduced motion, calm cannot be turned off, so
-// no dead control is shown.
+// no dead control is shown. The stored value lives only in the browser, so the
+// control renders only after hydration (useSyncExternalStore, no effect).
 export function MotionToggle({ dict }: MotionToggleProps) {
-  const wantsCalm = useSyncExternalStore(subscribeCalm, getCalm, () => false);
+  const hydrated = useSyncExternalStore(noopSubscribe, () => true, () => false);
+  const wantsCalm = useSyncExternalStore(subscribeCalm, getCalm, () => true);
   const prefersReduced = useSyncExternalStore(subscribeCalm, getReducedMotion, () => true);
 
-  if (prefersReduced) return null;
+  if (!hydrated || prefersReduced) return null;
 
   return (
     <button
