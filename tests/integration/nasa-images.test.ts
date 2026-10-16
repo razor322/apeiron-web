@@ -53,3 +53,19 @@ describe("searchNasaImage", () => {
     await expect(searchNasaImage("mars")).rejects.toThrow(/nasa_images_http_503/);
   });
 });
+
+describe("searchNasaImage logging", () => {
+  it("logs a cache miss then an ok event on first call, cache hit on second", async () => {
+    clearCache();
+    const info = vi.spyOn(console, "info").mockImplementation(() => {});
+    vi.stubGlobal("fetch", vi.fn().mockResolvedValue({
+      ok: true, status: 200, headers: new Headers(), json: async () => valid,
+    }));
+    await searchNasaImage("mars");
+    await searchNasaImage("mars");
+    const lines = info.mock.calls.map((c) => String(c[0]));
+    expect(lines.some((l) => l.includes("cache_miss"))).toBe(true);
+    expect(lines.some((l) => l.includes("cache_hit"))).toBe(true);
+    expect(lines.some((l) => l.includes("ms="))).toBe(true);
+  });
+});
