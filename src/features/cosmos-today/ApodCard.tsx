@@ -34,6 +34,12 @@ export function ApodCard({ snapshot, dict }: ApodCardProps) {
 
       <Heading level={2}>{data.title}</Heading>
 
+      {data.explanation ? (
+        <p className="max-w-prose font-sans text-base leading-relaxed text-starlight">
+          {data.explanation}
+        </p>
+      ) : null}
+
       <Label>
         {dict.cosmosToday.retrievedOn} {retrieved}
       </Label>

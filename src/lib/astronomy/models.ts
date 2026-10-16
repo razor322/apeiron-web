@@ -27,6 +27,7 @@ export type AstronomyMedia = {
   credit?: string;
   rightsNote?: string;
   altText: string;
+  explanation?: string;
   publishedAt?: string;
   retrievedAt: string;
 };

@@ -30,6 +30,7 @@ async function fetchRaw(): Promise<AstronomyMedia> {
     sourceUrl: parsed.hdurl ?? parsed.url,
     credit: parsed.copyright,
     altText: parsed.title,
+    explanation: parsed.explanation,
     publishedAt: parsed.date,
     retrievedAt: new Date().toISOString(),
   };

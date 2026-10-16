@@ -19,6 +19,7 @@ const media = {
   sourceUrl: "https://apod.nasa.gov",
   credit: "Jane Doe",
   altText: "Galaksi Andromeda",
+  explanation: "A spiral galaxy seen edge-on.",
   publishedAt: "2026-10-14",
   retrievedAt: "2026-10-14T06:00:00Z",
 };
@@ -42,6 +43,11 @@ describe("ApodCard", () => {
   it("shows a stale notice when the snapshot is stale", () => {
     render(<ApodCard snapshot={{ ...snap, stale: true }} dict={en} />);
     expect(screen.getByText(/stored data/i)).toBeInTheDocument();
+  });
+
+  it("renders the explanation when present", () => {
+    render(<ApodCard snapshot={snap} dict={en} />);
+    expect(screen.getByText("A spiral galaxy seen edge-on.")).toBeInTheDocument();
   });
 
   it("renders an img for image media", () => {

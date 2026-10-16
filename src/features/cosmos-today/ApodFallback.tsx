@@ -10,11 +10,7 @@ export function ApodFallback({ dict }: ApodFallbackProps) {
   return (
     <div className="flex flex-col gap-4">
       <ErrorState title={dict.cosmosToday.loadError} />
-      <SourceLink
-        name={dict.cosmosToday.apodLabel}
-        url={dict.cosmosToday.apodUrl}
-        label={dict.cosmosToday.apodLabel}
-      />
+      <SourceLink name={dict.cosmosToday.apodLabel} url={dict.cosmosToday.apodUrl} />
     </div>
   );
 }
