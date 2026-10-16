@@ -90,14 +90,86 @@ const ALL_STARS = Array.from({ length: 460 }, () => {
   };
 });
 
+// Surface blobs for the Earth disc: continents, cloud banks, and a few dark
+// ocean patches, all seeded so the planet is the same every render. Placed in a
+// unit disc (x,y in [-1,1]) and scaled to the drawn radius.
+const BLOB_COLORS = [
+  "rgba(110,140,115,0.20)",
+  "rgba(110,140,115,0.16)",
+  "rgba(235,240,255,0.08)",
+  "rgba(8,16,34,0.28)",
+];
+const rngBlobs = seeded(7);
+const ALL_BLOBS = Array.from({ length: 80 }, () => {
+  const angle = rngBlobs() * TAU;
+  const dist = Math.sqrt(rngBlobs()) * 0.92;
+  const rx = 0.04 + rngBlobs() * 0.18;
+  return {
+    x: Math.cos(angle) * dist,
+    y: Math.sin(angle) * dist,
+    rx,
+    ry: rx * (0.35 + rngBlobs() * 0.65),
+    rot: rngBlobs() * Math.PI,
+    c: BLOB_COLORS[(rngBlobs() * BLOB_COLORS.length) | 0]!,
+  };
+});
+
+// Deep-field galaxies for the observable-universe stage: a separate seeded set
+// (sharp points and faint smudges), independent of the star field.
+const rngGalaxies = seeded(1234);
+const GALAXY_TINTS = [
+  "rgba(255,244,222,0.9)",
+  "rgba(255,225,190,0.85)",
+  "rgba(210,220,255,0.8)",
+  "rgba(235,235,245,0.75)",
+];
+const ALL_GALAXIES = Array.from({ length: 260 }, () => {
+  const blur = rngGalaxies() < 0.35;
+  return {
+    x: rngGalaxies(),
+    y: rngGalaxies(),
+    r: blur ? 2.2 + rngGalaxies() * 3.2 : 0.7 + rngGalaxies() * 1.1,
+    a: blur ? 0.16 + rngGalaxies() * 0.22 : 0.5 + rngGalaxies() * 0.5,
+    smudge: blur,
+    tint: GALAXY_TINTS[(rngGalaxies() * GALAXY_TINTS.length) | 0]!,
+  };
+});
+
+// Static stars for the Milky Way arms, seeded once so the galaxy is stable
+// (unit space along a log spiral; scaled and tilted at draw time). Four arms:
+// two major, two minor.
+type ArmStar = { arm: number; u: number; ang: number; spread: number; size: number; warm: boolean; bright: number };
+const rngArms = seeded(99);
+const ARM_COUNT = 4;
+const ALL_ARM_STARS: ArmStar[] = Array.from({ length: 1400 }, () => {
+  const arm = (rngArms() * ARM_COUNT) | 0;
+  const u = rngArms();
+  return {
+    arm,
+    u,
+    ang: rngArms(),
+    spread: rngArms() - 0.5,
+    size: 0.6 + rngArms() * 1.5,
+    warm: rngArms() < 0.4,
+    bright: 0.28 + rngArms() * 0.5,
+  };
+});
+
 // Adaptive quality: weak devices (<=4 cores) and narrow viewports draw fewer
-// stars at lower device pixel ratio. One factor, one place to tune it.
-function quality(): { dprCap: number; stars: number } {
+// stars, blobs, and galaxies at lower device pixel ratio. One factor, one place.
+function quality(): { dprCap: number; stars: number; blobs: number; galaxies: number; arms: number } {
   const cores = typeof navigator !== "undefined" ? navigator.hardwareConcurrency : undefined;
   const weak = typeof cores === "number" && cores <= 4;
   const narrow = typeof window !== "undefined" && window.innerWidth < 768;
-  if (weak || narrow) return { dprCap: 1, stars: 240 };
-  return { dprCap: 2, stars: ALL_STARS.length };
+  if (weak || narrow)
+    return { dprCap: 1, stars: 240, blobs: 44, galaxies: 150, arms: 260 };
+  return {
+    dprCap: 2,
+    stars: ALL_STARS.length,
+    blobs: ALL_BLOBS.length,
+    galaxies: ALL_GALAXIES.length,
+    arms: 420,
+  };
 }
 
 export function createScene(canvas: HTMLCanvasElement): SceneHandle {
@@ -111,6 +183,9 @@ export function createScene(canvas: HTMLCanvasElement): SceneHandle {
 
   const q = quality();
   const STARS = ALL_STARS.slice(0, q.stars);
+  const BLOBS = ALL_BLOBS.slice(0, q.blobs);
+  const GALAXIES = ALL_GALAXIES.slice(0, q.galaxies);
+  const ARM_STARS = ALL_ARM_STARS.slice(0, q.arms);
 
   let cw = 0;
   let ch = 0;
@@ -185,16 +260,17 @@ export function createScene(canvas: HTMLCanvasElement): SceneHandle {
     }
     ctx.globalAlpha = 1;
 
-    // Milky Way: a barred spiral seen at a tilt. It materialises as the zoom
-    // leaves the Sun behind (e ~18), swells to fill the frame, then recedes into
-    // the deep-field of galaxies. Drawn before the sky glow so the horizon never
-    // competes with it, and it is absent at small e.
+    // Milky Way: a barred spiral seen at a tilt, the way a real galaxy photo
+    // reads: a warm core, arms drawn as bands of stars (not wire), dark dust
+    // lanes on the inner edge of each arm. It materialises as the zoom leaves the
+    // Sun behind (e ~18), swells to fill the frame, then recedes into the
+    // deep-field of galaxies.
     const gwA = smooth(17.5, 20, e) * (1 - smooth(24.5, 27, e));
     if (gwA > 0.01) {
-      const R = Math.max(1.2e21, 1e21) * ppm * 0.5;
+      const R = 1.2e21 * ppm * 0.55;
       const gx = cw / 2;
       const gy = ch / 2;
-      const tilt = 0.32 + 0.35 * smooth(20, 24, e);
+      const tilt = 0.34 + 0.33 * smooth(20, 24, e);
       const spin = (t * 0.02) % TAU;
 
       ctx.save();
@@ -202,67 +278,96 @@ export function createScene(canvas: HTMLCanvasElement): SceneHandle {
       ctx.translate(gx, gy);
       ctx.rotate(spin);
 
-      // Central bulge: warm haze.
-      const bg = ctx.createRadialGradient(0, 0, 0, 0, 0, Math.max(R * 0.5, 30));
-      bg.addColorStop(0, "rgba(255,236,201,0.9)");
-      bg.addColorStop(0.35, "rgba(232,161,91,0.35)");
-      bg.addColorStop(1, "rgba(232,161,91,0)");
-      ctx.fillStyle = bg;
+      // Outer halo: a soft ellipse of faint light under everything.
+      const halo = ctx.createRadialGradient(0, 0, 0, 0, 0, Math.max(R, 24));
+      halo.addColorStop(0, "rgba(210,215,240,0.16)");
+      halo.addColorStop(0.55, "rgba(180,195,235,0.06)");
+      halo.addColorStop(1, "rgba(180,195,235,0)");
+      ctx.fillStyle = halo;
       ctx.beginPath();
-      ctx.ellipse(0, 0, Math.max(R * 0.5, 30), Math.max(R * 0.5 * tilt, 12), 0, 0, TAU);
+      ctx.ellipse(0, 0, Math.max(R, 24), Math.max(R * tilt, 16), 0, 0, TAU);
       ctx.fill();
 
-      // Spiral arms: a few logarithmic arcs of stars.
-      const arms = 2;
-      for (let arm = 0; arm < arms; arm++) {
-        const base = (arm / arms) * TAU;
+      // Arms: two main + two minor, each a band of stars along a log spiral.
+      const armStars = ARM_STARS;
+      for (const st of armStars) {
+        const major = st.arm < 2;
+        const base = (st.arm / ARM_COUNT) * TAU;
+        const reach = major ? R : R * 0.72;
+        const twist = major ? 3.4 : 3.0;
+        const r = st.u * reach;
+        const ang = base + st.u * twist + (st.ang - 0.5) * 0.18;
+        const spread = st.spread * (0.06 + st.u * 0.14) * reach;
+        const x = Math.cos(ang) * r + spread * Math.cos(ang + Math.PI / 2);
+        const y = (Math.sin(ang) * r + spread * Math.sin(ang + Math.PI / 2)) * tilt;
+        ctx.globalAlpha = gwA * st.bright * (major ? 1 : 0.7);
+        ctx.fillStyle = st.warm ? "rgba(255,235,205,0.95)" : "rgba(224,228,245,0.9)";
+        ctx.fillRect(x, y, st.size, st.size);
+      }
+      ctx.globalAlpha = gwA;
+
+      // Dust lanes: dark bands along the inner edge of each main arm.
+      for (let arm = 0; arm < 2; arm++) {
+        const base = (arm / 2) * TAU;
         ctx.beginPath();
-        for (let i = 0; i <= 60; i++) {
-          const u = i / 60;
-          const r = u * R;
-          const ang = base + u * 3.2;
+        for (let i = 0; i <= 48; i++) {
+          const u = i / 48;
+          const r = u * R * 0.92;
+          const ang = base + u * 3.4 - 0.22;
           const x = Math.cos(ang) * r;
           const y = Math.sin(ang) * r * tilt;
           if (i) ctx.lineTo(x, y);
           else ctx.moveTo(x, y);
         }
-        ctx.strokeStyle = "rgba(232,228,220,0.28)";
-        ctx.lineWidth = Math.max(1, R * 0.02);
+        ctx.strokeStyle = "rgba(5,6,10,0.5)";
+        ctx.lineWidth = Math.max(1.4, R * 0.05);
         ctx.stroke();
       }
 
-      // Star dust across the disc.
-      const dust = ctx.createRadialGradient(0, 0, 0, 0, 0, Math.max(R, 20));
-      dust.addColorStop(0, "rgba(220,225,240,0.18)");
-      dust.addColorStop(0.6, "rgba(180,195,235,0.08)");
-      dust.addColorStop(1, "rgba(180,195,235,0)");
-      ctx.fillStyle = dust;
+      // Core: a bright warm bulge over the arm roots.
+      const bulgeR = Math.max(R * 0.34, 22);
+      const bg = ctx.createRadialGradient(0, 0, 0, 0, 0, bulgeR);
+      bg.addColorStop(0, "rgba(255,244,224,0.95)");
+      bg.addColorStop(0.3, "rgba(255,214,150,0.6)");
+      bg.addColorStop(0.7, "rgba(232,161,91,0.22)");
+      bg.addColorStop(1, "rgba(232,161,91,0)");
+      ctx.fillStyle = bg;
       ctx.beginPath();
-      ctx.ellipse(0, 0, Math.max(R, 20), Math.max(R * tilt, 14), 0, 0, TAU);
+      ctx.ellipse(0, 0, bulgeR, bulgeR * (tilt + 0.2), 0, 0, TAU);
       ctx.fill();
 
       ctx.restore();
     }
 
-    // Observable universe: the deep field. A scatter of distant galaxies that
-    // grows as the Milky Way recedes, using the same seeded field so it is stable.
-    const unA = smooth(24, 26.5, e);
+    // Observable universe: the deep field. A dense scatter of distant galaxies
+    // (sharp points plus faint smudges) with a light clustering, so it reads as
+    // the cosmic web rather than a thin sprinkle of dots.
+    const unA = smooth(23.5, 26.5, e);
     if (unA > 0.01) {
       ctx.save();
       ctx.globalAlpha = unA;
-      for (const s of STARS) {
-        if (s.s < 1.4) continue;
-        const x = cw / 2 + (s.x - 0.5) * cw * 1.15;
-        const y = ch / 2 + (s.y - 0.5) * ch * 1.15;
-        const r = 1.2 + s.a * 1.8;
-        const g = ctx.createRadialGradient(x, y, 0, x, y, r * 4);
-        g.addColorStop(0, "rgba(255,244,222,0.9)");
-        g.addColorStop(0.4, "rgba(210,205,235,0.25)");
-        g.addColorStop(1, "rgba(210,205,235,0)");
-        ctx.fillStyle = g;
-        ctx.beginPath();
-        ctx.arc(x, y, r * 4, 0, TAU);
-        ctx.fill();
+      for (const gl of GALAXIES) {
+        // Cluster: pull points toward a few gentle sinusoid bands.
+        const cx = gl.x + 0.04 * Math.sin(gl.y * 9 + 1.3);
+        const cy = gl.y + 0.04 * Math.cos(gl.x * 7 + 0.4);
+        const x = cw / 2 + (cx - 0.5) * cw * 1.2;
+        const y = ch / 2 + (cy - 0.5) * ch * 1.2;
+        if (gl.smudge) {
+          const g = ctx.createRadialGradient(x, y, 0, x, y, gl.r * 3);
+          g.addColorStop(0, gl.tint);
+          g.addColorStop(1, "rgba(210,205,235,0)");
+          ctx.globalAlpha = unA * gl.a;
+          ctx.fillStyle = g;
+          ctx.beginPath();
+          ctx.ellipse(x, y, gl.r * 1.6, gl.r, 0.6, 0, TAU);
+          ctx.fill();
+        } else {
+          ctx.globalAlpha = unA * gl.a;
+          ctx.fillStyle = gl.tint;
+          ctx.beginPath();
+          ctx.arc(x, y, gl.r, 0, TAU);
+          ctx.fill();
+        }
       }
       ctx.restore();
     }
@@ -395,11 +500,56 @@ export function createScene(canvas: HTMLCanvasElement): SceneHandle {
       ctx.beginPath();
       ctx.arc(ex, ey, Rpx, 0, TAU);
       ctx.fill();
+
+      // Surface detail: continents and cloud banks clipped to the disc, plus a
+      // faint latitude/longitude graticule, so Earth reads as a world and not a
+      // plain blue dot. Only drawn once the disc is big enough to show it.
+      if (Rpx > 60) {
+        const f = clamp((2000 - Rpx) / 1200);
+        ctx.save();
+        ctx.beginPath();
+        ctx.arc(ex, ey, Rpx, 0, TAU);
+        ctx.clip();
+        ctx.globalAlpha = f;
+        for (const b of BLOBS) {
+          ctx.fillStyle = b.c;
+          ctx.beginPath();
+          ctx.ellipse(ex + b.x * Rpx, ey + b.y * Rpx, b.rx * Rpx, b.ry * Rpx, b.rot, 0, TAU);
+          ctx.fill();
+        }
+        ctx.strokeStyle = "rgba(180,205,255,0.08)";
+        ctx.lineWidth = 1;
+        for (let l = -60; l <= 60; l += 30) {
+          const rad = (l * Math.PI) / 180;
+          const rx = Rpx * Math.cos(rad);
+          ctx.beginPath();
+          ctx.ellipse(ex, ey - Rpx * Math.sin(rad), rx, rx * 0.22, 0, 0, Math.PI);
+          ctx.stroke();
+        }
+        for (let m = 0; m < 6; m++) {
+          ctx.beginPath();
+          ctx.ellipse(ex, ey, Rpx * Math.abs(Math.cos((m * Math.PI) / 6)), Rpx, 0, 0, TAU);
+          ctx.stroke();
+        }
+        // Terminator: the day/night falloff across the sphere.
+        const tg = ctx.createLinearGradient(ex - Rpx, 0, ex + Rpx, 0);
+        tg.addColorStop(0, "rgba(5,6,10,0)");
+        tg.addColorStop(0.45, "rgba(5,6,10,0.15)");
+        tg.addColorStop(1, "rgba(5,6,10,0.88)");
+        ctx.fillStyle = tg;
+        ctx.fillRect(ex - Rpx, ey - Rpx, 2 * Rpx, 2 * Rpx);
+        ctx.restore();
+        ctx.globalAlpha = 1;
+      }
+
+      ctx.shadowColor = "rgba(120,165,240,0.6)";
+      ctx.shadowBlur = Math.min(18, 6 + Rpx * 0.02);
       ctx.strokeStyle = "rgba(150,185,245,0.55)";
       ctx.lineWidth = 1.2;
       ctx.beginPath();
       ctx.arc(ex, ey, Rpx, 0, TAU);
       ctx.stroke();
+      ctx.shadowBlur = 0;
     } else {
       const n = 64;
       const topPath = () => {
