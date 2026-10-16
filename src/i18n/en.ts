@@ -35,6 +35,21 @@ export const en = {
       description:
         "What this site is, where its data comes from, and how every number is sourced and marked.",
     },
+    numbers: {
+      title: "Numbers that stop you",
+      description:
+        "A short collection of sourced cosmic distances and times, each shown with its source, unit, and how well it is known.",
+    },
+    calendar: {
+      title: "The cosmic calendar",
+      description:
+        "The 13.8 billion year history of the universe compressed into a single year, with sourced milestones along the way.",
+    },
+    stardust: {
+      title: "You are made of stardust",
+      description:
+        "A short reflection on the elements in your body and where they were forged, with the evidence behind the claim.",
+    },
   },
   motion: {
     toggle: "Motion",
@@ -71,6 +86,28 @@ export const en = {
       nasaImagesUrl: "https://images.nasa.gov",
     },
     backHome: "Back to the journey",
+  },
+  numbers: {
+    heading: "Numbers that stop you",
+    intro:
+      "A handful of distances and times from across the journey. Every one carries its source, its unit, and how well it is known.",
+  },
+  calendar: {
+    heading: "The cosmic calendar",
+    intro:
+      "Compress the 13.8 billion year history of the universe into a single year. The Big Bang falls at midnight on 1 January; every milestone after it lands somewhere in the months that follow.",
+    scaleLabel: "On the cosmic calendar",
+    scaleNote:
+      "Each date maps real elapsed time onto a 365.25 day year, from the Big Bang to today.",
+  },
+  stardust: {
+    heading: "You are made of stardust",
+    intro:
+      "Nearly every atom in your body was forged inside a star, long before the Sun existed.",
+    body: "The hydrogen in your water and the carbon in your cells were made in the first minutes of the universe and in the hearts of stars that lived and died before our Sun was born. The heavier elements, the calcium in your bones, the iron in your blood, were built in those stars and scattered when they ended, then gathered again into the cloud that became the Solar System. The atoms you are made of have been through this cycle more than once.",
+    claim: "The Sun and its planets formed about 4.6 billion years ago from a cloud of gas and dust already enriched with elements made in earlier stars.",
+    claimSource: "NASA Solar System Exploration",
+    claimUrl: "https://science.nasa.gov/sun/facts/",
   },
   common: {
     loading: "Loading",
@@ -125,6 +162,25 @@ export const en = {
     heading: "Explore",
     intro:
       "Eight kinds of object, from the planet under your feet to the dark matter that holds the galaxies together.",
+    more: {
+      heading: "More to explore",
+      intro: "Three short pages that look at the same cosmos from a different angle.",
+      numbers: {
+        title: "Numbers that stop you",
+        summary:
+          "Distances and times from across the journey, each with its source and how well it is known.",
+      },
+      calendar: {
+        title: "The cosmic calendar",
+        summary:
+          "The whole history of the universe squeezed into one year, with sourced milestones.",
+      },
+      stardust: {
+        title: "You are made of stardust",
+        summary:
+          "Where the elements in your body were forged, and the evidence behind the claim.",
+      },
+    },
     detail: {
       definition: "Definition",
       facts: "Key numbers",

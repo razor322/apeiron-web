@@ -35,6 +35,29 @@ export default async function ExplorePage({
           <Body className="max-w-2xl text-dust">{dict.explore.intro}</Body>
         </header>
         <CategoryGrid dict={dict} locale={locale} />
+        <section className="flex flex-col gap-6 border-t border-[color:var(--line)] pt-10">
+          <header className="flex flex-col gap-2">
+            <Heading level={2}>{dict.explore.more.heading}</Heading>
+            <Body className="max-w-2xl text-dust">{dict.explore.more.intro}</Body>
+          </header>
+          <ul className="grid grid-cols-1 gap-x-8 gap-y-8 sm:grid-cols-3">
+            {[
+              { href: "numbers", ...dict.explore.more.numbers },
+              { href: "calendar", ...dict.explore.more.calendar },
+              { href: "stardust", ...dict.explore.more.stardust },
+            ].map((item) => (
+              <li key={item.href}>
+                <a
+                  href={`/${locale}/${item.href}`}
+                  className="flex flex-col gap-2 border border-[color:var(--line)] p-6 transition-colors hover:border-amber"
+                >
+                  <span className="font-serif text-xl text-starlight">{item.title}</span>
+                  <span className="font-sans text-sm text-dust">{item.summary}</span>
+                </a>
+              </li>
+            ))}
+          </ul>
+        </section>
       </Container>
     </main>
   );

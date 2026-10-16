@@ -37,6 +37,21 @@ export const id: Dictionary = {
       description:
         "Apa situs ini, dari mana datanya berasal, dan bagaimana setiap angka bersumber dan ditandai.",
     },
+    numbers: {
+      title: "Angka yang menghentikanmu",
+      description:
+        "Kumpulan singkat jarak dan waktu kosmis bersumber, masing-masing ditampilkan dengan sumber, satuan, dan seberapa baik nilainya diketahui.",
+    },
+    calendar: {
+      title: "Kalender kosmis",
+      description:
+        "Sejarah 13,8 miliar tahun alam semesta dipadatkan ke dalam satu tahun, lengkap dengan tonggak bersumber di sepanjang jalan.",
+    },
+    stardust: {
+      title: "Kamu terbuat dari debu bintang",
+      description:
+        "Renungan singkat tentang unsur-unsur di tubuhmu dan dari mana asalnya, beserta bukti di balik klaimnya.",
+    },
   },
   motion: {
     toggle: "Gerak",
@@ -73,6 +88,28 @@ export const id: Dictionary = {
       nasaImagesUrl: "https://images.nasa.gov",
     },
     backHome: "Kembali ke perjalanan",
+  },
+  numbers: {
+    heading: "Angka yang menghentikanmu",
+    intro:
+      "Beberapa jarak dan waktu dari sepanjang perjalanan. Masing-masing membawa sumbernya, satuannya, dan seberapa baik nilainya diketahui.",
+  },
+  calendar: {
+    heading: "Kalender kosmis",
+    intro:
+      "Padatkan sejarah 13,8 miliar tahun alam semesta ke dalam satu tahun. Dentuman Besar jatuh pada tengah malam 1 Januari; setiap tonggak sesudahnya mendarat di suatu tempat pada bulan-bulan berikutnya.",
+    scaleLabel: "Pada kalender kosmis",
+    scaleNote:
+      "Setiap tanggal memetakan waktu nyata yang berlalu ke dalam satu tahun 365,25 hari, dari Dentuman Besar sampai hari ini.",
+  },
+  stardust: {
+    heading: "Kamu terbuat dari debu bintang",
+    intro:
+      "Hampir setiap atom di tubuhmu ditempa di dalam bintang, jauh sebelum Matahari ada.",
+    body: "Hidrogen di airmu dan karbon di sel-selmu dibuat pada menit-menit pertama alam semesta dan di jantung bintang yang hidup lalu mati sebelum Matahari kita lahir. Unsur yang lebih berat, kalsium di tulangmu, zat besi di darahmu, dibangun di dalam bintang-bintang itu dan tersebar saat mereka berakhir, lalu berkumpul lagi menjadi awan yang menjadi Tata Surya. Atom-atom yang menyusunmu telah melewati siklus ini lebih dari sekali.",
+    claim: "Matahari dan planet-planetnya terbentuk sekitar 4,6 miliar tahun lalu dari awan gas dan debu yang sudah diperkaya unsur-unsur buatan bintang sebelumnya.",
+    claimSource: "NASA Solar System Exploration",
+    claimUrl: "https://science.nasa.gov/sun/facts/",
   },
   common: {
     loading: "Memuat",
@@ -127,6 +164,25 @@ export const id: Dictionary = {
     heading: "Jelajah",
     intro:
       "Delapan jenis objek, dari planet di bawah kakimu sampai materi gelap yang menyatukan galaksi.",
+    more: {
+      heading: "Lebih banyak untuk dijelajahi",
+      intro: "Tiga halaman singkat yang melihat alam semesta yang sama dari sudut berbeda.",
+      numbers: {
+        title: "Angka yang menghentikanmu",
+        summary:
+          "Jarak dan waktu dari sepanjang perjalanan, masing-masing dengan sumber dan seberapa baik nilainya diketahui.",
+      },
+      calendar: {
+        title: "Kalender kosmis",
+        summary:
+          "Seluruh sejarah alam semesta dipadatkan ke dalam satu tahun, dengan tonggak bersumber.",
+      },
+      stardust: {
+        title: "Kamu terbuat dari debu bintang",
+        summary:
+          "Dari mana unsur-unsur di tubuhmu ditempa, beserta bukti di balik klaimnya.",
+      },
+    },
     detail: {
       definition: "Definisi",
       facts: "Angka penting",
