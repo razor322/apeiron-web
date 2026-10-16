@@ -21,8 +21,8 @@ export async function searchNasaImage(
 ): Promise<AstronomySnapshot<AstronomyMedia>> {
   const key = `${PROVIDER}:${query}`;
   const elapsed = timeProvider();
-  logProvider({ provider: PROVIDER, event: "cache_miss" });
   const snap = await cached<AstronomyMedia>(key, TTL_MS, async () => {
+    logProvider({ provider: PROVIDER, event: "cache_miss" });
     const url = new URL(BASE_URL);
     url.searchParams.set("q", query);
     url.searchParams.set("media_type", "image");

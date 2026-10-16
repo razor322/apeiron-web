@@ -1,3 +1,5 @@
+import type { Locale } from "@/i18n/config";
+
 export type CosmicCalendarEntry = {
   metricKey: string;
   realYearsAgo: number;
@@ -48,32 +50,24 @@ export const COSMIC_CALENDAR: CosmicCalendarEntry[] = [
 
 const UNIVERSE_YEARS = 13.8e9;
 const DAYS_IN_YEAR = 365.25;
-const MONTHS = [
-  "January",
-  "February",
-  "March",
-  "April",
-  "May",
-  "June",
-  "July",
-  "August",
-  "September",
-  "October",
-  "November",
-  "December",
-];
 const DAYS_IN_MONTH = [31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31];
+
+const MONTH_FORMAT: Record<Locale, Intl.DateTimeFormat> = {
+  en: new Intl.DateTimeFormat("en-US", { month: "long", timeZone: "UTC" }),
+  id: new Intl.DateTimeFormat("id-ID", { month: "long", timeZone: "UTC" }),
+};
 
 // Maps real years-ago onto one calendar year: the Big Bang sits at 1 January,
 // today at 31 December. ponytail: fixed month lengths, no leap-year drift.
-export function scaleToYear(realYearsAgo: number): string {
+export function scaleToYear(realYearsAgo: number, locale: Locale = "en"): string {
   const fraction = (UNIVERSE_YEARS - realYearsAgo) / UNIVERSE_YEARS;
   const dayOfYear = Math.min(DAYS_IN_YEAR - 1, Math.max(0, fraction * DAYS_IN_YEAR));
   let remaining = Math.floor(dayOfYear);
   let monthIndex = 0;
-  while (monthIndex < MONTHS.length - 1 && remaining >= DAYS_IN_MONTH[monthIndex]!) {
+  while (monthIndex < DAYS_IN_MONTH.length - 1 && remaining >= DAYS_IN_MONTH[monthIndex]!) {
     remaining -= DAYS_IN_MONTH[monthIndex]!;
     monthIndex += 1;
   }
-  return `${MONTHS[monthIndex]!} ${remaining + 1}`;
+  const month = MONTH_FORMAT[locale].format(new Date(Date.UTC(2020, monthIndex, 1)));
+  return `${month} ${remaining + 1}`;
 }

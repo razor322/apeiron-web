@@ -17,6 +17,11 @@ describe("cosmic calendar", () => {
     expect(scaleToYear(13.8e9)).toMatch(/January/);
     expect(scaleToYear(250000)).toMatch(/December/);
   });
+  it("localizes month names for the Indonesian locale", () => {
+    const id = scaleToYear(13.8e9, "id");
+    expect(id).not.toBe(scaleToYear(13.8e9, "en"));
+    expect(id).toContain("Januari");
+  });
   it("keeps entries in newest-to-oldest order by real time", () => {
     for (let i = 1; i < COSMIC_CALENDAR.length; i++) {
       expect(COSMIC_CALENDAR[i - 1]!.realYearsAgo).toBeGreaterThan(

@@ -44,7 +44,7 @@ export default async function CalendarPage({
               className="flex flex-col gap-2 border-b border-[color:var(--line)] py-6 sm:flex-row sm:gap-8"
             >
               <div className="flex min-w-40 flex-col gap-1">
-                <span className="font-mono text-xl text-amber">{scaleToYear(entry.realYearsAgo)}</span>
+                <span className="font-mono text-xl text-amber">{scaleToYear(entry.realYearsAgo, locale)}</span>
                 <Label>{dict.calendar.scaleLabel}</Label>
               </div>
               <div className="flex flex-col gap-2">
