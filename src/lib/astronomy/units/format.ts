@@ -75,13 +75,16 @@ export function formatDuration(seconds: number, locale: Locale = "en"): string {
   return `${f.format(seconds / 31557600)} ${w.years}`;
 }
 
-// Orbital mechanics period: days below ~400, else years. formatDuration is tuned
-// for light-travel times and would report Mercury as "2,112 hours".
+// Orbital mechanics period: days below ~1000 (Mercury 88d .. Mars 687d), else years
+// (Jupiter 11.9y onward). formatDuration is tuned for light-travel times and would
+// report Mercury as "2,112 hours".
 export function formatPeriod(seconds: number, locale: Locale = "en"): string {
   const w = WORDS[locale];
   const f = nf(locale);
   const days = seconds / 86400;
-  if (days < 400) return `${f.format(sig(days))} ${w.days}`;
+  // ponytail: days branch skips sig() — rounding 3 sig figs turned 687 into "690 days";
+  // day counts are small and exact, sig only earns its keep on scaled years.
+  if (days < 1000) return `${f.format(days)} ${w.days}`;
   return `${f.format(sig(seconds / 31557600))} ${w.years}`;
 }
 
