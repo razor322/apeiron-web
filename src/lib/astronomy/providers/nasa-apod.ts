@@ -1,5 +1,6 @@
 import type { AstronomyMedia, AstronomySnapshot } from "@/lib/astronomy/models";
 import { ApodSchema } from "@/lib/astronomy/schemas/apod";
+import { logProvider, timeProvider } from "@/lib/astronomy/log";
 
 // Current documented APOD source. The legacy /planetary/apod route is archived.
 // Source doc: https://science.nasa.gov/apis/apod-api/ (WordPress REST route);
@@ -31,20 +32,26 @@ function buildUrl(): string {
 }
 
 async function fetchRaw(): Promise<AstronomyMedia> {
+  const elapsed = timeProvider();
   const res = await fetch(buildUrl(), { signal: AbortSignal.timeout(8000) });
   const remainingHeader = res.headers?.get("x-ratelimit-remaining") ?? null;
   const parsedRemaining = remainingHeader === null ? NaN : Number(remainingHeader);
   const remaining = Number.isFinite(parsedRemaining) ? parsedRemaining : undefined;
 
   if (RATE_LIMIT_STATUSES.has(res.status)) {
+    logProvider({ provider: APOD_PROVIDER, event: "rate_limited", status: res.status, errorClass: "RateLimitError" });
     throw new RateLimitError(res.status, remaining);
   }
-  if (!res.ok) throw new Error(`apod_http_${res.status}`);
+  if (!res.ok) {
+    logProvider({ provider: APOD_PROVIDER, event: "error", status: res.status });
+    throw new Error(`apod_http_${res.status}`);
+  }
   if (remaining !== undefined && remaining < 10) {
     console.warn(`[apod] rate limit nearly exhausted: ${remaining} remaining this hour.`);
   }
 
   const parsed = ApodSchema.parse(await res.json());
+  logProvider({ provider: APOD_PROVIDER, event: "ok", ms: elapsed() });
   return {
     id: parsed.date,
     title: parsed.title,

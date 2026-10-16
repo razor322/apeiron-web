@@ -95,3 +95,27 @@ describe("fetchApod rate limits", () => {
     expect(snap.stale).toBe(false);
   });
 });
+
+describe("fetchApod logging", () => {
+  it("logs ok with a duration on success", async () => {
+    const info = vi.spyOn(console, "info").mockImplementation(() => {});
+    vi.stubGlobal("fetch", vi.fn().mockResolvedValue({
+      ok: true, status: 200, headers: new Headers(), json: async () => valid,
+    }));
+    await fetchApod();
+    const logged = info.mock.calls.map((c) => String(c[0])).join("\n");
+    expect(logged).toContain("provider=nasa-apod");
+    expect(logged).toContain("event=ok");
+    expect(logged).toContain("ms=");
+  });
+  it("logs rate_limited on 429", async () => {
+    const warn = vi.spyOn(console, "warn").mockImplementation(() => {});
+    resetApodState();
+    vi.stubGlobal("fetch", vi.fn().mockResolvedValue({
+      ok: false, status: 429, headers: new Headers(), json: async () => ({}),
+    }));
+    await expect(fetchApod()).rejects.toBeInstanceOf(RateLimitError);
+    const logged = warn.mock.calls.map((c) => String(c[0])).join("\n");
+    expect(logged).toContain("rate_limited");
+  });
+});
