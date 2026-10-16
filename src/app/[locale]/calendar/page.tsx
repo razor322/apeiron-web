@@ -54,7 +54,11 @@ export default async function CalendarPage({
                 <Body className="max-w-2xl text-dust">
                   {getText(dict, `${entry.metricKey}.text`) as string}
                 </Body>
-                <SourceLink name={entry.sourceName} url={entry.sourceUrl} label={dict.common.source} />
+                <SourceLink
+                  name={entry.sourceName}
+                  url={entry.sourceUrl}
+                  label={`${entry.sourceName} (verified ${entry.verifiedAt})`}
+                />
               </div>
             </li>
           ))}

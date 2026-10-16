@@ -130,6 +130,7 @@ export const id: Dictionary = {
     claim: "Matahari dan planet-planetnya terbentuk sekitar 4,6 miliar tahun lalu dari awan gas dan debu yang sudah diperkaya unsur-unsur buatan bintang sebelumnya.",
     claimSource: "NASA Solar System Exploration",
     claimUrl: "https://science.nasa.gov/sun/facts/",
+    claimVerifiedAt: "2026-10-17",
   },
   common: {
     loading: "Memuat",

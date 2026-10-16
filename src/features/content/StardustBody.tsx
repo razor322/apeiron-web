@@ -13,7 +13,7 @@ export function StardustBody({ dict }: { dict: Dictionary }) {
         <SourceLink
           name={dict.stardust.claimSource}
           url={dict.stardust.claimUrl}
-          label={dict.common.source}
+          label={`${dict.stardust.claimSource} (verified ${dict.stardust.claimVerifiedAt})`}
         />
       </blockquote>
     </article>

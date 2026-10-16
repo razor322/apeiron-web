@@ -128,6 +128,7 @@ export const en = {
     claim: "The Sun and its planets formed about 4.6 billion years ago from a cloud of gas and dust already enriched with elements made in earlier stars.",
     claimSource: "NASA Solar System Exploration",
     claimUrl: "https://science.nasa.gov/sun/facts/",
+    claimVerifiedAt: "2026-10-17",
   },
   common: {
     loading: "Loading",
