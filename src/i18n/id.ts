@@ -207,6 +207,7 @@ export const id: Dictionary = {
         "Delapan dunia yang terikat pada Matahari kita, masing-masing dengan ukuran, jarak, dan kecepatannya sendiri.",
       backToExplore: "Kembali ke Jelajah",
       facts: "Angka kunci",
+      imageUnavailable: "Gambar tidak tersedia",
       narrative: "Tentang dunia ini",
       related: "Planet lain",
       allPlanets: "Semua planet",

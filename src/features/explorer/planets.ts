@@ -27,6 +27,8 @@ export type PlanetProfile = {
 // degrees Celsius, counts as integers. Numbers follow NASA Solar System
 // Exploration fact sheets (science.nasa.gov/<planet>/facts/), verified 2026-10-16.
 const MEASURED: ConfidenceType = "measured";
+const ESTIMATED: ConfidenceType = "estimated";
+const APPROXIMATE: ConfidenceType = "approximate";
 
 function facts(
   diameter: number,
@@ -39,8 +41,8 @@ function facts(
     { metricKey: "diameter", kind: "length", siValue: diameter, confidenceType: MEASURED },
     { metricKey: "distanceFromSun", kind: "length", siValue: distance, confidenceType: MEASURED },
     { metricKey: "orbitalPeriod", kind: "period", siValue: periodSeconds, confidenceType: MEASURED },
-    { metricKey: "meanTemp", kind: "temperature", siValue: tempC, confidenceType: MEASURED },
-    { metricKey: "moons", kind: "count", siValue: moons, confidenceType: MEASURED },
+    { metricKey: "meanTemp", kind: "temperature", siValue: tempC, confidenceType: APPROXIMATE },
+    { metricKey: "moons", kind: "count", siValue: moons, confidenceType: ESTIMATED },
   ];
 }
 

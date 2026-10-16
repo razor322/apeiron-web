@@ -205,6 +205,7 @@ export const en = {
         "The eight worlds bound to our Sun, each with its own size, distance, and pace.",
       backToExplore: "Back to Explore",
       facts: "Key numbers",
+      imageUnavailable: "Image unavailable",
       narrative: "About this world",
       related: "Other planets",
       allPlanets: "All planets",

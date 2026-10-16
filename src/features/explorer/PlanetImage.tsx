@@ -15,7 +15,7 @@ export function PlanetImage({ image, dict }: { image: AstronomyMedia; dict: Dict
         aria-label={image.altText}
         className="flex aspect-[4/3] w-full items-center justify-center rounded-sm border border-[color:var(--line)] bg-[radial-gradient(circle_at_35%_30%,rgba(232,161,91,0.28),transparent_60%)]"
       >
-        <span className="font-sans text-sm text-dust">{dict.explore.planet.facts}</span>
+        <span className="font-sans text-sm text-dust">{dict.explore.planet.imageUnavailable}</span>
       </div>
     );
   }
