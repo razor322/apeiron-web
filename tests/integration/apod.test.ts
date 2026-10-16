@@ -1,6 +1,6 @@
 import { describe, it, expect, vi, afterEach, beforeEach } from "vitest";
 import { ApodSchema } from "@/lib/astronomy/schemas/apod";
-import { fetchApod } from "@/lib/astronomy/providers/nasa-apod";
+import { fetchApod, RateLimitError, resetApodState } from "@/lib/astronomy/providers/nasa-apod";
 import { clearCache } from "@/lib/cache/ttl-cache";
 
 const valid = {
@@ -13,7 +13,10 @@ const valid = {
   copyright: "Someone",
 };
 
-beforeEach(() => clearCache());
+beforeEach(() => {
+  clearCache();
+  resetApodState();
+});
 afterEach(() => vi.restoreAllMocks());
 
 describe("ApodSchema", () => {
@@ -45,5 +48,41 @@ describe("fetchApod", () => {
     vi.stubGlobal("fetch", vi.fn().mockRejectedValue(new Error("down")));
     const snap = await fetchApod();
     expect(snap.stale).toBe(true);
+  });
+});
+
+describe("fetchApod rate limits", () => {
+  it("throws RateLimitError on 429 when there is no prior snapshot", async () => {
+    vi.stubGlobal("fetch", vi.fn().mockResolvedValue({
+      ok: false, status: 429, headers: new Headers(), json: async () => ({}),
+    }));
+    await expect(fetchApod()).rejects.toBeInstanceOf(RateLimitError);
+  });
+
+  it("treats 403 as a rate limit too", async () => {
+    vi.stubGlobal("fetch", vi.fn().mockResolvedValue({
+      ok: false, status: 403, headers: new Headers(), json: async () => ({}),
+    }));
+    await expect(fetchApod()).rejects.toBeInstanceOf(RateLimitError);
+  });
+
+  it("falls back to the stored snapshot when rate limited after a prior success", async () => {
+    vi.stubGlobal("fetch", vi.fn().mockResolvedValue({
+      ok: true, status: 200, headers: new Headers(), json: async () => valid,
+    }));
+    await fetchApod();
+    vi.stubGlobal("fetch", vi.fn().mockResolvedValue({
+      ok: false, status: 429, headers: new Headers({ "x-ratelimit-remaining": "0" }), json: async () => ({}),
+    }));
+    const snap = await fetchApod();
+    expect(snap.stale).toBe(true);
+  });
+
+  it("does not throw when a successful response carries a rate-limit header", async () => {
+    vi.stubGlobal("fetch", vi.fn().mockResolvedValue({
+      ok: true, status: 200, headers: new Headers({ "x-ratelimit-remaining": "998" }), json: async () => valid,
+    }));
+    const snap = await fetchApod();
+    expect(snap.stale).toBe(false);
   });
 });
