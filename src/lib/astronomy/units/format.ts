@@ -9,6 +9,7 @@ const WORDS: Record<Locale, {
   minutes: string;
   hours: string;
   years: string;
+  days: string;
 }> = {
   en: {
     million: "million km",
@@ -19,6 +20,7 @@ const WORDS: Record<Locale, {
     minutes: "minutes",
     hours: "hours",
     years: "years",
+    days: "days",
   },
   id: {
     million: "juta km",
@@ -29,6 +31,7 @@ const WORDS: Record<Locale, {
     minutes: "menit",
     hours: "jam",
     years: "tahun",
+    days: "hari",
   },
 };
 
@@ -70,6 +73,16 @@ export function formatDuration(seconds: number, locale: Locale = "en"): string {
   if (seconds < 3600) return `${f.format(seconds / 60)} ${w.minutes}`;
   if (seconds < 31557600) return `${f.format(seconds / 3600)} ${w.hours}`;
   return `${f.format(seconds / 31557600)} ${w.years}`;
+}
+
+// Orbital mechanics period: days below ~400, else years. formatDuration is tuned
+// for light-travel times and would report Mercury as "2,112 hours".
+export function formatPeriod(seconds: number, locale: Locale = "en"): string {
+  const w = WORDS[locale];
+  const f = nf(locale);
+  const days = seconds / 86400;
+  if (days < 400) return `${f.format(sig(days))} ${w.days}`;
+  return `${f.format(sig(seconds / 31557600))} ${w.years}`;
 }
 
 export function exponentForMeters(meters: number): number {

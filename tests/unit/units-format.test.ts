@@ -1,5 +1,5 @@
 import { describe, it, expect } from "vitest";
-import { formatLength, formatDuration, exponentForMeters } from "@/lib/astronomy/units/format";
+import { formatLength, formatDuration, formatPeriod, exponentForMeters } from "@/lib/astronomy/units/format";
 
 describe("formatLength", () => {
   it("formats sub-kilometer as meters with 3 sig figs (en)", () => {
@@ -29,6 +29,18 @@ describe("formatDuration", () => {
   it("handles minutes (en)", () => expect(formatDuration(500, "en")).toBe("8.3 minutes"));
   it("handles hours (en)", () => expect(formatDuration(15120, "en")).toBe("4.2 hours"));
   it("handles minutes (id)", () => expect(formatDuration(500, "id")).toBe("8,3 menit"));
+});
+
+describe("formatPeriod", () => {
+  it("formats short periods in days (en)", () => {
+    expect(formatPeriod(88 * 86400, "en")).toBe("88 days");
+  });
+  it("formats long periods in years (en)", () => {
+    expect(formatPeriod(164.8 * 31557600, "en")).toBe("165 years");
+  });
+  it("uses Indonesian words (id)", () => {
+    expect(formatPeriod(88 * 86400, "id")).toBe("88 hari");
+  });
 });
 
 describe("exponentForMeters", () => {
