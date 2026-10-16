@@ -2,7 +2,7 @@ import { describe, it, expect } from "vitest";
 import { formatLength, formatDuration, exponentForMeters } from "@/lib/astronomy/units/format";
 
 describe("formatLength", () => {
-  it("formats sub-kilometer as meters with 2 sig figs (en)", () => {
+  it("formats sub-kilometer as meters with 3 sig figs (en)", () => {
     expect(formatLength(1.8, "en")).toBe("1.8 m");
   });
   it("formats kilometers (en)", () => {
@@ -14,6 +14,13 @@ describe("formatLength", () => {
   it("formats with Indonesian grouping when locale is id", () => {
     expect(formatLength(384400000, "id")).toBe("384.000 km");
     expect(formatLength(1.496e11, "id")).toBe("150 juta km");
+  });
+  it("handles zero without producing NaN", () => {
+    expect(formatLength(0, "en")).toBe("0 m");
+  });
+  it("switches unit when the rounded value crosses a boundary", () => {
+    expect(formatLength(999_999_999, "en")).toBe("1 million km");
+    expect(formatLength(999_999_999_999, "en")).toBe("1 billion km");
   });
 });
 
@@ -28,5 +35,9 @@ describe("exponentForMeters", () => {
   it("returns the decimal order of magnitude", () => {
     expect(exponentForMeters(1.8)).toBe(0);
     expect(exponentForMeters(1.496e11)).toBe(11);
+  });
+  it("does not return NaN for zero or negative input", () => {
+    expect(exponentForMeters(0)).toBe(0);
+    expect(exponentForMeters(-5)).toBe(0);
   });
 });

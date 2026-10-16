@@ -39,6 +39,7 @@ function nf(locale: Locale): Intl.NumberFormat {
 // failing the brief's own expected "384,000 km". 3 sig figs reproduces every stated
 // expectation. Revert to sig2 only if the expected strings change.
 function sig(x: number): number {
+  if (x === 0) return 0;
   const m = 10 ** (Math.floor(Math.log10(Math.abs(x))) - 2);
   return Math.round(x / m) * m;
 }
@@ -47,8 +48,10 @@ export function formatLength(meters: number, locale: Locale = "en"): string {
   const w = WORDS[locale];
   const f = nf(locale);
   if (meters < 1000) return `${f.format(sig(meters))} m`;
-  if (meters < 1e9) return `${f.format(sig(meters / 1e3))} km`;
-  if (meters < 1e12) return `${f.format(sig(meters / 1e9))} ${w.million}`;
+  const km = sig(meters / 1e3);
+  if (km < 1e6) return `${f.format(km)} km`;
+  const million = sig(meters / 1e9);
+  if (million < 1e3) return `${f.format(million)} ${w.million}`;
   return `${f.format(sig(meters / 1e12))} ${w.billion}`;
 }
 
@@ -63,5 +66,6 @@ export function formatDuration(seconds: number, locale: Locale = "en"): string {
 }
 
 export function exponentForMeters(meters: number): number {
+  if (meters <= 0) return 0;
   return Math.floor(Math.log10(meters));
 }
