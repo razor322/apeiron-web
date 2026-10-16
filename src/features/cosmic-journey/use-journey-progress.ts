@@ -20,10 +20,15 @@ type JourneyProgress = {
 // scroll listener does, so no pinning or scrubbing code runs.
 export function useJourneyProgress(reduced: boolean): JourneyProgress {
   const [progress, setProgress] = useState(0);
+  const [activeIndex, setActiveIndex] = useState(0);
 
   useEffect(() => {
     if (reduced) {
-      const onScroll = () => setProgress(readProgress());
+      const onScroll = () => {
+        const p = readProgress();
+        setProgress(p);
+        setActiveIndex(activeStageIndex(p));
+      };
       onScroll();
       window.addEventListener("scroll", onScroll, { passive: true });
       window.addEventListener("resize", onScroll);
@@ -44,10 +49,14 @@ export function useJourneyProgress(reduced: boolean): JourneyProgress {
       if (cancelled) return;
       gsap.registerPlugin(ScrollTrigger);
       const state = { p: 0 };
+      const apply = (p: number) => {
+        setProgress(p);
+        setActiveIndex(activeStageIndex(p));
+      };
       const tween = gsap.to(state, {
         p: 1,
         ease: "none",
-        onUpdate: () => setProgress(state.p),
+        onUpdate: () => apply(state.p),
         scrollTrigger: {
           trigger: document.body,
           start: "top top",
@@ -55,7 +64,7 @@ export function useJourneyProgress(reduced: boolean): JourneyProgress {
           scrub: true,
           onRefresh: (self) => {
             state.p = self.progress;
-            setProgress(self.progress);
+            apply(self.progress);
           },
         },
       });
@@ -74,6 +83,9 @@ export function useJourneyProgress(reduced: boolean): JourneyProgress {
 
   const goTo = useCallback(
     (index: number) => {
+      // Reflect the keyboard choice immediately so the progress nav is correct
+      // even before ScrollTrigger has attached or the smooth scroll settles.
+      setActiveIndex(index);
       const max = document.documentElement.scrollHeight - window.innerHeight;
       const target = ((index + 0.5) / STAGES.length) * Math.max(0, max);
       window.scrollTo({ top: target, behavior: reduced ? "auto" : "smooth" });
@@ -81,5 +93,5 @@ export function useJourneyProgress(reduced: boolean): JourneyProgress {
     [reduced],
   );
 
-  return { activeIndex: activeStageIndex(progress), goTo, progress };
+  return { activeIndex, goTo, progress };
 }

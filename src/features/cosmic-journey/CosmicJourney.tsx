@@ -16,6 +16,9 @@ function stageOpacity(progress: number, index: number): number {
   const share = 1 / STAGES.length;
   const t = (progress - index * share) / share;
   if (t < 0 || t > 1) return 0;
+  // The hero is the first thing at the top of the page, so it is fully visible
+  // before any scroll: no fade-in that would leave scroll-top blank.
+  if (index === 0 && t < 0.2) return 1;
   const fade = 0.2;
   if (t < fade) return t / fade;
   if (t > 1 - fade) return (1 - t) / fade;

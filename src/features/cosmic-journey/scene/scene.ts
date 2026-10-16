@@ -73,7 +73,7 @@ function seeded(seed: number): () => number {
 }
 
 const rngStars = seeded(42);
-const STARS = Array.from({ length: 460 }, () => {
+const ALL_STARS = Array.from({ length: 460 }, () => {
   const big = rngStars() < 0.07;
   return {
     x: rngStars(),
@@ -86,6 +86,16 @@ const STARS = Array.from({ length: 460 }, () => {
   };
 });
 
+// Adaptive quality: weak devices (<=4 cores) and narrow viewports draw fewer
+// stars at lower device pixel ratio. One factor, one place to tune it.
+function quality(): { dprCap: number; stars: number } {
+  const cores = typeof navigator !== "undefined" ? navigator.hardwareConcurrency : undefined;
+  const weak = typeof cores === "number" && cores <= 4;
+  const narrow = typeof window !== "undefined" && window.innerWidth < 768;
+  if (weak || narrow) return { dprCap: 1, stars: 240 };
+  return { dprCap: 2, stars: ALL_STARS.length };
+}
+
 export function createScene(canvas: HTMLCanvasElement): SceneHandle {
   const context = canvas.getContext("2d");
   // No 2D context (or no canvas): the CSS gradient + star fallback behind the
@@ -95,11 +105,14 @@ export function createScene(canvas: HTMLCanvasElement): SceneHandle {
   }
   const ctx = context;
 
+  const q = quality();
+  const STARS = ALL_STARS.slice(0, q.stars);
+
   let cw = 0;
   let ch = 0;
 
   function resize() {
-    const d = Math.min(window.devicePixelRatio || 1, 2);
+    const d = Math.min(window.devicePixelRatio || 1, q.dprCap);
     cw = canvas.clientWidth;
     ch = canvas.clientHeight;
     canvas.width = Math.round(cw * d);
@@ -124,6 +137,8 @@ export function createScene(canvas: HTMLCanvasElement): SceneHandle {
   }
 
   function render(progress: number, t: number) {
+    // Hidden tab: skip all drawing work. The last frame stays on screen.
+    if (document.hidden) return;
     const e = exponentAt(progress);
     const W = 10 ** e;
     const S = Math.min(cw, ch);

@@ -37,11 +37,11 @@ export function Navbar({ locale, dict, children }: NavbarProps) {
           : "border-transparent bg-transparent"
       }`}
     >
-      <div className="mx-auto flex w-full max-w-6xl items-center justify-between gap-6 px-6 py-4">
+      <div className="mx-auto flex w-full max-w-6xl flex-wrap items-center justify-between gap-x-6 gap-y-2 px-4 py-4 sm:px-6">
         <a href={`/${locale}`} className="font-serif text-xl text-starlight">
           {dict.nav.brand}
         </a>
-        <ul className="flex items-center gap-5">
+        <ul className="flex flex-wrap items-center gap-x-4 gap-y-1 sm:gap-x-5">
           {links.map((link) => (
             <li key={link.href}>
               <a

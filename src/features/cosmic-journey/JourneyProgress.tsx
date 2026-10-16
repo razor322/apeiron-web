@@ -21,7 +21,7 @@ export function JourneyProgress({
       aria-label={readCopy(dict, "journey.navLabel")}
       className={className}
     >
-      <ol className="flex items-center gap-2">
+      <ol className="flex items-center gap-1 sm:gap-2">
         {STAGES.map((stage, index) => {
           const active = index === activeIndex;
           return (
@@ -30,7 +30,7 @@ export function JourneyProgress({
                 type="button"
                 onClick={() => goTo(index)}
                 aria-current={active ? "step" : undefined}
-                className={`flex h-9 w-9 items-center justify-center rounded-full font-mono text-xs transition-colors ${
+                className={`flex h-7 w-7 items-center justify-center rounded-full font-mono text-xs transition-colors sm:h-9 sm:w-9 ${
                   active
                     ? "border border-amber text-amber"
                     : "border border-[color:var(--line)] text-dust hover:border-amber hover:text-amber"
