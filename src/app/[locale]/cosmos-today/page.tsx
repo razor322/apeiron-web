@@ -9,6 +9,10 @@ import { Heading } from "@/components/ui/Typography";
 import { ApodCard } from "@/features/cosmos-today/ApodCard";
 import { ApodFallback } from "@/features/cosmos-today/ApodFallback";
 
+// APOD updates daily; regenerate every 6h to match the adapter cache TTL instead
+// of freezing today's image at build time.
+export const revalidate = 21600;
+
 export async function generateMetadata({
   params,
 }: {
