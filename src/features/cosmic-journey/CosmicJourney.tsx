@@ -2,7 +2,6 @@
 
 import { useEffect, useRef, useState, useSyncExternalStore } from "react";
 import type { Dictionary } from "@/i18n/en";
-import type { Locale } from "@/i18n/config";
 import { STAGES, readCopy } from "./stages";
 import { useJourneyProgress } from "./use-journey-progress";
 import { JourneyStage } from "./JourneyStage";
@@ -34,7 +33,7 @@ function stageOpacity(progress: number, index: number): number {
   return 1;
 }
 
-export function CosmicJourney({ dict }: { dict: Dictionary; locale: Locale }) {
+export function CosmicJourney({ dict }: { dict: Dictionary }) {
   // Server and first hydration render the reduced, stacked, no-JS-readable
   // journey (the server snapshot is `true`). We only upgrade to the pinned
   // experience once the client confirms motion is allowed.
@@ -90,7 +89,9 @@ export function CosmicJourney({ dict }: { dict: Dictionary; locale: Locale }) {
     <div className="journey-sky pointer-events-none absolute inset-0" aria-hidden="true" />
   );
 
-  const motionToggle = (
+  // The toggle only makes sense when the OS allows motion. If the OS already
+  // forces reduced motion, calm cannot be turned off, so the control would be dead.
+  const motionToggle = prefersReduced ? null : (
     <button
       type="button"
       aria-pressed={calm}

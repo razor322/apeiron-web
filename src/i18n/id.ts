@@ -22,7 +22,6 @@ export const id: Dictionary = {
     },
   },
   journey: {
-    home: "Kamu ada di sini",
     navLabel: "Tahapan perjalanan",
     rulerTitle: "Skala konseptual",
     rulerNote:

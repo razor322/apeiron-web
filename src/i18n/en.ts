@@ -20,7 +20,6 @@ export const en = {
     },
   },
   journey: {
-    home: "You are here",
     navLabel: "Journey stages",
     rulerTitle: "Conceptual scale",
     rulerNote:

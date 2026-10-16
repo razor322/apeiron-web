@@ -58,3 +58,6 @@ docs/superpowers/
 .idea/
 
 *.log
+
+*.txt
+
