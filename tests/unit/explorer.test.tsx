@@ -22,4 +22,7 @@ describe("explorer", () => {
     const link = screen.getByRole("link");
     expect(link).toHaveAttribute("href", "/en/explore/planet");
   });
+  it("keeps the planet category pointing at the planet grid route", () => {
+    expect(getCategory("planet")!.slug).toBe("planet");
+  });
 });
