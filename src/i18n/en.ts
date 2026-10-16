@@ -11,6 +11,7 @@ export const en = {
     empty: "Nothing here yet.",
     source: "Source",
     staleNotice: "Showing stored data from",
+    retry: "Try again",
     confidence: {
       measured: "Measured",
       estimated: "Estimated",

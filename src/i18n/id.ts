@@ -13,6 +13,7 @@ export const id: Dictionary = {
     empty: "Belum ada apa pun di sini.",
     source: "Sumber",
     staleNotice: "Menampilkan data tersimpan dari",
+    retry: "Coba lagi",
     confidence: {
       measured: "Terukur",
       estimated: "Perkiraan",
