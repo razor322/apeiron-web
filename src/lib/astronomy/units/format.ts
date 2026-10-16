@@ -82,7 +82,7 @@ export function formatPeriod(seconds: number, locale: Locale = "en"): string {
   const w = WORDS[locale];
   const f = nf(locale);
   const days = seconds / 86400;
-  // ponytail: days branch skips sig() — rounding 3 sig figs turned 687 into "690 days";
+  // ponytail: days branch skips sig() -- rounding 3 sig figs turned 687 into "690 days";
   // day counts are small and exact, sig only earns its keep on scaled years.
   if (days < 1000) return `${f.format(days)} ${w.days}`;
   return `${f.format(sig(seconds / 31557600))} ${w.years}`;
