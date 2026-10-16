@@ -7,6 +7,13 @@ const BASE_URL = "https://images-api.nasa.gov/search";
 const PROVIDER = "nasa-images";
 const TTL_MS = 24 * 60 * 60 * 1000;
 
+export class ImageRateLimitError extends Error {
+  constructor(public status: number) {
+    super(`nasa_images_rate_limited_${status}`);
+    this.name = "ImageRateLimitError";
+  }
+}
+
 // ponytail: not wired to any page yet; the planet pages use the curated static
 // registry. Wire this in when live/higher-resolution imagery is wanted.
 export async function searchNasaImage(
@@ -22,7 +29,7 @@ export async function searchNasaImage(
     const res = await fetch(url.toString(), { signal: AbortSignal.timeout(8000) });
     if (res.status === 429 || res.status === 403) {
       logProvider({ provider: PROVIDER, event: "rate_limited", status: res.status });
-      throw new Error(`nasa_images_rate_limited_${res.status}`);
+      throw new ImageRateLimitError(res.status);
     }
     if (!res.ok) {
       logProvider({ provider: PROVIDER, event: "error", status: res.status });

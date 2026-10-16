@@ -38,4 +38,12 @@ describe("GET /api/astronomy/images", () => {
     const res = await GET(req("mars"));
     expect(res.status).toBe(503);
   });
+  it("returns 429 when the provider rate limits", async () => {
+    vi.stubGlobal("fetch", vi.fn().mockResolvedValue({
+      ok: false, status: 429, headers: new Headers(), json: async () => ({}),
+    }));
+    const res = await GET(req("mars"));
+    expect(res.status).toBe(429);
+    expect(await res.json()).toEqual({ error: "rate_limited" });
+  });
 });
