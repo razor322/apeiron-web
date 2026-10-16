@@ -19,6 +19,14 @@ export const en = {
       calculated: "Calculated",
     },
   },
+  cosmosToday: {
+    heading: "Cosmos Today",
+    retrievedOn: "Retrieved on",
+    openMedia: "Open media at the official source",
+    loadError: "Today's content could not be loaded.",
+    apodLabel: "NASA APOD",
+    apodUrl: "https://apod.nasa.gov",
+  },
   journey: {
     navLabel: "Journey stages",
     rulerTitle: "Conceptual scale",

@@ -21,6 +21,14 @@ export const id: Dictionary = {
       calculated: "Terhitung",
     },
   },
+  cosmosToday: {
+    heading: "Cosmos Hari Ini",
+    retrievedOn: "Diambil pada",
+    openMedia: "Buka media di sumber resmi",
+    loadError: "Konten hari ini tidak dapat dimuat.",
+    apodLabel: "NASA APOD",
+    apodUrl: "https://apod.nasa.gov",
+  },
   journey: {
     navLabel: "Tahapan perjalanan",
     rulerTitle: "Skala konseptual",
