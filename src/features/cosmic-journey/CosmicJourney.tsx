@@ -1,25 +1,14 @@
 "use client";
 
-import { useEffect, useRef, useState, useSyncExternalStore } from "react";
+import { useEffect, useRef, useSyncExternalStore } from "react";
 import type { Dictionary } from "@/i18n/en";
-import { STAGES, readCopy } from "./stages";
+import { STAGES } from "./stages";
 import { useJourneyProgress } from "./use-journey-progress";
 import { JourneyStage } from "./JourneyStage";
 import { JourneyProgress } from "./JourneyProgress";
 import { ScaleRuler } from "./ScaleRuler";
+import { getCalm, subscribeCalm } from "@/lib/motion-preference";
 import type { SceneHandle } from "./scene/scene";
-
-const REDUCED_MOTION_QUERY = "(prefers-reduced-motion: reduce)";
-
-function subscribeReducedMotion(callback: () => void): () => void {
-  const mq = window.matchMedia(REDUCED_MOTION_QUERY);
-  mq.addEventListener("change", callback);
-  return () => mq.removeEventListener("change", callback);
-}
-
-function getReducedMotion(): boolean {
-  return window.matchMedia(REDUCED_MOTION_QUERY).matches;
-}
 
 // Opacity of a stage panel while scrubbing: fade in, hold, fade out across its
 // even share of the scroll. Adjacent stages only ever lightly overlap.
@@ -37,14 +26,8 @@ export function CosmicJourney({ dict }: { dict: Dictionary }) {
   // Server and first hydration render the reduced, stacked, no-JS-readable
   // journey (the server snapshot is `true`). We only upgrade to the pinned
   // experience once the client confirms motion is allowed.
-  const prefersReduced = useSyncExternalStore(
-    subscribeReducedMotion,
-    getReducedMotion,
-    () => true,
-  );
-  const [calm, setCalm] = useState(false);
+  const reduced = useSyncExternalStore(subscribeCalm, getCalm, () => true);
 
-  const reduced = prefersReduced || calm;
   const { activeIndex, goTo, progress } = useJourneyProgress(reduced);
 
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
@@ -89,19 +72,6 @@ export function CosmicJourney({ dict }: { dict: Dictionary }) {
     <div className="journey-sky pointer-events-none absolute inset-0" aria-hidden="true" />
   );
 
-  // The toggle only makes sense when the OS allows motion. If the OS already
-  // forces reduced motion, calm cannot be turned off, so the control would be dead.
-  const motionToggle = prefersReduced ? null : (
-    <button
-      type="button"
-      aria-pressed={calm}
-      onClick={() => setCalm((v) => !v)}
-      className="min-h-9 rounded-full border border-[color:var(--line)] px-4 font-sans text-xs text-dust transition-colors hover:border-amber hover:text-amber"
-    >
-      {calm ? readCopy(dict, "journey.motion.full") : readCopy(dict, "journey.motion.calm")}
-    </button>
-  );
-
   if (reduced) {
     // Reduced path: stages stacked in normal flow, no pin, no scrub, no canvas
     // animation. Completable by plain scroll and keyboard.
@@ -112,10 +82,6 @@ export function CosmicJourney({ dict }: { dict: Dictionary }) {
           <div className="absolute inset-0 bg-void/40" />
         </div>
         <div className="relative z-10 mx-auto w-full max-w-5xl">
-          <header className="flex items-center justify-between px-6 pt-8">
-            <span className="font-serif text-xl text-starlight">Apeiron</span>
-            {motionToggle}
-          </header>
           {STAGES.map((stage) => (
             <JourneyStage
               key={stage.id}
@@ -156,10 +122,6 @@ export function CosmicJourney({ dict }: { dict: Dictionary }) {
               "linear-gradient(to top, rgba(5,6,10,0.9), rgba(5,6,10,0.55) 45%, rgba(5,6,10,0))",
           }}
         />
-        <header className="absolute inset-x-0 top-0 z-20 flex items-center justify-between px-6 py-5">
-          <span className="font-serif text-xl text-starlight">Apeiron</span>
-          {motionToggle}
-        </header>
         <ScaleRuler
           exponent={STAGES[activeIndex]?.exponent ?? 0}
           dict={dict}

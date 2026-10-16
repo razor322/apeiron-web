@@ -6,6 +6,44 @@ export const id: Dictionary = {
     explore: "Jelajah",
     cosmosToday: "Cosmos Hari Ini",
     about: "Tentang",
+    label: "Navigasi utama",
+    brand: "Apeiron",
+  },
+  motion: {
+    toggle: "Gerak",
+    full: "Gerak penuh",
+    calm: "Gerak tenang",
+    hint: "Gerak tenang mematikan animasi gulir. Pilihanmu hanya tersimpan di perangkat ini.",
+  },
+  about: {
+    heading: "Tentang Apeiron",
+    purposeHeading: "Apa ini",
+    purpose:
+      "Apeiron adalah halaman scrollytelling tentang skala alam semesta, dari setitik cahaya sampai alam semesta teramati. Dibuat untuk pembaca yang penasaran, bukan astronom.",
+    sourcesHeading: "Sumber data",
+    sourcesIntro:
+      "Setiap gambar dan penjelasan di situs ini berasal dari sumber resmi, yang didaftar di sini beserta pemakaian dan kreditnya.",
+    methodologyHeading: "Metodologi",
+    methodology:
+      "Visualisasi di sini dapat menggunakan skala logaritmik, elemen artistik, atau komposisi citra. Tidak selalu representasi proporsional, jadi jarak dan ukuran ditampilkan untuk menyampaikan skala, bukan perbandingan yang tepat.",
+    rightsHeading: "Penggunaan dan hak citra",
+    rights:
+      "Gambar digunakan sesuai ketentuan sumbernya. Materi NASA umumnya tidak berhak cipta, tetapi tiap aset bisa punya kredit dan ketentuan sendiri, sehingga setiap aset diperiksa sebelum dipublikasikan.",
+    limitationsHeading: "Keterbatasan",
+    limitations:
+      "Angka dibulatkan sesuai presisi sumbernya dan ditandai terukur, perkiraan, kira-kira, atau terhitung. Data langsung bisa tidak tersedia, dan nilai tersimpan akan ditampilkan beserta tanggalnya.",
+    sourceTable: {
+      source: "Sumber",
+      usedFor: "Pemakaian",
+      licence: "Kredit dan hak",
+      apodUse: "Gambar hari ini",
+      apodLicence: "NASA APOD, domain publik kecuali entri mencantumkan penulis",
+      apodUrl: "https://apod.nasa.gov",
+      nasaImagesUse: "Citra objek dan topik",
+      nasaImagesLicence: "NASA Image and Video Library, kredit per aset",
+      nasaImagesUrl: "https://images.nasa.gov",
+    },
+    backHome: "Kembali ke perjalanan",
   },
   common: {
     loading: "Memuat",
@@ -122,10 +160,6 @@ export const id: Dictionary = {
     rulerTitle: "Skala konseptual",
     rulerNote:
       "Skala logaritmik: setiap langkah sepuluh kali lipat dari yang di bawahnya, sehingga seluruh rentang skala kosmis muat pada satu sumbu.",
-    motion: {
-      full: "Gerak penuh",
-      calm: "Gerak tenang",
-    },
     stages: {
       hero: {
         label: "Pembuka",

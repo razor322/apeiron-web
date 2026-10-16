@@ -4,6 +4,44 @@ export const en = {
     explore: "Explore",
     cosmosToday: "Cosmos Today",
     about: "About",
+    label: "Main navigation",
+    brand: "Apeiron",
+  },
+  motion: {
+    toggle: "Motion",
+    full: "Full motion",
+    calm: "Calm motion",
+    hint: "Calm motion turns off the scroll animation. Your choice is stored on this device only.",
+  },
+  about: {
+    heading: "About Apeiron",
+    purposeHeading: "What this is",
+    purpose:
+      "Apeiron is a scrollytelling page about the scale of the cosmos, from a point of light to the observable universe. It is made for curious readers, not astronomers.",
+    sourcesHeading: "Data sources",
+    sourcesIntro:
+      "Every image and explanation on this site comes from an official source, listed here with its use and credit.",
+    methodologyHeading: "Methodology",
+    methodology:
+      "Visualizations here may use a logarithmic scale, artistic elements, or composite imagery. They are not always a proportional representation, so distances and sizes are shown to convey scale, not exact proportions.",
+    rightsHeading: "Image usage and rights",
+    rights:
+      "Images are used under the terms of their source. NASA material is generally not copyrighted, but individual assets can carry their own credit and use terms, so each one is checked before publication.",
+    limitationsHeading: "Limitations",
+    limitations:
+      "Numbers are rounded to the precision of their source and are marked measured, estimated, approximate, or calculated. Live data can be unavailable, in which case a stored value is shown with its date.",
+    sourceTable: {
+      source: "Source",
+      usedFor: "Used for",
+      licence: "Credit and rights",
+      apodUse: "Image of the day",
+      apodLicence: "NASA APOD, public domain unless the entry credits an author",
+      apodUrl: "https://apod.nasa.gov",
+      nasaImagesUse: "Object and topic imagery",
+      nasaImagesLicence: "NASA Image and Video Library, credit per asset",
+      nasaImagesUrl: "https://images.nasa.gov",
+    },
+    backHome: "Back to the journey",
   },
   common: {
     loading: "Loading",
@@ -120,10 +158,6 @@ export const en = {
     rulerTitle: "Conceptual scale",
     rulerNote:
       "A logarithmic scale: each step is ten times the one below, so the whole range of cosmic scale fits on a single axis.",
-    motion: {
-      full: "Full motion",
-      calm: "Calm motion",
-    },
     stages: {
       hero: {
         label: "Opening",
