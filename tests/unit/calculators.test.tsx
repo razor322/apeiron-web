@@ -8,6 +8,7 @@ import { travelTime } from "@/features/calculators/travel-time";
 import { PlanetAgeCalculator } from "@/features/calculators/PlanetAgeCalculator";
 import { TravelTimeCalculator } from "@/features/calculators/TravelTimeCalculator";
 import { en } from "@/i18n/en";
+import { id } from "@/i18n/id";
 
 afterEach(cleanup);
 
@@ -44,7 +45,7 @@ describe("PLANET_ORBITS", () => {
 
 describe("PlanetAgeCalculator", () => {
   it("shows the result and the formula/assumption under it", () => {
-    render(<PlanetAgeCalculator dict={en} />);
+    render(<PlanetAgeCalculator dict={en} locale="en" />);
     fireEvent.change(screen.getByLabelText(en.calculators.planetAge.ageLabel), {
       target: { value: "30" },
     });
@@ -54,7 +55,7 @@ describe("PlanetAgeCalculator", () => {
     expect(screen.getByText(/orbital period/i)).toBeInTheDocument();
   });
   it("shows a direction error on empty input, not a mood", () => {
-    render(<PlanetAgeCalculator dict={en} />);
+    render(<PlanetAgeCalculator dict={en} locale="en" />);
     fireEvent.change(screen.getByLabelText(en.calculators.planetAge.ageLabel), {
       target: { value: "" },
     });
@@ -64,7 +65,11 @@ describe("PlanetAgeCalculator", () => {
 
 describe("TravelTimeCalculator", () => {
   it("always renders the assumption note", () => {
-    render(<TravelTimeCalculator dict={en} />);
+    render(<TravelTimeCalculator dict={en} locale="en" />);
     expect(screen.getByText(/ignores acceleration/i)).toBeInTheDocument();
+  });
+  it("formats the travel-time result for the Indonesian locale", () => {
+    render(<TravelTimeCalculator dict={id} locale="id" />);
+    expect(screen.queryByText(/minutes/)).not.toBeInTheDocument();
   });
 });

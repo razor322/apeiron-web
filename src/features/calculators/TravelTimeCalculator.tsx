@@ -2,13 +2,14 @@
 
 import { useState } from "react";
 import type { Dictionary } from "@/i18n/en";
+import type { Locale } from "@/i18n/config";
 import { travelTime } from "@/features/calculators/travel-time";
 import { formatDuration } from "@/lib/astronomy/units/format";
 import { ErrorState } from "@/components/ui/ErrorState";
 
-type Props = { dict: Dictionary };
+type Props = { dict: Dictionary; locale: Locale };
 
-export function TravelTimeCalculator({ dict }: Props) {
+export function TravelTimeCalculator({ dict, locale }: Props) {
   const t = dict.calculators.travelTime;
   const [distanceKm, setDistanceKm] = useState("149600000");
   const [speedKms, setSpeedKms] = useState("299792.458");
@@ -29,7 +30,7 @@ export function TravelTimeCalculator({ dict }: Props) {
     error = t.errorSpeed;
   } else {
     const r = travelTime(distance * 1000, speed * 1000);
-    duration = formatDuration(r.seconds, "en");
+    duration = formatDuration(r.seconds, locale);
     note = r.assumptionNote;
   }
 

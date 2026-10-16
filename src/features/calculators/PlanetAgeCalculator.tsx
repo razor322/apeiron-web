@@ -2,10 +2,11 @@
 
 import { useState } from "react";
 import type { Dictionary } from "@/i18n/en";
+import type { Locale } from "@/i18n/config";
 import { PLANET_ORBITS, planetAge } from "@/features/calculators/planet-age";
 import { ErrorState } from "@/components/ui/ErrorState";
 
-type Props = { dict: Dictionary };
+type Props = { dict: Dictionary; locale: Locale };
 
 export function PlanetAgeCalculator({ dict }: Props) {
   const t = dict.calculators.planetAge;
