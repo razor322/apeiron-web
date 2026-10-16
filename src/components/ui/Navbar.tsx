@@ -38,8 +38,14 @@ export function Navbar({ locale, dict, children }: NavbarProps) {
       }`}
     >
       <div className="mx-auto flex w-full max-w-6xl flex-wrap items-center justify-between gap-x-6 gap-y-2 px-4 py-4 sm:px-6">
-        <a href={`/${locale}`} className="font-serif text-xl text-starlight">
+        <a
+          href={`/${locale}`}
+          className="flex items-baseline gap-3 font-serif text-xl text-starlight"
+        >
           {dict.nav.brand}
+          <span aria-hidden="true" className="text-base italic text-dust">
+            ἄπειρον
+          </span>
         </a>
         <ul className="flex flex-wrap items-center gap-x-4 gap-y-1 sm:gap-x-5">
           {links.map((link) => (

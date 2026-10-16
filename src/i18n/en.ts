@@ -71,6 +71,7 @@ export const en = {
     error: "Something went wrong.",
     empty: "Nothing here yet.",
     source: "Source",
+    sourcesToggle: "Source and numbers",
     staleNotice: "Showing stored data from",
     retry: "Try again",
     confidence: {
@@ -204,6 +205,13 @@ export const en = {
     rulerTitle: "Conceptual scale",
     rulerNote:
       "A logarithmic scale: each step is ten times the one below, so the whole range of cosmic scale fits on a single axis.",
+    widthLabel: "Screen width",
+    lightCrossing: "Light crosses it in",
+    landmarks: {
+      moonOrbit: "Moon's orbit",
+      earthOrbit: "Earth's orbit",
+      neptuneOrbit: "Neptune's orbit",
+    },
     stages: {
       hero: {
         label: "Opening",
@@ -211,23 +219,32 @@ export const en = {
         headline: "You are here.",
         body: "Scroll slowly. We are about to move away, one order of magnitude at a time.",
       },
+      mid: {
+        label: "Transition",
+        aria: "Transition: now we rise",
+        headline: "Now, we rise.",
+        body: "",
+      },
       earth: {
         label: "Earth",
         aria: "The Earth",
-        headline: "The whole world you know, wide enough to circle in a day.",
+        figure: "12,756 km",
+        headline: "The width of Earth. The whole world you know sits on its surface.",
         body: "Every city, every ocean, every person who has ever lived rests on its surface.",
       },
       "solar-system": {
         label: "Solar System",
         aria: "The Solar System",
-        headline: "Light leaves the Sun, and still arrives in minutes.",
-        body: "Eight planets, one star, and a void far larger than all of them. One of those specks is home.",
+        figure: "8:20",
+        headline: "The minutes and seconds sunlight needs to reach us.",
+        body: "About 149.6 million km, and almost all of it is empty. Eight planets, one star, and a void far larger than all of them. One of those specks is home.",
       },
       star: {
         label: "Nearest star",
         aria: "The nearest star",
-        headline: "The next star is years away, not minutes.",
-        body: "Proxima Centauri is the closest star to our Sun. The journey has only begun.",
+        figure: "4.24 yrs",
+        headline: "Light to the nearest star, Proxima Centauri.",
+        body: "About 4,400 times the width of Neptune's orbit. The journey has only begun.",
       },
       galaxy: {
         label: "Galaxy",

@@ -73,6 +73,7 @@ export const id: Dictionary = {
     error: "Terjadi kesalahan.",
     empty: "Belum ada apa pun di sini.",
     source: "Sumber",
+    sourcesToggle: "Sumber dan angka",
     staleNotice: "Menampilkan data tersimpan dari",
     retry: "Coba lagi",
     confidence: {
@@ -206,6 +207,13 @@ export const id: Dictionary = {
     rulerTitle: "Skala konseptual",
     rulerNote:
       "Skala logaritmik: setiap langkah sepuluh kali lipat dari yang di bawahnya, sehingga seluruh rentang skala kosmis muat pada satu sumbu.",
+    widthLabel: "Lebar layar",
+    lightCrossing: "Cahaya menyeberanginya dalam",
+    landmarks: {
+      moonOrbit: "orbit Bulan",
+      earthOrbit: "orbit Bumi",
+      neptuneOrbit: "orbit Neptunus",
+    },
     stages: {
       hero: {
         label: "Pembuka",
@@ -213,23 +221,32 @@ export const id: Dictionary = {
         headline: "Kamu ada di sini.",
         body: "Gulir pelan-pelan. Kita akan mulai menjauh, satu orde besaran setiap langkahnya.",
       },
+      mid: {
+        label: "Transisi",
+        aria: "Transisi: sekarang kita naik",
+        headline: "Sekarang, kita naik.",
+        body: "",
+      },
       earth: {
         label: "Bumi",
         aria: "Bumi",
-        headline: "Seluruh dunia yang kamu kenal, cukup luas untuk dikelilingi dalam sehari.",
+        figure: "12.756 km",
+        headline: "Lebar Bumi. Seluruh dunia yang kamu kenal ada di permukaannya.",
         body: "Setiap kota, setiap lautan, setiap orang yang pernah hidup berada di permukaannya.",
       },
       "solar-system": {
         label: "Tata Surya",
         aria: "Tata Surya",
-        headline: "Cahaya meninggalkan Matahari, dan tetap tiba dalam hitungan menit.",
-        body: "Delapan planet, satu bintang, dan ruang kosong yang jauh lebih luas dari semuanya. Salah satu noktah itu adalah rumahmu.",
+        figure: "8:20",
+        headline: "Menit dan detik yang dibutuhkan cahaya Matahari untuk sampai ke sini.",
+        body: "Sekitar 149,6 juta km, dan hampir seluruhnya hampa. Delapan planet, satu bintang, dan ruang kosong yang jauh lebih luas dari semuanya. Salah satu noktah itu adalah rumahmu.",
       },
       star: {
         label: "Bintang terdekat",
         aria: "Bintang terdekat",
-        headline: "Bintang berikutnya berjarak tahun, bukan menit.",
-        body: "Proxima Centauri adalah bintang terdekat dari Matahari kita. Perjalanan ini baru saja dimulai.",
+        figure: "4,24 thn",
+        headline: "Cahaya ke bintang terdekat, Proxima Centauri.",
+        body: "Sekitar 4.400 kali lebar orbit Neptunus. Perjalanan ini baru dimulai.",
       },
       galaxy: {
         label: "Galaksi",

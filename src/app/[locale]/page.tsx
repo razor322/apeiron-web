@@ -25,5 +25,5 @@ export default async function LocaleHome({
   if (!isLocale(locale)) notFound();
   const dict = await getDictionary(locale);
 
-  return <CosmicJourney dict={dict} />;
+  return <CosmicJourney dict={dict} locale={locale} />;
 }

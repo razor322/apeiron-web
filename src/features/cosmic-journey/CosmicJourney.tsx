@@ -2,30 +2,33 @@
 
 import { useEffect, useRef, useSyncExternalStore } from "react";
 import type { Dictionary } from "@/i18n/en";
+import type { Locale } from "@/i18n/config";
 import { STAGES } from "./stages";
 import { useJourneyProgress } from "./use-journey-progress";
 import { JourneyStage } from "./JourneyStage";
 import { JourneyProgress } from "./JourneyProgress";
 import { ScaleRuler } from "./ScaleRuler";
+import { ScaleReadout } from "./ScaleReadout";
 import { getCalm, subscribeCalm } from "@/lib/motion-preference";
 import type { SceneHandle } from "./scene/scene";
 
-// Opacity of a stage panel while scrubbing: fade in, hold, fade out across its
-// even share of the scroll. Adjacent stages only ever lightly overlap.
+// Opacity of a stage panel while scrubbing, keyed to the stage's own scroll
+// window so text and camera describe the same moment. Fades in, holds, fades out.
 function stageOpacity(progress: number, index: number): number {
-  const share = 1 / STAGES.length;
-  const t = (progress - index * share) / share;
+  const [start, end] = STAGES[index]!.range;
+  const span = Math.max(0.0001, end - start);
+  const t = (progress - start) / span;
   if (t < 0 || t > 1) return 0;
-  // The hero is the first thing at the top of the page, so it is fully visible
-  // before any scroll: no fade-in that would leave scroll-top blank.
+  // The hero is the first thing at the top of the page: fully visible before any
+  // scroll, so scroll-top is never blank.
   if (index === 0 && t < 0.2) return 1;
-  const fade = 0.2;
+  const fade = 0.25;
   if (t < fade) return t / fade;
   if (t > 1 - fade) return (1 - t) / fade;
   return 1;
 }
 
-export function CosmicJourney({ dict }: { dict: Dictionary }) {
+export function CosmicJourney({ dict, locale }: { dict: Dictionary; locale: Locale }) {
   // Server and first hydration render the reduced, stacked, no-JS-readable
   // journey (the server snapshot is `true`). We only upgrade to the pinned
   // experience once the client confirms motion is allowed.
@@ -108,7 +111,9 @@ export function CosmicJourney({ dict }: { dict: Dictionary }) {
   }
 
   // Motion path: one fixed stage viewport pinned by sticky, the tall wrapper
-  // below supplies the scroll distance that ScrollTrigger scrubs over.
+  // below supplies the scroll distance that ScrollTrigger scrubs over. Content
+  // panels sit fixed bottom-left, the hero and mid transition centre themselves,
+  // the ruler and readout live on the right, as in the prototype.
   return (
     <div className="relative" style={{ height: `${STAGES.length * 100}vh` }}>
       <div className="sticky top-0 h-screen overflow-hidden">
@@ -128,11 +133,22 @@ export function CosmicJourney({ dict }: { dict: Dictionary }) {
         <ScaleRuler
           exponent={STAGES[activeIndex]?.exponent ?? 0}
           dict={dict}
-          className="absolute right-8 top-1/2 z-10 hidden w-56 -translate-y-1/2 text-right md:block"
+          className="absolute right-[clamp(18px,2.4vw,30px)] top-1/2 z-10 hidden w-44 -translate-y-1/2 text-right md:block"
+        />
+        <ScaleReadout
+          progress={progress}
+          locale={locale}
+          dict={dict}
+          className="absolute right-[clamp(18px,3vw,36px)] bottom-[clamp(40px,11vh,110px)] z-10 hidden text-right md:block"
         />
         <div className="absolute inset-0 z-10">
           {STAGES.map((stage, index) => {
             const opacity = stageOpacity(progress, index);
+            const kind = stage.kind;
+            const position =
+              kind === "hero" || kind === "mid"
+                ? "absolute inset-x-0 top-[19vh] px-5"
+                : "absolute bottom-[clamp(40px,11vh,110px)] left-[clamp(20px,6vw,96px)] w-[min(34rem,calc(100%-40px))]";
             return (
               <JourneyStage
                 key={stage.id}
@@ -140,7 +156,7 @@ export function CosmicJourney({ dict }: { dict: Dictionary }) {
                 dict={dict}
                 ariaHidden={opacity < 0.05}
                 style={{ opacity, pointerEvents: opacity < 0.5 ? "none" : "auto" }}
-                className="absolute bottom-[12vh] left-[clamp(20px,6vw,96px)] w-[min(34rem,calc(100%-40px))]"
+                className={position}
               />
             );
           })}
