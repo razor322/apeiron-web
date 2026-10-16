@@ -59,6 +59,29 @@ export const id: Dictionary = {
       calculated: "Terhitung",
     },
   },
+  calculators: {
+    heading: "Kalkulator",
+    intro:
+      "Perkiraan edukatif. Setiap hasil menampilkan rumus dan asumsi di baliknya.",
+    planetAge: {
+      heading: "Usiamu di planet lain",
+      ageLabel: "Usiamu dalam tahun Bumi",
+      planetLabel: "Planet",
+      resultLabel: "Usiamu di sana",
+      errorPositive: "Masukkan usia positif dalam tahun Bumi.",
+      errorNonNumeric: "Masukkan angka untuk usiamu.",
+      errorUnknownPlanet: "Pilih planet dari daftar.",
+    },
+    travelTime: {
+      heading: "Waktu tempuh",
+      distanceLabel: "Jarak dalam kilometer",
+      speedLabel: "Kecepatan dalam kilometer per detik",
+      resultLabel: "Waktu tempuh",
+      errorDistance: "Masukkan jarak yang tidak negatif.",
+      errorSpeed: "Masukkan kecepatan positif.",
+      errorNonNumeric: "Masukkan angka.",
+    },
+  },
   cosmosToday: {
     heading: "Cosmos Hari Ini",
     retrievedOn: "Diambil pada",

@@ -57,6 +57,29 @@ export const en = {
       calculated: "Calculated",
     },
   },
+  calculators: {
+    heading: "Calculators",
+    intro:
+      "Educational estimates. Every result shows the formula and the assumptions behind it.",
+    planetAge: {
+      heading: "Your age on another planet",
+      ageLabel: "Your age in Earth years",
+      planetLabel: "Planet",
+      resultLabel: "Your age there",
+      errorPositive: "Enter a positive age in Earth years.",
+      errorNonNumeric: "Enter a number for your age.",
+      errorUnknownPlanet: "Choose a planet from the list.",
+    },
+    travelTime: {
+      heading: "Travel time",
+      distanceLabel: "Distance in kilometers",
+      speedLabel: "Speed in kilometers per second",
+      resultLabel: "Travel time",
+      errorDistance: "Enter a non-negative distance.",
+      errorSpeed: "Enter a positive speed.",
+      errorNonNumeric: "Enter a number.",
+    },
+  },
   cosmosToday: {
     heading: "Cosmos Today",
     retrievedOn: "Retrieved on",
