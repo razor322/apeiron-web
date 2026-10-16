@@ -3,6 +3,7 @@ export const en = {
     home: "Home",
     explore: "Explore",
     cosmosToday: "Cosmos Today",
+    calculators: "Calculators",
     about: "About",
     label: "Main navigation",
     brand: "Apeiron",
@@ -23,6 +24,11 @@ export const en = {
       title: "Cosmos Today",
       description:
         "The astronomy image of the day with its explanation, drawn from NASA APOD and shown with its source.",
+    },
+    calculators: {
+      title: "Apeiron: calculators",
+      description:
+        "Educational estimates of your age on other planets and travel times across the Solar System, each shown with its formula and assumptions.",
     },
     about: {
       title: "About Apeiron",
@@ -85,6 +91,9 @@ export const en = {
     heading: "Calculators",
     intro:
       "Educational estimates. Every result shows the formula and the assumptions behind it.",
+    longIntro:
+      "These calculators are illustrative, not precise instruments. The age result divides your Earth years by a planet's orbital period, and the travel time divides distance by speed in a straight line. Both ignore acceleration, gravity, and the real path a spacecraft would take, so treat each number as a sense of scale rather than a plan.",
+    backHome: "Back to the journey",
     planetAge: {
       heading: "Your age on another planet",
       ageLabel: "Your age in Earth years",

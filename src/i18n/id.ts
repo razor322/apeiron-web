@@ -5,6 +5,7 @@ export const id: Dictionary = {
     home: "Beranda",
     explore: "Jelajah",
     cosmosToday: "Cosmos Hari Ini",
+    calculators: "Kalkulator",
     about: "Tentang",
     label: "Navigasi utama",
     brand: "Apeiron",
@@ -25,6 +26,11 @@ export const id: Dictionary = {
       title: "Cosmos Hari Ini",
       description:
         "Gambar astronomi hari ini beserta penjelasannya, diambil dari NASA APOD dan ditampilkan dengan sumbernya.",
+    },
+    calculators: {
+      title: "Apeiron: kalkulator",
+      description:
+        "Perkiraan edukatif tentang usiamu di planet lain dan waktu tempuh melintasi Tata Surya, masing-masing ditampilkan dengan rumus dan asumsinya.",
     },
     about: {
       title: "Tentang Apeiron",
@@ -87,6 +93,8 @@ export const id: Dictionary = {
     heading: "Kalkulator",
     intro:
       "Perkiraan edukatif. Setiap hasil menampilkan rumus dan asumsi di baliknya.",
+    longIntro:
+      "Kalkulator ini bersifat ilustratif, bukan alat yang presisi. Hasil usia membagi usiamu dalam tahun Bumi dengan periode orbit planet, dan waktu tempuh membagi jarak dengan kecepatan pada garis lurus. Keduanya mengabaikan percepatan, gravitasi, dan jalur sebenarnya yang akan ditempuh wahana, jadi anggap setiap angka sebagai gambaran skala, bukan rencana.",
     planetAge: {
       heading: "Usiamu di planet lain",
       ageLabel: "Usiamu dalam tahun Bumi",
@@ -105,6 +113,7 @@ export const id: Dictionary = {
       errorSpeed: "Masukkan kecepatan positif.",
       errorNonNumeric: "Masukkan angka.",
     },
+    backHome: "Kembali ke perjalanan",
   },
   cosmosToday: {
     heading: "Cosmos Hari Ini",

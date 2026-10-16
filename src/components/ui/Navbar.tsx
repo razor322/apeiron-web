@@ -25,6 +25,7 @@ export function Navbar({ locale, dict, children }: NavbarProps) {
     { href: `/${locale}`, label: dict.nav.home },
     { href: `/${locale}/explore`, label: dict.nav.explore },
     { href: `/${locale}/cosmos-today`, label: dict.nav.cosmosToday },
+    { href: `/${locale}/calculators`, label: dict.nav.calculators },
     { href: `/${locale}/about`, label: dict.nav.about },
   ];
 

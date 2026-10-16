@@ -12,8 +12,19 @@ describe("Navbar", () => {
     render(<Navbar locale="en" dict={en} />);
     const hrefs = screen.getAllByRole("link").map((a) => a.getAttribute("href"));
     for (const h of hrefs) {
-      expect(["/en", "/en/explore", "/en/cosmos-today", "/en/about"]).toContain(h);
+      expect([
+        "/en",
+        "/en/explore",
+        "/en/cosmos-today",
+        "/en/calculators",
+        "/en/about",
+      ]).toContain(h);
     }
+  });
+  it("links to the calculators page", () => {
+    render(<Navbar locale="en" dict={en} />);
+    const link = screen.getByRole("link", { name: en.nav.calculators });
+    expect(link).toHaveAttribute("href", "/en/calculators");
   });
   it("carries the locale prefix for the id locale", () => {
     render(<Navbar locale="id" dict={en} />);
