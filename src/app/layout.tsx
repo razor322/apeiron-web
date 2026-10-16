@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { fontVariables } from "@/app/fonts";
+import { WebVitalsReporter } from "@/components/perf/WebVitalsReporter";
 import "@/app/globals.css";
 
 export const metadata: Metadata = {
@@ -13,7 +14,10 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en" className="bg-void">
-      <body className={`${fontVariables} font-sans`}>{children}</body>
+      <body className={`${fontVariables} font-sans`}>
+        {children}
+        <WebVitalsReporter />
+      </body>
     </html>
   );
 }
