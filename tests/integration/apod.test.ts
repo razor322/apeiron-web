@@ -21,7 +21,8 @@ describe("ApodSchema", () => {
     expect(ApodSchema.safeParse(valid).success).toBe(true);
   });
   it("rejects a payload without a url", () => {
-    const { url, ...bad } = valid;
+    const bad: Record<string, unknown> = { ...valid };
+    delete bad.url;
     expect(ApodSchema.safeParse(bad).success).toBe(false);
   });
 });
