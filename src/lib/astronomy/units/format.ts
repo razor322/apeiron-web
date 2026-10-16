@@ -3,6 +3,7 @@ import type { Locale } from "@/i18n/config";
 const WORDS: Record<Locale, {
   million: string;
   billion: string;
+  ly: string;
   ltSecond: string;
   seconds: string;
   minutes: string;
@@ -12,6 +13,7 @@ const WORDS: Record<Locale, {
   en: {
     million: "million km",
     billion: "billion km",
+    ly: "light-years",
     ltSecond: "less than a second",
     seconds: "seconds",
     minutes: "minutes",
@@ -21,6 +23,7 @@ const WORDS: Record<Locale, {
   id: {
     million: "juta km",
     billion: "miliar km",
+    ly: "tahun cahaya",
     ltSecond: "kurang dari 1 detik",
     seconds: "detik",
     minutes: "menit",
@@ -28,6 +31,9 @@ const WORDS: Record<Locale, {
     years: "tahun",
   },
 };
+
+// One light-year in metres, for scales once kilometres stop meaning anything.
+const LIGHT_YEAR = 9.4607e15;
 
 function nf(locale: Locale): Intl.NumberFormat {
   return new Intl.NumberFormat(locale === "id" ? "id-ID" : "en-US", {
@@ -52,7 +58,8 @@ export function formatLength(meters: number, locale: Locale = "en"): string {
   if (km < 1e6) return `${f.format(km)} km`;
   const million = sig(meters / 1e9);
   if (million < 1e3) return `${f.format(million)} ${w.million}`;
-  return `${f.format(sig(meters / 1e12))} ${w.billion}`;
+  if (meters < LIGHT_YEAR * 0.1) return `${f.format(sig(meters / 1e12))} ${w.billion}`;
+  return `${f.format(sig(meters / LIGHT_YEAR))} ${w.ly}`;
 }
 
 export function formatDuration(seconds: number, locale: Locale = "en"): string {

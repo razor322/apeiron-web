@@ -33,8 +33,9 @@ const PLANETS = [
   { n: "Neptune", a: 4.495e12, r: 2.46e7, ang: 3.7, lab: 1 },
 ];
 
-// Screen width, in metres, as a function of scroll progress. Keyframes mirrored
-// from the prototype's journey curve; the interpolation eases between holds.
+// Screen width, in metres, as a function of scroll progress. The first ten
+// keyframes mirror the prototype's journey curve (Earth to Proxima); the last
+// three carry the zoom on out to the Milky Way and the observable universe.
 const KEYFRAMES: [number, number][] = [
   [0, 0.3],
   [0.07, 0.3],
@@ -46,7 +47,10 @@ const KEYFRAMES: [number, number][] = [
   [0.68, 11.3],
   [0.74, 11.3],
   [0.86, 13.05],
-  [1, 13.05],
+  [0.9, 13.05],
+  [0.94, 21],
+  [0.97, 27],
+  [1, 27],
 ];
 
 function exponentAt(progress: number): number {
@@ -143,6 +147,9 @@ export function createScene(canvas: HTMLCanvasElement): SceneHandle {
     const W = 10 ** e;
     const S = Math.min(cw, ch);
     const ppm = S / W;
+    // The local system (Sun, planets, Earth, Moon) fades out as the zoom leaves
+    // for the galaxy; past e ~17.5 none of it should remain on screen.
+    const localFade = 1 - smooth(15, 17.5, e);
 
     const a = 0.08 - 0.3 * smooth(3, 7, e);
     let camy = Math.max(0, RE + a * W) * (1 - smooth(6.5, 7.2, e));
@@ -178,7 +185,89 @@ export function createScene(canvas: HTMLCanvasElement): SceneHandle {
     }
     ctx.globalAlpha = 1;
 
-    // Sky glow near the horizon, one gradient stop only.
+    // Milky Way: a barred spiral seen at a tilt. It materialises as the zoom
+    // leaves the Sun behind (e ~18), swells to fill the frame, then recedes into
+    // the deep-field of galaxies. Drawn before the sky glow so the horizon never
+    // competes with it, and it is absent at small e.
+    const gwA = smooth(17.5, 20, e) * (1 - smooth(24.5, 27, e));
+    if (gwA > 0.01) {
+      const R = Math.max(1.2e21, 1e21) * ppm * 0.5;
+      const gx = cw / 2;
+      const gy = ch / 2;
+      const tilt = 0.32 + 0.35 * smooth(20, 24, e);
+      const spin = (t * 0.02) % TAU;
+
+      ctx.save();
+      ctx.globalAlpha = gwA;
+      ctx.translate(gx, gy);
+      ctx.rotate(spin);
+
+      // Central bulge: warm haze.
+      const bg = ctx.createRadialGradient(0, 0, 0, 0, 0, Math.max(R * 0.5, 30));
+      bg.addColorStop(0, "rgba(255,236,201,0.9)");
+      bg.addColorStop(0.35, "rgba(232,161,91,0.35)");
+      bg.addColorStop(1, "rgba(232,161,91,0)");
+      ctx.fillStyle = bg;
+      ctx.beginPath();
+      ctx.ellipse(0, 0, Math.max(R * 0.5, 30), Math.max(R * 0.5 * tilt, 12), 0, 0, TAU);
+      ctx.fill();
+
+      // Spiral arms: a few logarithmic arcs of stars.
+      const arms = 2;
+      for (let arm = 0; arm < arms; arm++) {
+        const base = (arm / arms) * TAU;
+        ctx.beginPath();
+        for (let i = 0; i <= 60; i++) {
+          const u = i / 60;
+          const r = u * R;
+          const ang = base + u * 3.2;
+          const x = Math.cos(ang) * r;
+          const y = Math.sin(ang) * r * tilt;
+          if (i) ctx.lineTo(x, y);
+          else ctx.moveTo(x, y);
+        }
+        ctx.strokeStyle = "rgba(232,228,220,0.28)";
+        ctx.lineWidth = Math.max(1, R * 0.02);
+        ctx.stroke();
+      }
+
+      // Star dust across the disc.
+      const dust = ctx.createRadialGradient(0, 0, 0, 0, 0, Math.max(R, 20));
+      dust.addColorStop(0, "rgba(220,225,240,0.18)");
+      dust.addColorStop(0.6, "rgba(180,195,235,0.08)");
+      dust.addColorStop(1, "rgba(180,195,235,0)");
+      ctx.fillStyle = dust;
+      ctx.beginPath();
+      ctx.ellipse(0, 0, Math.max(R, 20), Math.max(R * tilt, 14), 0, 0, TAU);
+      ctx.fill();
+
+      ctx.restore();
+    }
+
+    // Observable universe: the deep field. A scatter of distant galaxies that
+    // grows as the Milky Way recedes, using the same seeded field so it is stable.
+    const unA = smooth(24, 26.5, e);
+    if (unA > 0.01) {
+      ctx.save();
+      ctx.globalAlpha = unA;
+      for (const s of STARS) {
+        if (s.s < 1.4) continue;
+        const x = cw / 2 + (s.x - 0.5) * cw * 1.15;
+        const y = ch / 2 + (s.y - 0.5) * ch * 1.15;
+        const r = 1.2 + s.a * 1.8;
+        const g = ctx.createRadialGradient(x, y, 0, x, y, r * 4);
+        g.addColorStop(0, "rgba(255,244,222,0.9)");
+        g.addColorStop(0.4, "rgba(210,205,235,0.25)");
+        g.addColorStop(1, "rgba(210,205,235,0)");
+        ctx.fillStyle = g;
+        ctx.beginPath();
+        ctx.arc(x, y, r * 4, 0, TAU);
+        ctx.fill();
+      }
+      ctx.restore();
+    }
+
+    ctx.globalAlpha = 1;
     const skyA = (1 - smooth(2, 5.5, e)) * 0.3;
     if (skyA > 0.003) {
       const g = ctx.createLinearGradient(0, yy - 0.5 * S, 0, yy);
@@ -189,7 +278,7 @@ export function createScene(canvas: HTMLCanvasElement): SceneHandle {
     }
 
     // Sun.
-    const sunA = smooth(10, 10.8, e);
+    const sunA = smooth(10, 10.8, e) * localFade;
     if (sunA > 0.01) {
       const rc = Math.max(RS * ppm, 1.8);
       const rg = rc * 3.5 + 14;
@@ -211,7 +300,7 @@ export function createScene(canvas: HTMLCanvasElement): SceneHandle {
     }
 
     // Orbit rings and planets.
-    const orbA = 0.11 * smooth(11, 12, e);
+    const orbA = 0.11 * smooth(11, 12, e) * localFade;
     if (orbA > 0.004) {
       ctx.strokeStyle = `rgba(232,228,220,${orbA})`;
       ctx.lineWidth = 1;
@@ -223,7 +312,7 @@ export function createScene(canvas: HTMLCanvasElement): SceneHandle {
         ctx.stroke();
       }
     }
-    const plA = smooth(11.6, 12.4, e);
+    const plA = smooth(11.6, 12.4, e) * localFade;
     if (plA > 0.01) {
       for (const pl of PLANETS) {
         const q = project(pl.a * Math.cos(pl.ang), pl.a * Math.sin(pl.ang));
@@ -238,7 +327,7 @@ export function createScene(canvas: HTMLCanvasElement): SceneHandle {
     }
 
     // Sun to Earth light line, with a travelling pulse.
-    const lnA = smooth(10.3, 11, e) * (1 - smooth(12.3, 13, e));
+    const lnA = smooth(10.3, 11, e) * (1 - smooth(12.3, 13, e)) * localFade;
     if (lnA > 0.01) {
       ctx.save();
       ctx.strokeStyle = `rgba(232,161,91,${0.4 * lnA})`;
@@ -262,7 +351,7 @@ export function createScene(canvas: HTMLCanvasElement): SceneHandle {
     }
 
     // Moon.
-    const mA = smooth(8, 8.6, e) * (1 - smooth(10, 10.8, e));
+    const mA = smooth(8, 8.6, e) * (1 - smooth(10, 10.8, e)) * localFade;
     if (mA > 0.01) {
       const mp = project(AU + LM * Math.cos(0.35), LM * Math.sin(0.35));
       const mr = LM * ppm;
@@ -289,12 +378,15 @@ export function createScene(canvas: HTMLCanvasElement): SceneHandle {
       ctx.globalAlpha = 1;
     }
 
-    // Earth: a disc while small, the horizon filling the frame while large.
+    // Earth: a disc while small, the horizon filling the frame while large. It
+    // fades with the rest of the local system once the zoom leaves for the galaxy.
     if (Rpx < 1.6) {
+      ctx.globalAlpha = localFade;
       ctx.fillStyle = "#8FB0E8";
       ctx.beginPath();
       ctx.arc(ex, ey, 1.6, 0, TAU);
       ctx.fill();
+      ctx.globalAlpha = 1;
     } else if (Rpx < 2000) {
       const g = ctx.createLinearGradient(0, ey - Rpx, 0, ey + Rpx);
       g.addColorStop(0, "#14213a");

@@ -10,11 +10,12 @@ type ScaleReadoutProps = {
   className?: string;
 };
 
-const MAX_EXPONENT = 13.05;
+const MAX_EXPONENT = 27;
 const C = 299792458;
 
 // Screen width, in metres, for a scroll progress value. Mirrors the scene's zoom
-// keyframes so the number the reader sees matches the canvas.
+// keyframes so the number the reader sees matches the canvas, out to the galaxy
+// and the observable universe.
 const KEYFRAMES: [number, number][] = [
   [0, 0.3],
   [0.07, 0.3],
@@ -26,7 +27,10 @@ const KEYFRAMES: [number, number][] = [
   [0.68, 11.3],
   [0.74, 11.3],
   [0.86, 13.05],
-  [1, 13.05],
+  [0.9, 13.05],
+  [0.94, 21],
+  [0.97, 27],
+  [1, 27],
 ];
 
 function exponentAt(progress: number): number {
