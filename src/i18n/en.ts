@@ -99,6 +99,26 @@ export const en = {
     scaleLabel: "On the cosmic calendar",
     scaleNote:
       "Each date maps real elapsed time onto a 365.25 day year, from the Big Bang to today.",
+    bigBang: {
+      title: "The Big Bang",
+      text: "The universe begins, expanding from a hot, dense state.",
+    },
+    milkyWay: {
+      title: "The Milky Way takes shape",
+      text: "Our galaxy assembles from gas and dark matter, its first stars igniting.",
+    },
+    solarSystem: {
+      title: "The Solar System forms",
+      text: "The Sun and its planets condense from a cloud of gas and dust.",
+    },
+    firstLife: {
+      title: "The first life on Earth",
+      text: "Simple single-celled life appears in Earth's oceans.",
+    },
+    firstHumans: {
+      title: "The first humans",
+      text: "Anatomically modern humans emerge, in the last seconds of the year-scale.",
+    },
   },
   stardust: {
     heading: "You are made of stardust",

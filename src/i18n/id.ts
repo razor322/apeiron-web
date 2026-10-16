@@ -101,6 +101,26 @@ export const id: Dictionary = {
     scaleLabel: "Pada kalender kosmis",
     scaleNote:
       "Setiap tanggal memetakan waktu nyata yang berlalu ke dalam satu tahun 365,25 hari, dari Dentuman Besar sampai hari ini.",
+    bigBang: {
+      title: "Dentuman Besar",
+      text: "Alam semesta bermula, mengembang dari keadaan yang panas dan padat.",
+    },
+    milkyWay: {
+      title: "Bima Sakti terbentuk",
+      text: "Galaksi kita tersusun dari gas dan materi gelap, bintang pertamanya menyala.",
+    },
+    solarSystem: {
+      title: "Tata Surya terbentuk",
+      text: "Matahari dan planet-planetnya memadat dari awan gas dan debu.",
+    },
+    firstLife: {
+      title: "Kehidupan pertama di Bumi",
+      text: "Kehidupan bersel tunggal sederhana muncul di samudra Bumi.",
+    },
+    firstHumans: {
+      title: "Manusia pertama",
+      text: "Manusia modern secara anatomis muncul, pada detik-detik terakhir skala tahun ini.",
+    },
   },
   stardust: {
     heading: "Kamu terbuat dari debu bintang",
