@@ -17,16 +17,23 @@ Facts live in one registry: `src/features/cosmic-facts/facts.ts` (`COSMIC_FACTS`
 
 ## Change a cache TTL
 
-TTLs are declared per adapter, next to the code that uses them.
+Freshness is owned in two different places, one per provider.
 
-- APOD: `APOD_TTL_MS` in `src/lib/astronomy/providers/nasa-apod.ts`
-  (currently `6 * 3600_000`, six hours).
-- The cache itself is `src/lib/cache/ttl-cache.ts` (`cached(key, ttlMs, fetcher)`),
-  an in-process TTL map with stale-on-error fallback. Do not change it to alter a
-  TTL; change the constant in the adapter.
+- APOD: the adapter `src/lib/astronomy/providers/nasa-apod.ts` keeps no TTL
+  constant. It holds a module-level `lastSnapshot` only, to surface staleness
+  when the provider fails or rate-limits. Day-level freshness comes from ISR on
+  the Cosmos Today route: `export const revalidate = 21600` (six hours) in
+  `src/app/[locale]/cosmos-today/page.tsx`. To change APOD freshness, edit that
+  `revalidate` value.
+- NASA Images: `src/lib/astronomy/providers/nasa-images.ts` caches through
+  `cached(key, 24h, ...)` (`TTL_MS = 24 * 60 * 60 * 1000`). The cache itself is
+  `src/lib/cache/ttl-cache.ts` (`cached(key, ttlMs, fetcher)`), an in-process TTL
+  map with stale-on-error fallback. To change that TTL, edit `TTL_MS` in the
+  adapter; do not change the cache.
 
-After editing, run `bun run test tests/unit/ttl-cache.test.ts` and, if the adapter
-has integration coverage, `bun run test tests/integration/apod.test.ts`.
+After editing, run `bun run test tests/unit/ttl-cache.test.ts` and, for the
+adapter you touched, `bun run test tests/integration/apod.test.ts` or
+`bun run test tests/integration/nasa-images.test.ts`.
 
 ## Fix a provider
 
@@ -36,15 +43,26 @@ Each provider is one adapter behind one stable interface. If a source changes:
    its validation schema under `src/lib/astronomy/schemas/` if the response
    shape moved. Keep mapping the raw response onto the internal model so the UI
    never sees a provider shape.
-2. Update that adapter's tests in the same change:
-   `tests/integration/apod.test.ts` and, if the mapping changed,
-   `tests/unit/apod-card.test.tsx`.
-3. Never let a raw provider field leak past the adapter. The UI reads only the
+2. Handle rate limits as a first-class case. APOD throws `RateLimitError`
+   (`src/lib/astronomy/providers/nasa-apod.ts`) on HTTP 429 (quota exhausted) or
+   403 (blocked key), carrying the status and any `x-ratelimit-remaining`; it
+   warns when fewer than 10 requests remain this hour. NASA Images throws
+   `ImageRateLimitError` on the same two statuses.
+3. Read the provider logs. `src/lib/astronomy/log.ts` (`logProvider`) emits one
+   greppable line per event: `event=ok|error|rate_limited|cache_hit|cache_miss`,
+   plus `ms`, `status`, and `errorClass` when present. Errors go to
+   `console.error`, rate limits to `console.warn`, everything else to
+   `console.info`. Never surface these strings to the client.
+4. Update that adapter's tests in the same change:
+   `tests/integration/apod.test.ts`, `tests/integration/nasa-images.test.ts`,
+   and, if the mapping changed, `tests/unit/apod-card.test.tsx`.
+5. Never let a raw provider field leak past the adapter. The UI reads only the
    `AstronomySnapshot<T>` wrapper (data + provenance: provider, sourceUrl,
    retrievedAt, stale).
-4. If the provider is down, the adapter returns the last snapshot with
-   `stale: true`; the UI shows the stored value with its date. Do not remove
-   that fallback.
+6. If the provider is down or rate-limited, the adapter returns the last
+   snapshot with `stale: true` (APOD's module-level `lastSnapshot`; NASA Images'
+   cache stale-on-error); the UI shows the stored value with its date. Do not
+   remove that fallback.
 
 ## Roll back a release
 
