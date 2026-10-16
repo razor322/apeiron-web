@@ -8,6 +8,10 @@ export type SceneHandle = {
   destroy: () => void;
 };
 
+// Resolved label strings the scene may draw next to bodies (nearby stars). The
+// scene stays dictionary-agnostic: the caller hands it plain text.
+export type SceneLabels = { stars: Record<string, string> };
+
 const TAU = Math.PI * 2;
 const clamp = (x: number, a = 0, b = 1) => (x < a ? a : x > b ? b : x);
 const smooth = (a: number, b: number, x: number) => {
@@ -23,14 +27,63 @@ const LM = 3.844e8;
 const RM = 1.737e6;
 
 const ORBITS = [5.79e10, 1.082e11, AU, 2.279e11, 7.785e11, 1.434e12, 2.871e12, 4.495e12];
-const PLANETS = [
-  { n: "Mercury", a: 5.79e10, r: 2.44e6, ang: 2.2, lab: 0 },
-  { n: "Venus", a: 1.082e11, r: 6.05e6, ang: 4.1, lab: 0 },
-  { n: "Mars", a: 2.279e11, r: 3.39e6, ang: 1.15, lab: 0 },
-  { n: "Jupiter", a: 7.785e11, r: 6.99e7, ang: 2.65, lab: 1 },
-  { n: "Saturn", a: 1.434e12, r: 5.82e7, ang: 5.1, lab: 1 },
-  { n: "Uranus", a: 2.871e12, r: 2.54e7, ang: 0.6, lab: 1 },
-  { n: "Neptune", a: 4.495e12, r: 2.46e7, ang: 3.7, lab: 1 },
+type Moon = { n: string; d: number; r: number; ang: number; lab: boolean };
+type Planet = { n: string; a: number; r: number; ang: number; lab: boolean; moons: Moon[] };
+
+// The eight planets with their iconic natural satellites. Distances in metres
+// from the planet centre, radii in metres. Mercury and Venus have none, which is
+// correct. Only the largest get a label.
+const PLANETS: Planet[] = [
+  { n: "Mercury", a: 5.79e10, r: 2.44e6, ang: 2.2, lab: false, moons: [] },
+  { n: "Venus", a: 1.082e11, r: 6.05e6, ang: 4.1, lab: false, moons: [] },
+  {
+    n: "Mars",
+    a: 2.279e11,
+    r: 3.39e6,
+    ang: 1.15,
+    lab: false,
+    moons: [
+      { n: "Phobos", d: 9.38e6, r: 1.1e4, ang: 0.8, lab: false },
+      { n: "Deimos", d: 2.346e7, r: 6.2e3, ang: 2.4, lab: false },
+    ],
+  },
+  {
+    n: "Jupiter",
+    a: 7.785e11,
+    r: 6.99e7,
+    ang: 2.65,
+    lab: true,
+    moons: [
+      { n: "Io", d: 4.217e8, r: 1.82e6, ang: 0.2, lab: false },
+      { n: "Europa", d: 6.711e8, r: 1.56e6, ang: 1.6, lab: false },
+      { n: "Ganymede", d: 1.0704e9, r: 2.63e6, ang: 3.1, lab: true },
+      { n: "Callisto", d: 1.8827e9, r: 2.41e6, ang: 4.7, lab: true },
+    ],
+  },
+  {
+    n: "Saturn",
+    a: 1.434e12,
+    r: 5.82e7,
+    ang: 5.1,
+    lab: true,
+    moons: [{ n: "Titan", d: 1.2219e9, r: 2.57e6, ang: 1.1, lab: true }],
+  },
+  {
+    n: "Uranus",
+    a: 2.871e12,
+    r: 2.54e7,
+    ang: 0.6,
+    lab: true,
+    moons: [{ n: "Titania", d: 4.363e8, r: 7.9e5, ang: 2.8, lab: true }],
+  },
+  {
+    n: "Neptune",
+    a: 4.495e12,
+    r: 2.46e7,
+    ang: 3.7,
+    lab: true,
+    moons: [{ n: "Triton", d: 3.5476e8, r: 1.35e6, ang: 0.9, lab: true }],
+  },
 ];
 
 // Screen width, in metres, as a function of scroll progress. The first ten
@@ -114,24 +167,40 @@ const ALL_BLOBS = Array.from({ length: 80 }, () => {
   };
 });
 
-// Deep-field galaxies for the observable-universe stage: a separate seeded set
-// (sharp points and faint smudges), independent of the star field.
+// Nearby stars for the "star" stage: Proxima Centauri plus a handful of bright
+// named neighbours, placed in unit space (scaled and projected at draw time).
+type NearbyStar = { key: string; x: number; y: number; r: number; warm: boolean; named: boolean };
+const NEARBY_STARS: NearbyStar[] = [
+  { key: "journey.stars.proxima", x: 0.68, y: 0.66, r: 2.6, warm: true, named: true },
+  { key: "journey.stars.alphaCentauri", x: 0.82, y: 0.4, r: 3.1, warm: true, named: true },
+  { key: "journey.stars.sirius", x: 0.3, y: 0.28, r: 2.2, warm: false, named: true },
+  { key: "journey.stars.barnard", x: 0.5, y: 0.8, r: 1.6, warm: true, named: true },
+  { key: "journey.stars.others", x: 0.14, y: 0.6, r: 1.4, warm: false, named: false },
+  { key: "journey.stars.others", x: 0.88, y: 0.2, r: 1.5, warm: true, named: false },
+];
+
 const rngGalaxies = seeded(1234);
 const GALAXY_TINTS = [
-  "rgba(255,244,222,0.9)",
-  "rgba(255,225,190,0.85)",
-  "rgba(210,220,255,0.8)",
-  "rgba(235,235,245,0.75)",
+  "rgba(255,244,222,0.95)",
+  "rgba(255,225,190,0.9)",
+  "rgba(210,220,255,0.85)",
+  "rgba(235,235,245,0.8)",
+  "rgba(255,190,175,0.7)",
 ];
-const ALL_GALAXIES = Array.from({ length: 260 }, () => {
-  const blur = rngGalaxies() < 0.35;
+const ALL_GALAXIES = Array.from({ length: 420 }, () => {
+  const kind = rngGalaxies();
+  const blur = kind < 0.4;
+  const redshift = kind > 0.85;
   return {
     x: rngGalaxies(),
     y: rngGalaxies(),
-    r: blur ? 2.2 + rngGalaxies() * 3.2 : 0.7 + rngGalaxies() * 1.1,
-    a: blur ? 0.16 + rngGalaxies() * 0.22 : 0.5 + rngGalaxies() * 0.5,
+    r: blur ? 2.4 + rngGalaxies() * 3.4 : redshift ? 1.2 + rngGalaxies() * 1.6 : 0.7 + rngGalaxies() * 1.1,
+    a: blur ? 0.3 + rngGalaxies() * 0.25 : 0.7 + rngGalaxies() * 0.3,
     smudge: blur,
-    tint: GALAXY_TINTS[(rngGalaxies() * GALAXY_TINTS.length) | 0]!,
+    tint: redshift ? "rgba(255,190,175,0.75)" : GALAXY_TINTS[(rngGalaxies() * GALAXY_TINTS.length) | 0]!,
+    // Cluster nodes: galaxies gather toward a few centres, so the field reads as
+    // a web rather than an even sprinkle.
+    cluster: rngGalaxies(),
   };
 });
 
@@ -162,7 +231,7 @@ function quality(): { dprCap: number; stars: number; blobs: number; galaxies: nu
   const weak = typeof cores === "number" && cores <= 4;
   const narrow = typeof window !== "undefined" && window.innerWidth < 768;
   if (weak || narrow)
-    return { dprCap: 1, stars: 240, blobs: 44, galaxies: 150, arms: 260 };
+    return { dprCap: 1, stars: 240, blobs: 44, galaxies: 180, arms: 260 };
   return {
     dprCap: 2,
     stars: ALL_STARS.length,
@@ -172,7 +241,7 @@ function quality(): { dprCap: number; stars: number; blobs: number; galaxies: nu
   };
 }
 
-export function createScene(canvas: HTMLCanvasElement): SceneHandle {
+export function createScene(canvas: HTMLCanvasElement, labels?: SceneLabels): SceneHandle {
   const context = canvas.getContext("2d");
   // No 2D context (or no canvas): the CSS gradient + star fallback behind the
   // canvas stays visible, so the journey still renders. Nothing to animate.
@@ -265,7 +334,7 @@ export function createScene(canvas: HTMLCanvasElement): SceneHandle {
     // lanes on the inner edge of each arm. It materialises as the zoom leaves the
     // Sun behind (e ~18), swells to fill the frame, then recedes into the
     // deep-field of galaxies.
-    const gwA = smooth(17.5, 20, e) * (1 - smooth(24.5, 27, e));
+    const gwA = smooth(17.5, 20, e) * (1 - smooth(22.5, 24.5, e));
     if (gwA > 0.01) {
       const R = 1.2e21 * ppm * 0.55;
       const gx = cw / 2;
@@ -339,33 +408,66 @@ export function createScene(canvas: HTMLCanvasElement): SceneHandle {
       ctx.restore();
     }
 
-    // Observable universe: the deep field. A dense scatter of distant galaxies
-    // (sharp points plus faint smudges) with a light clustering, so it reads as
-    // the cosmic web rather than a thin sprinkle of dots.
-    const unA = smooth(23.5, 26.5, e);
+    // Nearby stars: the Sun's neighbourhood. Proxima Centauri and a few bright
+    // named neighbours drift in as the zoom leaves the Solar System, before the
+    // Milky Way opens up. Each is a soft glow with a small bright core.
+    const starA = smooth(14, 16.5, e) * (1 - smooth(19, 21, e));
+    if (starA > 0.01) {
+      ctx.save();
+      ctx.globalAlpha = starA;
+      for (const ns of NEARBY_STARS) {
+        const x = ns.x * cw;
+        const y = ns.y * ch;
+        const glow = ctx.createRadialGradient(x, y, 0, x, y, ns.r * 7);
+        glow.addColorStop(0, ns.warm ? "rgba(255,224,175,0.9)" : "rgba(220,232,255,0.9)");
+        glow.addColorStop(0.3, ns.warm ? "rgba(255,200,140,0.3)" : "rgba(190,210,255,0.28)");
+        glow.addColorStop(1, "rgba(0,0,0,0)");
+        ctx.fillStyle = glow;
+        ctx.beginPath();
+        ctx.arc(x, y, ns.r * 7, 0, TAU);
+        ctx.fill();
+        ctx.fillStyle = "#FFF6E6";
+        ctx.beginPath();
+        ctx.arc(x, y, ns.r * 0.5, 0, TAU);
+        ctx.fill();
+        if (ns.named) {
+          const name = labels?.stars[ns.key];
+          if (name) label(name, x + ns.r + 6, y + 4, starA * 0.85, "#9A9CA6");
+        }
+      }
+      ctx.restore();
+    }
+
+    // Observable universe: the deep field, reached by a camera pull-back. The
+    // galaxies start large and few, then shrink and multiply as the zoom climbs,
+    // so the reader feels the frame opening onto the whole web of galaxies.
+    const unA = smooth(22, 25.5, e);
     if (unA > 0.01) {
+      const pullback = 1 + (27 - Math.min(27, e)) * 0.45;
       ctx.save();
       ctx.globalAlpha = unA;
       for (const gl of GALAXIES) {
         // Cluster: pull points toward a few gentle sinusoid bands.
-        const cx = gl.x + 0.04 * Math.sin(gl.y * 9 + 1.3);
-        const cy = gl.y + 0.04 * Math.cos(gl.x * 7 + 0.4);
-        const x = cw / 2 + (cx - 0.5) * cw * 1.2;
-        const y = ch / 2 + (cy - 0.5) * ch * 1.2;
+        const node = 0.06 * gl.cluster;
+        const cx = gl.x + 0.05 * Math.sin(gl.y * 9 + 1.3) + node * Math.sin(gl.y * 3);
+        const cy = gl.y + 0.05 * Math.cos(gl.x * 7 + 0.4) + node * Math.cos(gl.x * 5);
+        const x = cw / 2 + (cx - 0.5) * cw * 1.25;
+        const y = ch / 2 + (cy - 0.5) * ch * 1.25;
+        const r = gl.r * pullback;
         if (gl.smudge) {
-          const g = ctx.createRadialGradient(x, y, 0, x, y, gl.r * 3);
+          const g = ctx.createRadialGradient(x, y, 0, x, y, r * 3);
           g.addColorStop(0, gl.tint);
           g.addColorStop(1, "rgba(210,205,235,0)");
           ctx.globalAlpha = unA * gl.a;
           ctx.fillStyle = g;
           ctx.beginPath();
-          ctx.ellipse(x, y, gl.r * 1.6, gl.r, 0.6, 0, TAU);
+          ctx.ellipse(x, y, r * 1.6, r, 0.6, 0, TAU);
           ctx.fill();
         } else {
           ctx.globalAlpha = unA * gl.a;
           ctx.fillStyle = gl.tint;
           ctx.beginPath();
-          ctx.arc(x, y, gl.r, 0, TAU);
+          ctx.arc(x, y, r, 0, TAU);
           ctx.fill();
         }
       }
@@ -421,12 +523,34 @@ export function createScene(canvas: HTMLCanvasElement): SceneHandle {
     if (plA > 0.01) {
       for (const pl of PLANETS) {
         const q = project(pl.a * Math.cos(pl.ang), pl.a * Math.sin(pl.ang));
+        const pr = Math.max(pl.r * ppm, 1.3);
         ctx.globalAlpha = plA * 0.9;
         ctx.fillStyle = "#CFCBC2";
         ctx.beginPath();
-        ctx.arc(q[0], q[1], Math.max(pl.r * ppm, 1.3), 0, TAU);
+        ctx.arc(q[0], q[1], pr, 0, TAU);
         ctx.fill();
         if (pl.lab) label(pl.n, q[0] + 7, q[1] - 7, plA * 0.8, "#9A9CA6");
+
+        // Iconic natural satellites: a faint orbit ring and a small dot, so the
+        // planets read as systems, not single dots.
+        for (const mo of pl.moons) {
+          const mr = mo.d * ppm;
+          if (mr < 3 || mr > 8000) continue;
+          const mx = q[0] + Math.cos(mo.ang) * mr;
+          const my = q[1] + Math.sin(mo.ang) * mr;
+          ctx.globalAlpha = plA * 0.16;
+          ctx.strokeStyle = "rgba(232,228,220,1)";
+          ctx.lineWidth = 1;
+          ctx.beginPath();
+          ctx.arc(q[0], q[1], mr, 0, TAU);
+          ctx.stroke();
+          ctx.globalAlpha = plA * 0.85;
+          ctx.fillStyle = "#BFBBB2";
+          ctx.beginPath();
+          ctx.arc(mx, my, Math.max(mo.r * ppm, 1), 0, TAU);
+          ctx.fill();
+          if (mo.lab) label(mo.n, mx + 6, my - 6, plA * 0.7, "#8A8D98");
+        }
       }
       ctx.globalAlpha = 1;
     }

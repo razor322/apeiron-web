@@ -214,6 +214,13 @@ export const id: Dictionary = {
       earthOrbit: "orbit Bumi",
       neptuneOrbit: "orbit Neptunus",
     },
+    stars: {
+      proxima: "Proxima Centauri",
+      alphaCentauri: "Alpha Centauri",
+      sirius: "Sirius",
+      barnard: "Bintang Barnard",
+      others: "",
+    },
     stages: {
       hero: {
         label: "Pembuka",

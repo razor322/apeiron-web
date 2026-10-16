@@ -3,7 +3,7 @@
 import { useEffect, useRef, useSyncExternalStore } from "react";
 import type { Dictionary } from "@/i18n/en";
 import type { Locale } from "@/i18n/config";
-import { STAGES } from "./stages";
+import { STAGES, readCopy } from "./stages";
 import { useJourneyProgress } from "./use-journey-progress";
 import { JourneyStage } from "./JourneyStage";
 import { JourneyProgress } from "./JourneyProgress";
@@ -49,17 +49,24 @@ export function CosmicJourney({ dict, locale }: { dict: Dictionary; locale: Loca
   useEffect(() => {
     if (reduced) return;
     let cancelled = false;
+    const starLabels: Record<string, string> = {
+      "journey.stars.proxima": readCopy(dict, "journey.stars.proxima"),
+      "journey.stars.alphaCentauri": readCopy(dict, "journey.stars.alphaCentauri"),
+      "journey.stars.sirius": readCopy(dict, "journey.stars.sirius"),
+      "journey.stars.barnard": readCopy(dict, "journey.stars.barnard"),
+      "journey.stars.others": readCopy(dict, "journey.stars.others"),
+    };
     (async () => {
       const mod = await import("./scene/scene");
       if (cancelled || !canvasRef.current) return;
-      sceneRef.current = mod.createScene(canvasRef.current);
+      sceneRef.current = mod.createScene(canvasRef.current, { stars: starLabels });
     })();
     return () => {
       cancelled = true;
       sceneRef.current?.destroy();
       sceneRef.current = null;
     };
-  }, [reduced]);
+  }, [reduced, dict]);
 
   // Animation loop for the motion branch. Reduced mode never runs this, so the
   // scene stays still.

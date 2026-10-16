@@ -212,6 +212,13 @@ export const en = {
       earthOrbit: "Earth's orbit",
       neptuneOrbit: "Neptune's orbit",
     },
+    stars: {
+      proxima: "Proxima Centauri",
+      alphaCentauri: "Alpha Centauri",
+      sirius: "Sirius",
+      barnard: "Barnard's Star",
+      others: "",
+    },
     stages: {
       hero: {
         label: "Opening",
