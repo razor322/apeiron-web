@@ -1,13 +1,11 @@
 import type { AstronomyMedia, AstronomySnapshot } from "@/lib/astronomy/models";
 import { ApodSchema } from "@/lib/astronomy/schemas/apod";
-import { cached } from "@/lib/cache/ttl-cache";
 
 // Current documented APOD source. The legacy /planetary/apod route is archived.
 // Source doc: https://science.nasa.gov/apis/apod-api/ (WordPress REST route);
 // gateway: https://api.nasa.gov/planetary/apod.
 const APOD_BASE_URL = "https://api.nasa.gov/planetary/apod";
 const APOD_PROVIDER = "nasa-apod";
-const APOD_TTL_MS = 6 * 3600_000;
 
 function buildUrl(): string {
   const key = process.env.NASA_API_KEY ?? "DEMO_KEY";
@@ -36,15 +34,15 @@ async function fetchRaw(): Promise<AstronomyMedia> {
   };
 }
 
-// ponytail: cached() serves fresh entries without re-running the fetcher, so it
-// cannot report a provider failure once an entry is warm. Keep the last real
-// snapshot here to surface staleness; upgrade if cached gains stale-on-fresh.
+// ponytail: the page owns day-level freshness (ISR revalidate 6h in the
+// cosmos-today route), so this adapter keeps only the last real snapshot to
+// surface staleness when the provider fails. Add a real TTL store here if a
+// second consumer needs sub-day caching.
 let lastSnapshot: AstronomySnapshot<AstronomyMedia> | null = null;
 
 export async function fetchApod(): Promise<AstronomySnapshot<AstronomyMedia>> {
   try {
     const media = await fetchRaw();
-    await cached("apod", APOD_TTL_MS, async () => media);
     lastSnapshot = {
       data: media,
       provider: APOD_PROVIDER,
