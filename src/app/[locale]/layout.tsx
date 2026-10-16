@@ -1,8 +1,14 @@
 import { notFound } from "next/navigation";
+import type { Metadata } from "next";
 import { getDictionary } from "@/i18n/get-dictionary";
 import { isLocale, LOCALES } from "@/i18n/config";
+import { metadataBase } from "@/lib/seo";
 import { Navbar } from "@/components/ui/Navbar";
 import { MotionToggle } from "@/components/ui/MotionToggle";
+
+export const metadata: Metadata = {
+  metadataBase: metadataBase(),
+};
 
 export function generateStaticParams() {
   return LOCALES.map((locale) => ({ locale }));

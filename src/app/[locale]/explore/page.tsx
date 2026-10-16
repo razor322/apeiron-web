@@ -1,9 +1,22 @@
 import { notFound } from "next/navigation";
+import type { Metadata } from "next";
 import { getDictionary } from "@/i18n/get-dictionary";
 import { isLocale } from "@/i18n/config";
+import { routeMetadata } from "@/lib/seo";
 import { Container } from "@/components/ui/Container";
 import { Heading, Body } from "@/components/ui/Typography";
 import { CategoryGrid } from "@/features/explorer/CategoryGrid";
+
+export async function generateMetadata({
+  params,
+}: {
+  params: Promise<{ locale: string }>;
+}): Promise<Metadata> {
+  const { locale } = await params;
+  if (!isLocale(locale)) return {};
+  const { meta } = await getDictionary(locale);
+  return routeMetadata(meta, meta.explore, "explore");
+}
 
 export default async function ExplorePage({
   params,

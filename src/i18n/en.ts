@@ -7,6 +7,29 @@ export const en = {
     label: "Main navigation",
     brand: "Apeiron",
   },
+  meta: {
+    siteName: "Apeiron",
+    home: {
+      title: "Apeiron: the scale of the cosmos",
+      description:
+        "A scroll-driven journey from a point of light to the observable universe, one order of magnitude at a time.",
+    },
+    explore: {
+      title: "Explore cosmic objects",
+      description:
+        "Eight kinds of object, from the planet under your feet to the dark matter that holds the galaxies together.",
+    },
+    cosmosToday: {
+      title: "Cosmos Today",
+      description:
+        "The astronomy image of the day with its explanation, drawn from NASA APOD and shown with its source.",
+    },
+    about: {
+      title: "About Apeiron",
+      description:
+        "What this site is, where its data comes from, and how every number is sourced and marked.",
+    },
+  },
   motion: {
     toggle: "Motion",
     full: "Full motion",

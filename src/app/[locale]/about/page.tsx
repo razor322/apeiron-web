@@ -1,9 +1,22 @@
 import { notFound } from "next/navigation";
+import type { Metadata } from "next";
 import { getDictionary } from "@/i18n/get-dictionary";
 import { isLocale } from "@/i18n/config";
+import { routeMetadata } from "@/lib/seo";
 import { Container } from "@/components/ui/Container";
 import { Button } from "@/components/ui/Button";
 import { Heading, Body, Label } from "@/components/ui/Typography";
+
+export async function generateMetadata({
+  params,
+}: {
+  params: Promise<{ locale: string }>;
+}): Promise<Metadata> {
+  const { locale } = await params;
+  if (!isLocale(locale)) return {};
+  const { meta } = await getDictionary(locale);
+  return routeMetadata(meta, meta.about, "about");
+}
 
 export default async function AboutPage({
   params,

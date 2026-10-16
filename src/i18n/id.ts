@@ -9,6 +9,29 @@ export const id: Dictionary = {
     label: "Navigasi utama",
     brand: "Apeiron",
   },
+  meta: {
+    siteName: "Apeiron",
+    home: {
+      title: "Apeiron: skala alam semesta",
+      description:
+        "Perjalanan bergulir dari setitik cahaya sampai alam semesta teramati, satu orde besaran setiap langkahnya.",
+    },
+    explore: {
+      title: "Jelajahi objek kosmis",
+      description:
+        "Delapan jenis objek, dari planet di bawah kakimu sampai materi gelap yang menyatukan galaksi.",
+    },
+    cosmosToday: {
+      title: "Cosmos Hari Ini",
+      description:
+        "Gambar astronomi hari ini beserta penjelasannya, diambil dari NASA APOD dan ditampilkan dengan sumbernya.",
+    },
+    about: {
+      title: "Tentang Apeiron",
+      description:
+        "Apa situs ini, dari mana datanya berasal, dan bagaimana setiap angka bersumber dan ditandai.",
+    },
+  },
   motion: {
     toggle: "Gerak",
     full: "Gerak penuh",
