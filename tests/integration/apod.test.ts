@@ -59,6 +59,15 @@ describe("fetchApod rate limits", () => {
     await expect(fetchApod()).rejects.toBeInstanceOf(RateLimitError);
   });
 
+  it("leaves remaining undefined when the rate-limit header is non-numeric", async () => {
+    vi.stubGlobal("fetch", vi.fn().mockResolvedValue({
+      ok: false, status: 429, headers: new Headers({ "x-ratelimit-remaining": "unknown" }), json: async () => ({}),
+    }));
+    const err = await fetchApod().catch((e) => e);
+    expect(err).toBeInstanceOf(RateLimitError);
+    expect((err as RateLimitError).remaining).toBeUndefined();
+  });
+
   it("treats 403 as a rate limit too", async () => {
     vi.stubGlobal("fetch", vi.fn().mockResolvedValue({
       ok: false, status: 403, headers: new Headers(), json: async () => ({}),

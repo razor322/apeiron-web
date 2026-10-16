@@ -33,7 +33,8 @@ function buildUrl(): string {
 async function fetchRaw(): Promise<AstronomyMedia> {
   const res = await fetch(buildUrl(), { signal: AbortSignal.timeout(8000) });
   const remainingHeader = res.headers?.get("x-ratelimit-remaining") ?? null;
-  const remaining = remainingHeader === null ? undefined : Number(remainingHeader);
+  const parsedRemaining = remainingHeader === null ? NaN : Number(remainingHeader);
+  const remaining = Number.isFinite(parsedRemaining) ? parsedRemaining : undefined;
 
   if (RATE_LIMIT_STATUSES.has(res.status)) {
     throw new RateLimitError(res.status, remaining);
