@@ -33,15 +33,12 @@ export const id: Dictionary = {
     heading: "Jelajah",
     intro:
       "Delapan jenis objek, dari planet di bawah kakimu sampai materi gelap yang menyatukan galaksi.",
-    browse: "Telusuri kategori",
     detail: {
       definition: "Definisi",
       facts: "Angka penting",
       terms: "Istilah",
       related: "Topik terkait",
       backToExplore: "Kembali ke Jelajah",
-      notFoundTitle: "Kategori tidak ditemukan",
-      notFoundHint: "Topik itu belum ada.",
     },
     categories: {
       planet: {

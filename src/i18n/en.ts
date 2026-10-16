@@ -31,15 +31,12 @@ export const en = {
     heading: "Explore",
     intro:
       "Eight kinds of object, from the planet under your feet to the dark matter that holds the galaxies together.",
-    browse: "Browse categories",
     detail: {
       definition: "Definition",
       facts: "Key numbers",
       terms: "Terms",
       related: "Related topics",
       backToExplore: "Back to Explore",
-      notFoundTitle: "No such category",
-      notFoundHint: "That topic does not exist yet.",
     },
     categories: {
       planet: {
