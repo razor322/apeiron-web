@@ -29,6 +29,23 @@ body {
   -webkit-font-smoothing: antialiased;
 }
 
+/* Fallback sky for the journey: a sky gradient plus a fixed star field drawn in
+   pure CSS, so the backdrop renders even when the canvas or WebGL is missing. */
+.journey-sky {
+  background-color: var(--color-void);
+  background-image:
+    radial-gradient(1px 1px at 12% 18%, rgba(232, 228, 220, 0.7), transparent),
+    radial-gradient(1px 1px at 28% 62%, rgba(232, 228, 220, 0.55), transparent),
+    radial-gradient(2px 2px at 41% 34%, rgba(243, 201, 154, 0.75), transparent),
+    radial-gradient(1px 1px at 55% 78%, rgba(232, 228, 220, 0.6), transparent),
+    radial-gradient(1px 1px at 67% 22%, rgba(232, 228, 220, 0.5), transparent),
+    radial-gradient(2px 2px at 78% 58%, rgba(232, 228, 220, 0.65), transparent),
+    radial-gradient(1px 1px at 88% 84%, rgba(243, 201, 154, 0.55), transparent),
+    radial-gradient(1px 1px at 94% 42%, rgba(232, 228, 220, 0.45), transparent),
+    linear-gradient(to bottom, var(--sky-glow), var(--color-void) 40%);
+  background-repeat: no-repeat;
+}
+
 :focus-visible {
   outline: 2px solid var(--color-amber);
   outline-offset: 3px;

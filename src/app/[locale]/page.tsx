@@ -1,6 +1,7 @@
 import { getDictionary } from "@/i18n/get-dictionary";
 import { isLocale } from "@/i18n/config";
 import { notFound } from "next/navigation";
+import { CosmicJourney } from "@/features/cosmic-journey/CosmicJourney";
 
 export default async function LocaleHome({
   params,
@@ -11,9 +12,5 @@ export default async function LocaleHome({
   if (!isLocale(locale)) notFound();
   const dict = await getDictionary(locale);
 
-  return (
-    <main className="min-h-screen flex flex-col items-start justify-center gap-6 px-6">
-      <h1 className="font-serif text-4xl text-starlight">{dict.nav.home}</h1>
-    </main>
-  );
+  return <CosmicJourney dict={dict} locale={locale} />;
 }
