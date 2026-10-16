@@ -1,4 +1,5 @@
 import type { Dictionary } from "@/i18n/en";
+import type { Locale } from "@/i18n/config";
 import { getText } from "@/features/explorer/categories";
 import { formatFact, type PlanetProfile } from "@/features/explorer/planets";
 
@@ -9,7 +10,7 @@ export function PlanetCard({
 }: {
   planet: PlanetProfile;
   dict: Dictionary;
-  locale: string;
+  locale: Locale;
 }) {
   const name = getText(dict, planet.nameKey) as string;
   const tagline = getText(dict, planet.taglineKey) as string;
@@ -26,7 +27,7 @@ export function PlanetCard({
       <span className="font-sans text-base text-starlight group-hover:text-amber">{name}</span>
       <span className="font-sans text-sm text-dust">{tagline}</span>
       {diameter ? (
-        <span className="font-mono text-xs text-dust">{formatFact(diameter, "en")}</span>
+        <span className="font-mono text-xs text-dust">{formatFact(diameter, locale)}</span>
       ) : null}
     </a>
   );
