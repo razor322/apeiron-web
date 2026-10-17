@@ -1,4 +1,5 @@
 import type { Dictionary } from "@/i18n/en";
+import Link from "next/link";
 import { getText } from "@/features/explorer/categories";
 import { formatFact, getPlanet, type PlanetProfile } from "@/features/explorer/planets";
 import { getPlanetImage } from "@/features/explorer/planet-images";
@@ -79,12 +80,12 @@ export function PlanetDetail({
             if (!related) return null;
             return (
               <li key={slug}>
-                <a
+                <Link
                   href={`/${locale}/explore/planet/${slug}`}
                   className="font-sans text-sm text-starlight underline decoration-[color:var(--line)] hover:text-amber"
                 >
                   {getText(dict, related.nameKey) as string}
-                </a>
+                </Link>
               </li>
             );
           })}

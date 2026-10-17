@@ -1,4 +1,5 @@
 import type { ReactNode } from "react";
+import Link from "next/link";
 
 type ButtonProps = {
   children: ReactNode;
@@ -24,6 +25,15 @@ export function Button({
   const className = `${base} ${look}`;
 
   if (href) {
+    // Internal links use next/link for client-side navigation; external links
+    // (mailto:, http) stay as anchors.
+    if (href.startsWith("/")) {
+      return (
+        <Link href={href} aria-label={ariaLabel} className={className}>
+          {children}
+        </Link>
+      );
+    }
     return (
       <a href={href} aria-label={ariaLabel} className={className}>
         {children}

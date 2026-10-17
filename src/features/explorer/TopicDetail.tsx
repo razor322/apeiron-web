@@ -1,4 +1,5 @@
 import type { Dictionary } from "@/i18n/en";
+import Link from "next/link";
 import { getFact } from "@/features/cosmic-facts/facts";
 import { CATEGORIES, categoryName, categorySummary, getText, type Category } from "@/features/explorer/categories";
 import { DataLabel } from "@/components/ui/DataLabel";
@@ -65,12 +66,12 @@ export function TopicDetail({
             .slice(0, 3)
             .map((c) => (
               <li key={c.slug}>
-                <a
+                <Link
                   href={`/${locale}/explore/${c.slug}`}
                   className="font-sans text-sm text-starlight underline decoration-[color:var(--line)] hover:text-amber"
                 >
                   {categoryName(dict, c)}
-                </a>
+                </Link>
               </li>
             ))}
         </ul>

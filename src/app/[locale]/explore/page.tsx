@@ -1,5 +1,6 @@
 import { notFound } from "next/navigation";
 import type { Metadata } from "next";
+import Link from "next/link";
 import { getDictionary } from "@/i18n/get-dictionary";
 import { isLocale } from "@/i18n/config";
 import { routeMetadata } from "@/lib/seo";
@@ -61,12 +62,12 @@ export default async function ExplorePage({
                 </li>
               ))}
             </ul>
-            <a
+            <Link
               href={`/${locale}/cosmos-today`}
               className="mt-2 font-sans text-sm text-amber underline"
             >
               {dict.explore.recent.cta}
-            </a>
+            </Link>
           </section>
         ) : null}
         <section className="flex flex-col gap-6 border-t border-[color:var(--line)] pt-10">
@@ -82,13 +83,13 @@ export default async function ExplorePage({
               { href: "calculators", ...dict.explore.more.calculators },
             ].map((item) => (
               <li key={item.href}>
-                <a
+                <Link
                   href={`/${locale}/${item.href}`}
                   className="flex flex-col gap-2 border border-[color:var(--line)] p-6 transition-colors hover:border-amber"
                 >
                   <span className="font-serif text-xl text-starlight">{item.title}</span>
                   <span className="font-sans text-sm text-dust">{item.summary}</span>
-                </a>
+                </Link>
               </li>
             ))}
           </ul>

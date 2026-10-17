@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState, type ReactNode } from "react";
+import Link from "next/link";
 import type { Dictionary } from "@/i18n/en";
 
 type NavbarProps = {
@@ -39,7 +40,7 @@ export function Navbar({ locale, dict, children }: NavbarProps) {
       }`}
     >
       <div className="mx-auto flex w-full max-w-6xl flex-wrap items-center justify-between gap-x-6 gap-y-2 px-4 py-4 sm:px-6">
-        <a
+        <Link
           href={`/${locale}`}
           className="flex items-baseline gap-3 font-serif text-xl text-starlight"
         >
@@ -47,16 +48,16 @@ export function Navbar({ locale, dict, children }: NavbarProps) {
           <span aria-hidden="true" className="text-base italic text-dust">
             ἄπειρον
           </span>
-        </a>
+        </Link>
         <ul className="flex flex-wrap items-center gap-x-4 gap-y-1 sm:gap-x-5">
           {links.map((link) => (
             <li key={link.href}>
-              <a
+              <Link
                 href={link.href}
                 className="font-sans text-sm text-dust transition-colors hover:text-starlight"
               >
                 {link.label}
-              </a>
+              </Link>
             </li>
           ))}
         </ul>
