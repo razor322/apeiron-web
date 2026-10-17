@@ -34,14 +34,13 @@ export function CosmicJourney({ dict, locale }: { dict: Dictionary; locale: Loca
   // experience once the client confirms motion is allowed.
   const reduced = useSyncExternalStore(subscribeCalm, getCalm, () => true);
 
-  const { activeIndex, goTo, progress } = useJourneyProgress(reduced);
+  const { activeIndex, goTo, progressRef } = useJourneyProgress(reduced);
 
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
   const sceneRef = useRef<SceneHandle | null>(null);
-  const progressRef = useRef(progress);
-  useEffect(() => {
-    progressRef.current = progress;
-  }, [progress]);
+  // One wrapper per stage, so the scroll loop can set opacity/pointer-events on
+  // the DOM directly instead of re-rendering React every frame.
+  const panelRefs = useRef<(HTMLDivElement | null)[]>([]);
 
   // Lazy-load the canvas scene only in the motion branch. The CSS gradient and
   // star fallback below always renders, so if this import or canvas fails the
@@ -69,17 +68,29 @@ export function CosmicJourney({ dict, locale }: { dict: Dictionary; locale: Loca
   }, [reduced, dict]);
 
   // Animation loop for the motion branch. Reduced mode never runs this, so the
-  // scene stays still.
+  // scene stays still. Besides rendering the canvas, it writes each panel's
+  // opacity straight to the DOM from the progress ref, so scrolling does not
+  // re-render the tree.
   useEffect(() => {
     if (reduced) return;
     let raf = 0;
     const loop = (now: number) => {
-      sceneRef.current?.render(progressRef.current, now / 1000);
+      const p = progressRef.current;
+      sceneRef.current?.render(p, now / 1000);
+      for (let i = 0; i < STAGES.length; i++) {
+        const el = panelRefs.current[i];
+        if (!el) continue;
+        const opacity = stageOpacity(p, i);
+        el.style.opacity = String(opacity);
+        el.style.pointerEvents = opacity < 0.5 ? "none" : "auto";
+        if (opacity < 0.05) el.setAttribute("aria-hidden", "true");
+        else el.removeAttribute("aria-hidden");
+      }
       raf = requestAnimationFrame(loop);
     };
     raf = requestAnimationFrame(loop);
     return () => cancelAnimationFrame(raf);
-  }, [reduced]);
+  }, [reduced, progressRef]);
 
   const sky = (
     <div className="journey-sky pointer-events-none absolute inset-0" aria-hidden="true" />
@@ -143,28 +154,29 @@ export function CosmicJourney({ dict, locale }: { dict: Dictionary; locale: Loca
           className="absolute right-[clamp(18px,2.4vw,30px)] top-1/2 z-10 hidden w-44 -translate-y-1/2 text-right md:block"
         />
         <ScaleReadout
-          progress={progress}
+          progressRef={progressRef}
           locale={locale}
           dict={dict}
           className="absolute right-[clamp(18px,3vw,36px)] bottom-[clamp(40px,11vh,110px)] z-10 hidden text-right md:block"
         />
         <div className="absolute inset-0 z-10">
           {STAGES.map((stage, index) => {
-            const opacity = stageOpacity(progress, index);
             const kind = stage.kind;
             const position =
               kind === "hero" || kind === "mid"
                 ? "absolute inset-x-0 top-[19vh] px-5"
                 : "absolute bottom-[clamp(40px,11vh,110px)] left-[clamp(20px,6vw,96px)] w-[min(34rem,calc(100%-40px))]";
             return (
-              <JourneyStage
+              <div
                 key={stage.id}
-                stage={stage}
-                dict={dict}
-                ariaHidden={opacity < 0.05}
-                style={{ opacity, pointerEvents: opacity < 0.5 ? "none" : "auto" }}
+                ref={(el) => {
+                  panelRefs.current[index] = el;
+                }}
+                style={{ opacity: 0, pointerEvents: "none" }}
                 className={position}
-              />
+              >
+                <JourneyStage stage={stage} dict={dict} />
+              </div>
             );
           })}
         </div>

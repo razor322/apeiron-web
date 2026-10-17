@@ -20,7 +20,10 @@
 }
 
 html {
-  scroll-behavior: smooth;
+  /* No global scroll-behavior: smooth. ScrollTrigger scrubs progress on the
+     journey, and a global smooth scroll fights that interpolation, making the
+     whole page feel laggy. Programmatic jumps (the progress nav) request smooth
+     scroll individually. */
 }
 
 body {

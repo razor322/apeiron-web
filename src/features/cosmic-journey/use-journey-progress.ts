@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useRef, useState, type MutableRefObject } from "react";
 import { STAGES, activeStageIndex } from "./stages";
 
 function readProgress(): number {
@@ -12,22 +12,35 @@ function readProgress(): number {
 type JourneyProgress = {
   activeIndex: number;
   goTo: (index: number) => void;
-  progress: number;
+  // Live scroll progress for the current frame. Held in a ref, not React state,
+  // so scrubbing does not re-render the tree 60 times a second; consumers read
+  // it inside their own rAF loop and write to the DOM directly.
+  progressRef: MutableRefObject<number>;
 };
 
 // Scroll-driven journey position. In the non-reduced branch GSAP ScrollTrigger
 // is registered here and scrubs progress; in the reduced branch a plain passive
-// scroll listener does, so no pinning or scrubbing code runs.
+// scroll listener does, so no pinning or scrubbing code runs. Only the coarse
+// active stage drives React state (it changes a handful of times per page, not
+// every frame).
 export function useJourneyProgress(reduced: boolean): JourneyProgress {
-  const [progress, setProgress] = useState(0);
+  const progressRef = useRef(0);
   const [activeIndex, setActiveIndex] = useState(0);
+  const activeRef = useRef(0);
 
   useEffect(() => {
+    const setActive = (index: number) => {
+      if (index !== activeRef.current) {
+        activeRef.current = index;
+        setActiveIndex(index);
+      }
+    };
+
     if (reduced) {
       const onScroll = () => {
         const p = readProgress();
-        setProgress(p);
-        setActiveIndex(activeStageIndex(p));
+        progressRef.current = p;
+        setActive(activeStageIndex(p));
       };
       onScroll();
       window.addEventListener("scroll", onScroll, { passive: true });
@@ -50,8 +63,8 @@ export function useJourneyProgress(reduced: boolean): JourneyProgress {
       gsap.registerPlugin(ScrollTrigger);
       const state = { p: 0 };
       const apply = (p: number) => {
-        setProgress(p);
-        setActiveIndex(activeStageIndex(p));
+        progressRef.current = p;
+        setActive(activeStageIndex(p));
       };
       const tween = gsap.to(state, {
         p: 1,
@@ -85,6 +98,7 @@ export function useJourneyProgress(reduced: boolean): JourneyProgress {
     (index: number) => {
       // Reflect the keyboard choice immediately so the progress nav is correct
       // even before ScrollTrigger has attached or the smooth scroll settles.
+      activeRef.current = index;
       setActiveIndex(index);
       const max = document.documentElement.scrollHeight - window.innerHeight;
       const target = ((index + 0.5) / STAGES.length) * Math.max(0, max);
@@ -93,5 +107,5 @@ export function useJourneyProgress(reduced: boolean): JourneyProgress {
     [reduced],
   );
 
-  return { activeIndex, goTo, progress };
+  return { activeIndex, goTo, progressRef };
 }
