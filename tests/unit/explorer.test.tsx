@@ -19,7 +19,7 @@ describe("explorer", () => {
   });
   it("TopicCard links to the detail page", () => {
     render(<TopicCard category={getCategory("planet")!} dict={en} />);
-    const link = screen.getByRole("link");
+    const link = screen.getByRole("link", { name: /Planets/i });
     expect(link).toHaveAttribute("href", "/en/explore/planet");
   });
   it("keeps the planet category pointing at the planet grid route", () => {

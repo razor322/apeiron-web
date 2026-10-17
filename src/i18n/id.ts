@@ -189,7 +189,7 @@ export const id: Dictionary = {
       "Delapan jenis objek, dari planet di bawah kakimu sampai materi gelap yang menyatukan galaksi.",
     more: {
       heading: "Lebih banyak untuk dijelajahi",
-      intro: "Tiga halaman singkat yang melihat alam semesta yang sama dari sudut berbeda.",
+      intro: "Halaman singkat yang melihat alam semesta yang sama dari sudut berbeda.",
       numbers: {
         title: "Angka yang menghentikanmu",
         summary:
@@ -205,6 +205,16 @@ export const id: Dictionary = {
         summary:
           "Dari mana unsur-unsur di tubuhmu ditempa, beserta bukti di balik klaimnya.",
       },
+      calculators: {
+        title: "Kalkulator",
+        summary:
+          "Usiamu di planet lain dan waktu perjalanan melintasi Tata Surya, dengan rumusnya ditampilkan.",
+      },
+    },
+    recent: {
+      heading: "Dari Cosmos Hari Ini",
+      intro: "Gambar astronomi harian paling baru, terbaru lebih dahulu.",
+      cta: "Lihat lebih banyak di Cosmos Hari Ini",
     },
     detail: {
       definition: "Definisi",

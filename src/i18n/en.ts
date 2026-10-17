@@ -187,7 +187,7 @@ export const en = {
       "Eight kinds of object, from the planet under your feet to the dark matter that holds the galaxies together.",
     more: {
       heading: "More to explore",
-      intro: "Three short pages that look at the same cosmos from a different angle.",
+      intro: "Short pages that look at the same cosmos from a different angle.",
       numbers: {
         title: "Numbers that stop you",
         summary:
@@ -203,6 +203,16 @@ export const en = {
         summary:
           "Where the elements in your body were forged, and the evidence behind the claim.",
       },
+      calculators: {
+        title: "Calculators",
+        summary:
+          "Your age on another planet and travel times across the Solar System, with the formula shown.",
+      },
+    },
+    recent: {
+      heading: "From Cosmos Today",
+      intro: "The most recent astronomy images of the day, newest first.",
+      cta: "See more on Cosmos Today",
     },
     detail: {
       definition: "Definition",
