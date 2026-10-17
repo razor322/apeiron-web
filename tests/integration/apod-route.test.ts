@@ -11,7 +11,6 @@ const valid = {
   url: "https://example.org/a.jpg",
   hdurl: "https://example.org/a_hd.jpg",
 };
-
 beforeEach(() => {
   clearCache();
   resetApodState();
@@ -21,7 +20,7 @@ afterEach(() => vi.restoreAllMocks());
 describe("GET /api/astronomy/apod", () => {
   it("returns 200 with the snapshot on success", async () => {
     vi.stubGlobal("fetch", vi.fn().mockResolvedValue({
-      ok: true, status: 200, headers: new Headers(), json: async () => valid,
+      ok: true, status: 200, headers: new Headers(), json: async () => [valid],
     }));
     const res = await GET();
     expect(res.status).toBe(200);

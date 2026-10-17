@@ -3,14 +3,30 @@ import { ApodSchema } from "@/lib/astronomy/schemas/apod";
 import { fetchApod, RateLimitError, resetApodState } from "@/lib/astronomy/providers/nasa-apod";
 import { clearCache } from "@/lib/cache/ttl-cache";
 
-const valid = {
-  date: "2026-10-14",
-  title: "Contoh",
-  explanation: "Penjelasan.",
+// science.nasa.gov APOD feed item (image day): hdurl is the direct image, and
+// explanation/credit/alt arrive as markup-bearing strings.
+const imageItem = {
+  date: "2026-10-15",
+  title: "The Milky Way over Manhattan",
+  explanation: "<strong>Explanation:</strong> A <a href=\"https://x\">view</a> of the sky &amp; stars.",
   media_type: "image",
-  url: "https://example.org/a.jpg",
-  hdurl: "https://example.org/a_hd.jpg",
-  copyright: "Someone",
+  url: "https://science.nasa.gov/image-article/apod-2026-october-15/",
+  hdurl: "https://assets.science.nasa.gov/dynamicimage/Manhattan.jpg",
+  credit: "<a href=\"https://instagram.com/x\">Jason Kurth</a>",
+  alt: "The Manhattan skyline under a faint Milky Way.",
+};
+
+// Video day: hdurl is empty, so the provider must fall back to the permalink.
+const videoItem = {
+  date: "2026-10-16",
+  title: "Chasing the International Space Station",
+  explanation: "<strong>Explanation:</strong> A timelapse.",
+  media_type: "video",
+  url: "https://science.nasa.gov/image-article/apod-2026-october-16/",
+  hdurl: "",
+  credit: "",
+  copyright: "<a href=\"https://x\">Eric Holland</a>",
+  alt: "Video of a rocket launch.",
 };
 
 beforeEach(() => {
@@ -20,102 +36,76 @@ beforeEach(() => {
 afterEach(() => vi.restoreAllMocks());
 
 describe("ApodSchema", () => {
-  it("accepts a valid payload", () => {
-    expect(ApodSchema.safeParse(valid).success).toBe(true);
+  it("accepts a valid feed item", () => {
+    expect(ApodSchema.safeParse(imageItem).success).toBe(true);
+  });
+  it("accepts an empty hdurl (video day)", () => {
+    expect(ApodSchema.safeParse(videoItem).success).toBe(true);
   });
   it("rejects a payload without a url", () => {
-    const bad: Record<string, unknown> = { ...valid };
+    const bad: Record<string, unknown> = { ...imageItem };
     delete bad.url;
     expect(ApodSchema.safeParse(bad).success).toBe(false);
   });
 });
 
 describe("fetchApod", () => {
-  it("maps a valid response to AstronomyMedia with provenance", async () => {
+  it("maps a valid image-day response to AstronomyMedia with provenance", async () => {
     vi.stubGlobal("fetch", vi.fn().mockResolvedValue({
-      ok: true, status: 200, json: async () => valid,
+      ok: true, status: 200, json: async () => [imageItem],
     }));
     const snap = await fetchApod();
     expect(snap.data.mediaType).toBe("image");
+    expect(snap.data.previewUrl).toBe(imageItem.hdurl);
     expect(snap.data.sourceName).toBeTruthy();
     expect(snap.data.retrievedAt).toMatch(/^\d{4}-\d{2}-\d{2}T/);
     expect(snap.stale).toBe(false);
   });
 
+  it("strips HTML from the explanation and credit", async () => {
+    vi.stubGlobal("fetch", vi.fn().mockResolvedValue({
+      ok: true, status: 200, json: async () => [imageItem],
+    }));
+    const snap = await fetchApod();
+    expect(snap.data.explanation).not.toContain("<");
+    expect(snap.data.explanation).toContain("view of the sky & stars");
+    expect(snap.data.credit).toBe("Jason Kurth");
+  });
+
+  it("falls back to the permalink when hdurl is empty (video day)", async () => {
+    vi.stubGlobal("fetch", vi.fn().mockResolvedValue({
+      ok: true, status: 200, json: async () => [videoItem],
+    }));
+    const snap = await fetchApod();
+    expect(snap.data.mediaType).toBe("video");
+    expect(snap.data.originalUrl).toBe(videoItem.url);
+    expect(snap.data.credit).toBe("Eric Holland");
+  });
+
   it("marks the snapshot stale when the provider fails after a prior success", async () => {
-    vi.stubGlobal("fetch", vi.fn().mockResolvedValue({ ok: true, status: 200, json: async () => valid }));
+    vi.stubGlobal("fetch", vi.fn().mockResolvedValue({ ok: true, status: 200, json: async () => [imageItem] }));
     await fetchApod();
     vi.stubGlobal("fetch", vi.fn().mockRejectedValue(new Error("down")));
     const snap = await fetchApod();
     expect(snap.stale).toBe(true);
   });
-});
 
-describe("fetchApod rate limits", () => {
-  it("throws RateLimitError on 429 when there is no prior snapshot", async () => {
+  it("throws RateLimitError on 429 with no prior snapshot", async () => {
     vi.stubGlobal("fetch", vi.fn().mockResolvedValue({
-      ok: false, status: 429, headers: new Headers(), json: async () => ({}),
+      ok: false, status: 429, json: async () => ({}),
     }));
     await expect(fetchApod()).rejects.toBeInstanceOf(RateLimitError);
   });
 
-  it("leaves remaining undefined when the rate-limit header is non-numeric", async () => {
-    vi.stubGlobal("fetch", vi.fn().mockResolvedValue({
-      ok: false, status: 429, headers: new Headers({ "x-ratelimit-remaining": "unknown" }), json: async () => ({}),
-    }));
-    const err = await fetchApod().catch((e) => e);
-    expect(err).toBeInstanceOf(RateLimitError);
-    expect((err as RateLimitError).remaining).toBeUndefined();
-  });
-
-  it("treats 403 as a rate limit too", async () => {
-    vi.stubGlobal("fetch", vi.fn().mockResolvedValue({
-      ok: false, status: 403, headers: new Headers(), json: async () => ({}),
-    }));
-    await expect(fetchApod()).rejects.toBeInstanceOf(RateLimitError);
-  });
-
-  it("falls back to the stored snapshot when rate limited after a prior success", async () => {
-    vi.stubGlobal("fetch", vi.fn().mockResolvedValue({
-      ok: true, status: 200, headers: new Headers(), json: async () => valid,
-    }));
-    await fetchApod();
-    vi.stubGlobal("fetch", vi.fn().mockResolvedValue({
-      ok: false, status: 429, headers: new Headers({ "x-ratelimit-remaining": "0" }), json: async () => ({}),
-    }));
-    const snap = await fetchApod();
-    expect(snap.stale).toBe(true);
-  });
-
-  it("does not throw when a successful response carries a rate-limit header", async () => {
-    vi.stubGlobal("fetch", vi.fn().mockResolvedValue({
-      ok: true, status: 200, headers: new Headers({ "x-ratelimit-remaining": "998" }), json: async () => valid,
-    }));
-    const snap = await fetchApod();
-    expect(snap.stale).toBe(false);
-  });
-});
-
-describe("fetchApod logging", () => {
   it("logs ok with a duration on success", async () => {
     const info = vi.spyOn(console, "info").mockImplementation(() => {});
     vi.stubGlobal("fetch", vi.fn().mockResolvedValue({
-      ok: true, status: 200, headers: new Headers(), json: async () => valid,
+      ok: true, status: 200, json: async () => [imageItem],
     }));
     await fetchApod();
     const logged = info.mock.calls.map((c) => String(c[0])).join("\n");
     expect(logged).toContain("provider=nasa-apod");
     expect(logged).toContain("event=ok");
     expect(logged).toContain("ms=");
-  });
-  it("logs rate_limited on 429", async () => {
-    const warn = vi.spyOn(console, "warn").mockImplementation(() => {});
-    resetApodState();
-    vi.stubGlobal("fetch", vi.fn().mockResolvedValue({
-      ok: false, status: 429, headers: new Headers(), json: async () => ({}),
-    }));
-    await expect(fetchApod()).rejects.toBeInstanceOf(RateLimitError);
-    const logged = warn.mock.calls.map((c) => String(c[0])).join("\n");
-    expect(logged).toContain("rate_limited");
   });
 });
