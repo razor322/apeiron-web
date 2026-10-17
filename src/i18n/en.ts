@@ -222,6 +222,19 @@ export const en = {
       distance: "Distance",
       velocity: "Speed",
     },
+    gallery: {
+      heading: "Gallery",
+      intro:
+        "A curated selection of real NASA imagery, one group per theme, each with its credit. Drawn from the NASA Image and Video Library.",
+      queries: {
+        nebula: "Nebulae",
+        galaxy: "Galaxies",
+        jupiter: "Jupiter",
+        saturn: "Saturn",
+        mars: "Mars",
+        earth: "Earth",
+      },
+    },
     earthToday: {
       heading: "Earth today",
       intro:

@@ -230,6 +230,19 @@ export const id: Dictionary = {
         "Citra piringan penuh Bumi paling baru dari wahana DSCOVR, sekitar 1,5 juta kilometer ke arah Matahari.",
       cta: "Lihat lebih banyak dari EPIC",
     },
+    gallery: {
+      heading: "Galeri",
+      intro:
+        "Pilihan citra NASA asli, satu kelompok per tema, masing-masing dengan kreditnya. Diambil dari NASA Image and Video Library.",
+      queries: {
+        nebula: "Nebula",
+        galaxy: "Galaksi",
+        jupiter: "Yupiter",
+        saturn: "Saturnus",
+        mars: "Mars",
+        earth: "Bumi",
+      },
+    },
     exoplanetPage: {
       heading: "Dunia di sekitar bintang lain",
       intro:
