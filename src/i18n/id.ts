@@ -180,6 +180,8 @@ export const id: Dictionary = {
     loadError: "Konten hari ini tidak dapat dimuat.",
     apodLabel: "NASA APOD",
     apodUrl: "https://apod.nasa.gov",
+    recentHeading: "Gambar terbaru",
+    videoLabel: "Video",
   },
   explore: {
     heading: "Jelajah",

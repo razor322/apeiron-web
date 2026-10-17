@@ -178,6 +178,8 @@ export const en = {
     loadError: "Today's content could not be loaded.",
     apodLabel: "NASA APOD",
     apodUrl: "https://apod.nasa.gov",
+    recentHeading: "Recent images",
+    videoLabel: "Video",
   },
   explore: {
     heading: "Explore",

@@ -1,6 +1,6 @@
 import { describe, it, expect, vi, afterEach, beforeEach } from "vitest";
 import { ApodSchema } from "@/lib/astronomy/schemas/apod";
-import { fetchApod, RateLimitError, resetApodState } from "@/lib/astronomy/providers/nasa-apod";
+import { fetchApod, fetchApodList, RateLimitError, resetApodState } from "@/lib/astronomy/providers/nasa-apod";
 import { clearCache } from "@/lib/cache/ttl-cache";
 
 // science.nasa.gov APOD feed item (image day): hdurl is the direct image, and
@@ -107,5 +107,29 @@ describe("fetchApod", () => {
     expect(logged).toContain("provider=nasa-apod");
     expect(logged).toContain("event=ok");
     expect(logged).toContain("ms=");
+  });
+});
+
+describe("fetchApodList", () => {
+  it("maps every item and keeps the feed order (newest first)", async () => {
+    const newer = { ...imageItem, date: "2026-10-17", title: "Newer" };
+    const older = { ...imageItem, date: "2026-10-15", title: "Older" };
+    vi.stubGlobal("fetch", vi.fn().mockResolvedValue({
+      ok: true, status: 200, json: async () => [newer, older],
+    }));
+    const snap = await fetchApodList(12);
+    expect(snap.data.map((m) => m.title)).toEqual(["Newer", "Older"]);
+    expect(snap.stale).toBe(false);
+  });
+
+  it("falls back to the last single snapshot when the feed fails", async () => {
+    vi.stubGlobal("fetch", vi.fn().mockResolvedValue({
+      ok: true, status: 200, json: async () => [imageItem],
+    }));
+    await fetchApod();
+    vi.stubGlobal("fetch", vi.fn().mockRejectedValue(new Error("down")));
+    const snap = await fetchApodList(12);
+    expect(snap.stale).toBe(true);
+    expect(snap.data.length).toBeGreaterThanOrEqual(1);
   });
 });

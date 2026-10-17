@@ -1,5 +1,5 @@
 import type { AstronomyMedia, AstronomySnapshot } from "@/lib/astronomy/models";
-import { ApodSchema } from "@/lib/astronomy/schemas/apod";
+import { ApodSchema, type ApodData } from "@/lib/astronomy/schemas/apod";
 import { logProvider, timeProvider } from "@/lib/astronomy/log";
 
 // science.nasa.gov SMD APOD feed (the documented current source). No API key and
@@ -35,35 +35,17 @@ function plainText(input: string | undefined): string {
     .trim();
 }
 
-function buildUrl(): string {
+function buildUrl(perPage: number): string {
   const url = new URL(APOD_BASE_URL);
-  url.searchParams.set("per_page", "1");
+  url.searchParams.set("per_page", String(perPage));
   return url.toString();
 }
 
-async function fetchRaw(): Promise<AstronomyMedia> {
-  const elapsed = timeProvider();
-  const res = await fetch(buildUrl(), { signal: AbortSignal.timeout(8000) });
-
-  if (RATE_LIMIT_STATUSES.has(res.status)) {
-    logProvider({ provider: APOD_PROVIDER, event: "rate_limited", status: res.status, errorClass: "RateLimitError" });
-    throw new RateLimitError(res.status);
-  }
-  if (!res.ok) {
-    logProvider({ provider: APOD_PROVIDER, event: "error", status: res.status });
-    throw new Error(`apod_http_${res.status}`);
-  }
-
-  const body: unknown = await res.json();
-  const first = Array.isArray(body) ? body[0] : body;
-  const parsed = ApodSchema.parse(first);
-
+function mapItem(parsed: ApodData): AstronomyMedia {
   // hdurl is the direct image for image days, empty for video days; fall back to
   // the article permalink so a video day still links somewhere real.
   const mediaUrl = parsed.hdurl && parsed.hdurl.length > 0 ? parsed.hdurl : parsed.url;
   const credit = plainText(parsed.credit) || plainText(parsed.copyright);
-
-  logProvider({ provider: APOD_PROVIDER, event: "ok", ms: elapsed() });
   return {
     id: parsed.date,
     title: parsed.title,
@@ -78,6 +60,33 @@ async function fetchRaw(): Promise<AstronomyMedia> {
     publishedAt: parsed.date,
     retrievedAt: new Date().toISOString(),
   };
+}
+
+async function fetchItems(perPage: number): Promise<AstronomyMedia[]> {
+  const elapsed = timeProvider();
+  const res = await fetch(buildUrl(perPage), { signal: AbortSignal.timeout(8000) });
+
+  if (RATE_LIMIT_STATUSES.has(res.status)) {
+    logProvider({ provider: APOD_PROVIDER, event: "rate_limited", status: res.status, errorClass: "RateLimitError" });
+    throw new RateLimitError(res.status);
+  }
+  if (!res.ok) {
+    logProvider({ provider: APOD_PROVIDER, event: "error", status: res.status });
+    throw new Error(`apod_http_${res.status}`);
+  }
+
+  const body: unknown = await res.json();
+  const rows = Array.isArray(body) ? body : [body];
+  const parsed = rows.map((row) => ApodSchema.safeParse(row)).filter((r) => r.success);
+  if (parsed.length === 0) throw new Error("apod_empty");
+
+  logProvider({ provider: APOD_PROVIDER, event: "ok", ms: elapsed() });
+  return parsed.map((r) => mapItem(r.data));
+}
+
+async function fetchRaw(): Promise<AstronomyMedia> {
+  const items = await fetchItems(1);
+  return items[0]!;
 }
 
 // ponytail: the page owns day-level freshness (ISR revalidate 6h in the
@@ -104,6 +113,42 @@ export async function fetchApod(): Promise<AstronomySnapshot<AstronomyMedia>> {
     return lastSnapshot;
   } catch (err) {
     if (lastSnapshot) return { ...lastSnapshot, stale: true };
+    throw err;
+  }
+}
+
+// A list of recent APOD items, newest first (the feed returns them in date order).
+// Falls back to the last single snapshot when the feed is unreachable, so the
+// page keeps showing something rather than an empty list.
+export async function fetchApodList(
+  limit = 12,
+): Promise<AstronomySnapshot<AstronomyMedia[]>> {
+  try {
+    const items = await fetchItems(limit);
+    lastSnapshot = {
+      data: items[0]!,
+      provider: APOD_PROVIDER,
+      sourceUrl: items[0]!.sourceUrl,
+      retrievedAt: new Date().toISOString(),
+      stale: false,
+    };
+    return {
+      data: items,
+      provider: APOD_PROVIDER,
+      sourceUrl: items[0]!.sourceUrl,
+      retrievedAt: new Date().toISOString(),
+      stale: false,
+    };
+  } catch (err) {
+    if (lastSnapshot) {
+      return {
+        data: [lastSnapshot.data],
+        provider: APOD_PROVIDER,
+        sourceUrl: lastSnapshot.sourceUrl,
+        retrievedAt: lastSnapshot.retrievedAt,
+        stale: true,
+      };
+    }
     throw err;
   }
 }

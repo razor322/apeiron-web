@@ -3,10 +3,12 @@ import type { Metadata } from "next";
 import { getDictionary } from "@/i18n/get-dictionary";
 import { isLocale } from "@/i18n/config";
 import { routeMetadata } from "@/lib/seo";
-import { fetchApod } from "@/lib/astronomy/providers/nasa-apod";
+import { fetchApodList } from "@/lib/astronomy/providers/nasa-apod";
+import type { AstronomyMedia, AstronomySnapshot } from "@/lib/astronomy/models";
 import { Container } from "@/components/ui/Container";
 import { Heading } from "@/components/ui/Typography";
 import { ApodCard } from "@/features/cosmos-today/ApodCard";
+import { ApodListItem } from "@/features/cosmos-today/ApodListItem";
 import { ApodFallback } from "@/features/cosmos-today/ApodFallback";
 
 // APOD updates daily; regenerate every 6h to match the adapter cache TTL instead
@@ -33,19 +35,46 @@ export default async function CosmosTodayPage({
   if (!isLocale(locale)) notFound();
   const dict = await getDictionary(locale);
 
-  let snapshot;
+  let snapshot: AstronomySnapshot<AstronomyMedia[]> | null = null;
   try {
-    snapshot = await fetchApod();
+    snapshot = await fetchApodList(12);
   } catch {
     snapshot = null;
   }
 
+  const [today, ...recent] = snapshot?.data ?? [];
+
   return (
     <main className="py-16">
-      <Container className="flex flex-col gap-8">
+      <Container className="flex flex-col gap-10">
         <Heading level={1}>{dict.cosmosToday.heading}</Heading>
-        {snapshot ? (
-          <ApodCard snapshot={snapshot} dict={dict} />
+        {today ? (
+          <>
+            <ApodCard
+              snapshot={{
+                data: today,
+                provider: snapshot!.provider,
+                sourceUrl: snapshot!.sourceUrl,
+                retrievedAt: snapshot!.retrievedAt,
+                stale: snapshot!.stale,
+              }}
+              dict={dict}
+            />
+            {recent.length > 0 ? (
+              <section className="flex flex-col gap-2">
+                <Heading level={2} className="text-xl">
+                  {dict.cosmosToday.recentHeading}
+                </Heading>
+                <ul className="flex flex-col">
+                  {recent.map((media) => (
+                    <li key={media.id}>
+                      <ApodListItem media={media} dict={dict} />
+                    </li>
+                  ))}
+                </ul>
+              </section>
+            ) : null}
+          </>
         ) : (
           <ApodFallback dict={dict} />
         )}
