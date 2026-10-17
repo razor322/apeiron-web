@@ -64,8 +64,9 @@ describe("searchNasaImage logging", () => {
     await searchNasaImage("mars");
     await searchNasaImage("mars");
     const lines = info.mock.calls.map((c) => String(c[0]));
-    expect(lines.some((l) => l.includes("cache_miss"))).toBe(true);
-    expect(lines.some((l) => l.includes("cache_hit"))).toBe(true);
-    expect(lines.some((l) => l.includes("ms="))).toBe(true);
+    const count = (needle: string) => lines.filter((l) => l.includes(needle)).length;
+    expect(count("cache_miss")).toBe(1);
+    expect(count("cache_hit")).toBe(1);
+    expect(count("ms=")).toBe(1);
   });
 });
