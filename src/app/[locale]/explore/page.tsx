@@ -1,12 +1,15 @@
 import { notFound } from "next/navigation";
+import { Suspense } from "react";
 import type { Metadata } from "next";
 import Link from "next/link";
+import type { Dictionary } from "@/i18n/en";
 import { getDictionary } from "@/i18n/get-dictionary";
 import { isLocale } from "@/i18n/config";
 import { routeMetadata } from "@/lib/seo";
 import { fetchApodList } from "@/lib/astronomy/providers/nasa-apod";
 import { Container } from "@/components/ui/Container";
 import { Heading, Body } from "@/components/ui/Typography";
+import { Skeleton } from "@/components/ui/Skeleton";
 import { CategoryGrid } from "@/features/explorer/CategoryGrid";
 import { ApodListItem } from "@/features/cosmos-today/ApodListItem";
 
@@ -34,13 +37,6 @@ export default async function ExplorePage({
   if (!isLocale(locale)) notFound();
   const dict = await getDictionary(locale);
 
-  let recent: Awaited<ReturnType<typeof fetchApodList>>["data"] = [];
-  try {
-    recent = (await fetchApodList(4)).data;
-  } catch {
-    recent = [];
-  }
-
   return (
     <main className="py-16">
       <Container className="flex flex-col gap-10">
@@ -49,27 +45,9 @@ export default async function ExplorePage({
           <Body className="max-w-2xl text-dust">{dict.explore.intro}</Body>
         </header>
         <CategoryGrid dict={dict} locale={locale} />
-        {recent.length > 0 ? (
-          <section className="flex flex-col gap-2 border-t border-[color:var(--line)] pt-10">
-            <header className="flex flex-col gap-2">
-              <Heading level={2}>{dict.explore.recent.heading}</Heading>
-              <Body className="max-w-2xl text-dust">{dict.explore.recent.intro}</Body>
-            </header>
-            <ul className="flex flex-col">
-              {recent.map((media) => (
-                <li key={media.id}>
-                  <ApodListItem media={media} dict={dict} />
-                </li>
-              ))}
-            </ul>
-            <Link
-              href={`/${locale}/cosmos-today`}
-              className="mt-2 font-sans text-sm text-amber underline"
-            >
-              {dict.explore.recent.cta}
-            </Link>
-          </section>
-        ) : null}
+        <Suspense fallback={<RecentShimmer dict={dict} locale={locale} />}>
+          <RecentImages dict={dict} locale={locale} />
+        </Suspense>
         <section className="flex flex-col gap-6 border-t border-[color:var(--line)] pt-10">
           <header className="flex flex-col gap-2">
             <Heading level={2}>{dict.explore.more.heading}</Heading>
@@ -96,5 +74,56 @@ export default async function ExplorePage({
         </section>
       </Container>
     </main>
+  );
+}
+
+// Streamed separately so the shell and the category grid paint before the feed
+// resolves. Fetches only four items.
+async function RecentImages({ dict, locale }: { dict: Dictionary; locale: string }) {
+  let recent: Awaited<ReturnType<typeof fetchApodList>>["data"] = [];
+  try {
+    recent = (await fetchApodList(4)).data;
+  } catch {
+    recent = [];
+  }
+  if (recent.length === 0) return null;
+
+  return (
+    <section className="flex flex-col gap-2 border-t border-[color:var(--line)] pt-10">
+      <header className="flex flex-col gap-2">
+        <Heading level={2}>{dict.explore.recent.heading}</Heading>
+        <Body className="max-w-2xl text-dust">{dict.explore.recent.intro}</Body>
+      </header>
+      <ul className="flex flex-col">
+        {recent.map((media) => (
+          <li key={media.id}>
+            <ApodListItem media={media} dict={dict} />
+          </li>
+        ))}
+      </ul>
+      <Link
+        href={`/${locale}/cosmos-today`}
+        className="mt-2 font-sans text-sm text-amber underline"
+      >
+        {dict.explore.recent.cta}
+      </Link>
+    </section>
+  );
+}
+
+function RecentShimmer({ dict }: { dict: Dictionary; locale: string }) {
+  return (
+    <section className="flex flex-col gap-2 border-t border-[color:var(--line)] pt-10">
+      <Heading level={2}>{dict.explore.recent.heading}</Heading>
+      {Array.from({ length: 4 }).map((_, i) => (
+        <div key={i} className="flex items-center gap-5 border-t border-[color:var(--line)] py-5">
+          <Skeleton className="h-16 w-16 shrink-0" />
+          <div className="flex flex-col gap-2">
+            <Skeleton className="h-3 w-24" />
+            <Skeleton className="h-5 w-64" />
+          </div>
+        </div>
+      ))}
+    </section>
   );
 }
