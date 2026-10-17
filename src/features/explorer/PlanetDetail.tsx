@@ -4,6 +4,8 @@ import { getText } from "@/features/explorer/categories";
 import { formatFact, getPlanet, type PlanetProfile } from "@/features/explorer/planets";
 import { getPlanetImage } from "@/features/explorer/planet-images";
 import { PlanetImage } from "@/features/explorer/PlanetImage";
+import { SurfaceMap } from "@/features/explorer/SurfaceMap";
+import { TREK_LAYERS } from "@/lib/astronomy/providers/trek";
 import { DataLabel } from "@/components/ui/DataLabel";
 import { SourceLink } from "@/components/ui/SourceLink";
 import { ImageCredit } from "@/components/ui/ImageCredit";
@@ -24,6 +26,9 @@ export function PlanetDetail({
   const narrative = getText(dict, planet.narrativeKey) as string;
   const metricLabel = (metricKey: string) =>
     getText(dict, `explore.planetMetrics.${metricKey}`) as string;
+  // A NASA Trek surface map where one exists: Mars itself, and Earth's Moon.
+  const surface =
+    planet.slug === "mars" ? TREK_LAYERS.mars : planet.slug === "earth" ? TREK_LAYERS.moon : null;
 
   return (
     <article className="flex flex-col gap-12">
@@ -37,6 +42,16 @@ export function PlanetDetail({
         <section className="flex flex-col gap-2">
           <PlanetImage image={image} dict={dict} />
           <ImageCredit credit={image.credit} sourceUrl={image.sourceUrl} />
+        </section>
+      ) : null}
+
+      {surface ? (
+        <section className="flex flex-col gap-3">
+          <Heading level={2} className="text-xl">
+            {dict.explore.planet.surfaceHeading}
+          </Heading>
+          <Body className="max-w-prose text-dust">{dict.explore.planet.surfaceIntro}</Body>
+          <SurfaceMap layer={surface} />
         </section>
       ) : null}
 

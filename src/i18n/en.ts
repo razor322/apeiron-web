@@ -337,6 +337,9 @@ export const en = {
       narrative: "About this world",
       related: "Other planets",
       allPlanets: "All planets",
+      surfaceHeading: "Surface map",
+      surfaceIntro:
+        "A real surface image mosaic from NASA Trek, stitched from orbital photographs.",
     },
     planetMetrics: {
       diameter: "Diameter",

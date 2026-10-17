@@ -339,6 +339,9 @@ export const id: Dictionary = {
       narrative: "Tentang dunia ini",
       related: "Planet lain",
       allPlanets: "Semua planet",
+      surfaceHeading: "Peta permukaan",
+      surfaceIntro:
+        "Mosaik citra permukaan asli dari NASA Trek, disusun dari foto-foto orbit.",
     },
     planetMetrics: {
       diameter: "Diameter",
