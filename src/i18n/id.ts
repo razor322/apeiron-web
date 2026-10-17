@@ -216,6 +216,22 @@ export const id: Dictionary = {
       intro: "Gambar astronomi harian paling baru, terbaru lebih dahulu.",
       cta: "Lihat lebih banyak di Cosmos Hari Ini",
     },
+    exoplanetPage: {
+      heading: "Dunia di sekitar bintang lain",
+      intro:
+        "Planet terkonfirmasi di luar Tata Surya kita, dari NASA Exoplanet Archive. Sebagian besar ditemukan dari redupnya cahaya bintang saat planet melintas, atau tarikan kecil yang diberikannya pada bintang.",
+      confirmedLabel: "planet terkonfirmasi dalam arsip",
+      recentHeading: "Penemuan paling baru",
+      hostStar: "Bintang induk",
+      discovered: "Ditemukan",
+      method: "Metode",
+      orbit: "Orbit",
+      radius: "Radius",
+      days: "hari",
+      earthRadii: "radius Bumi",
+      sourceName: "NASA Exoplanet Archive (Caltech/IPAC)",
+      sourceUrl: "https://exoplanetarchive.ipac.caltech.edu/",
+    },
     detail: {
       definition: "Definisi",
       facts: "Angka penting",

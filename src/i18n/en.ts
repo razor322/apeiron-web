@@ -214,6 +214,22 @@ export const en = {
       intro: "The most recent astronomy images of the day, newest first.",
       cta: "See more on Cosmos Today",
     },
+    exoplanetPage: {
+      heading: "Worlds around other stars",
+      intro:
+        "Confirmed planets beyond our Solar System, from the NASA Exoplanet Archive. Most are found by the dip in a star's light as a planet crosses it, or the small tug it pulls on the star.",
+      confirmedLabel: "confirmed planets in the archive",
+      recentHeading: "Most recent discoveries",
+      hostStar: "Host star",
+      discovered: "Discovered",
+      method: "Method",
+      orbit: "Orbit",
+      radius: "Radius",
+      days: "days",
+      earthRadii: "Earth radii",
+      sourceName: "NASA Exoplanet Archive (Caltech/IPAC)",
+      sourceUrl: "https://exoplanetarchive.ipac.caltech.edu/",
+    },
     detail: {
       definition: "Definition",
       facts: "Key numbers",
