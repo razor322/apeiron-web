@@ -214,6 +214,39 @@ export const en = {
       intro: "The most recent astronomy images of the day, newest first.",
       cta: "See more on Cosmos Today",
     },
+    sky: {
+      heading: "Earth and sky",
+      intro:
+        "What is close to us right now: asteroids passing near Earth, and the latest full-disc image of Earth from space.",
+    },
+    map: {
+      heading: "Everything in Explore",
+      intro: "A map of what is here, so you can go straight to what you want.",
+      sky: {
+        title: "Earth and sky",
+        summary: "Nearby asteroids and the most recent image of Earth from space.",
+      },
+      gallery: {
+        title: "Gallery",
+        summary: "A curated selection of real NASA imagery by theme, with credits.",
+      },
+      numbers: {
+        title: "Numbers that stop you",
+        summary: "Distances and times from across the journey, each with its source.",
+      },
+      calendar: {
+        title: "The cosmic calendar",
+        summary: "The whole history of the universe squeezed into one year.",
+      },
+      stardust: {
+        title: "You are made of stardust",
+        summary: "Where the elements in your body were forged, and the evidence.",
+      },
+      calculators: {
+        title: "Calculators",
+        summary: "Your age on another planet and travel times, with the formula shown.",
+      },
+    },
     nearEarth: {
       heading: "Near Earth",
       intro:

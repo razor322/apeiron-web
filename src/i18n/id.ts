@@ -216,6 +216,39 @@ export const id: Dictionary = {
       intro: "Gambar astronomi harian paling baru, terbaru lebih dahulu.",
       cta: "Lihat lebih banyak di Cosmos Hari Ini",
     },
+    sky: {
+      heading: "Bumi dan langit",
+      intro:
+        "Apa yang dekat dengan kita saat ini: asteroid yang melintas dekat Bumi, dan citra Bumi terbaru dari luar angkasa.",
+    },
+    map: {
+      heading: "Semua isi Jelajah",
+      intro: "Peta isi di sini, agar kamu bisa langsung menuju yang kamu cari.",
+      sky: {
+        title: "Bumi dan langit",
+        summary: "Asteroid dekat dan citra Bumi terbaru dari luar angkasa.",
+      },
+      gallery: {
+        title: "Galeri",
+        summary: "Pilihan citra NASA asli per tema, dengan kreditnya.",
+      },
+      numbers: {
+        title: "Angka yang menghentikanmu",
+        summary: "Jarak dan waktu dari sepanjang perjalanan, masing-masing dengan sumber.",
+      },
+      calendar: {
+        title: "Kalender kosmis",
+        summary: "Seluruh sejarah alam semesta dipadatkan ke dalam satu tahun.",
+      },
+      stardust: {
+        title: "Kamu terbuat dari debu bintang",
+        summary: "Dari mana unsur-unsur di tubuhmu ditempa, beserta buktinya.",
+      },
+      calculators: {
+        title: "Kalkulator",
+        summary: "Usiamu di planet lain dan waktu perjalanan, dengan rumusnya.",
+      },
+    },
     nearEarth: {
       heading: "Dekat Bumi",
       intro:
