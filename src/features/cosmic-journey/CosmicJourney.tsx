@@ -6,6 +6,7 @@ import type { Locale } from "@/i18n/config";
 import { STAGES, readCopy } from "./stages";
 import { useJourneyProgress } from "./use-journey-progress";
 import { JourneyStage } from "./JourneyStage";
+import { CalmJourney } from "./CalmJourney";
 import { JourneyProgress } from "./JourneyProgress";
 import { ScaleRuler } from "./ScaleRuler";
 import { ScaleReadout } from "./ScaleReadout";
@@ -97,35 +98,9 @@ export function CosmicJourney({ dict, locale }: { dict: Dictionary; locale: Loca
   );
 
   if (reduced) {
-    // Reduced path: stages stacked in normal flow, no pin, no scrub, no canvas
-    // animation. Completable by plain scroll and keyboard.
-    return (
-      <main className="relative">
-        <div className="fixed inset-0 -z-10">
-          {sky}
-          <div className="absolute inset-0 bg-void/40" />
-        </div>
-        <div className="relative z-10 mx-auto w-full max-w-5xl">
-          {STAGES.map((stage) => (
-            <JourneyStage
-              key={stage.id}
-              stage={stage}
-              dict={dict}
-              className="flex min-h-screen flex-col justify-center px-6 py-24"
-            />
-          ))}
-          <div className="px-6 pb-24">
-            <ScaleRuler exponent={STAGES[activeIndex]?.exponent ?? 0} dict={dict} />
-          </div>
-        </div>
-        <JourneyProgress
-          activeIndex={activeIndex}
-          goTo={goTo}
-          dict={dict}
-          className="fixed bottom-6 left-1/2 z-20 -translate-x-1/2 rounded-full border border-[color:var(--line)] bg-void/70 px-3 py-1.5 backdrop-blur"
-        />
-      </main>
-    );
+    // Reduced path: a plain card per stage with a real image, no pin, no scrub,
+    // no canvas animation. Completable by plain scroll and keyboard.
+    return <CalmJourney dict={dict} activeIndex={activeIndex} goTo={goTo} sky={sky} />;
   }
 
   // Motion path: one fixed stage viewport pinned by sticky, the tall wrapper
