@@ -1,7 +1,12 @@
+"use client";
+
+import { useEffect, useRef, type MutableRefObject } from "react";
 import type { Dictionary } from "@/i18n/en";
 import { MAX_EXPONENT, readCopy } from "./stages";
+import { exponentAtProgress } from "./exponent";
 
 type ScaleRulerProps = {
+  progressRef?: MutableRefObject<number>;
   exponent: number;
   dict: Dictionary;
   className?: string;
@@ -9,15 +14,16 @@ type ScaleRulerProps = {
 
 const SUPERSCRIPTS = "⁰¹²³⁴⁵⁶⁷⁸⁹";
 function superscript(n: number): string {
-  return String(n)
+  const whole = Math.floor(n);
+  return String(whole)
     .split("")
     .map((d) => SUPERSCRIPTS[Number(d)])
     .join("");
 }
 
 // Named landmarks on the ruler, at the order of magnitude they sit at, so the
-// abstract exponents gain meaning: a person, Earth, the Moon's orbit, Earth's
-// orbit, Neptune's orbit. Keys resolve to dict copy.
+// abstract exponents gain meaning: the Moon's orbit, Earth's orbit, Neptune's
+// orbit. Keys resolve to dict copy.
 const LANDMARKS: { key: string; exponent: number }[] = [
   { key: "journey.landmarks.moonOrbit", exponent: 8.89 },
   { key: "journey.landmarks.earthOrbit", exponent: 11.48 },
@@ -28,9 +34,41 @@ const LANDMARKS: { key: string; exponent: number }[] = [
 // stage, with a single glowing amber marker that travels outward. Logarithmic
 // because the journey spans many orders of magnitude, and only a log scale holds
 // that range on one axis. Amber appears here on the marker alone.
-export function ScaleRuler({ exponent, dict, className = "" }: ScaleRulerProps) {
+//
+// The marker and the 10^x readout are driven from the progress ref in a rAF loop
+// (writing style/textContent directly), so they glide with the scroll instead of
+// stepping once per stage.
+export function ScaleRuler({ progressRef, exponent, dict, className = "" }: ScaleRulerProps) {
   const ticks = Array.from({ length: MAX_EXPONENT + 1 }, (_, i) => i);
-  const marker = Math.min(100, (exponent / MAX_EXPONENT) * 100);
+  const markerRef = useRef<HTMLSpanElement | null>(null);
+  const expRef = useRef<HTMLParagraphElement | null>(null);
+
+  useEffect(() => {
+    // No ref (reduced motion): the marker sits at the active stage's exponent.
+    if (!progressRef) {
+      if (markerRef.current) {
+        markerRef.current.style.bottom = `${Math.min(100, (exponent / MAX_EXPONENT) * 100)}%`;
+      }
+      if (expRef.current) expRef.current.textContent = `10${superscript(exponent)} m`;
+      return;
+    }
+    let raf = 0;
+    let lastExp = -1;
+    const tick = () => {
+      const e = exponentAtProgress(progressRef.current);
+      if (markerRef.current) {
+        markerRef.current.style.bottom = `${Math.min(100, (e / MAX_EXPONENT) * 100)}%`;
+      }
+      const whole = Math.floor(e);
+      if (whole !== lastExp && expRef.current) {
+        expRef.current.textContent = `10${superscript(e)} m`;
+        lastExp = whole;
+      }
+      raf = requestAnimationFrame(tick);
+    };
+    raf = requestAnimationFrame(tick);
+    return () => cancelAnimationFrame(raf);
+  }, [progressRef, exponent]);
 
   return (
     <div className={className}>
@@ -69,12 +107,13 @@ export function ScaleRuler({ exponent, dict, className = "" }: ScaleRulerProps) 
         })}
 
         <span
+          ref={markerRef}
           aria-hidden="true"
           className="absolute -right-1 h-0.5 w-6 -translate-y-1/2 bg-amber shadow-[0_0_10px_var(--color-amber)]"
-          style={{ bottom: `${marker}%` }}
+          style={{ bottom: "0%" }}
         />
       </div>
-      <p className="mt-4 font-mono text-sm text-starlight">10{superscript(exponent)} m</p>
+      <p ref={expRef} className="mt-4 font-mono text-sm text-starlight" />
       <p className="mt-1 font-sans text-xs text-dust">
         {readCopy(dict, "journey.rulerTitle")}
       </p>
