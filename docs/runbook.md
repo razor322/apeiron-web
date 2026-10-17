@@ -19,12 +19,15 @@ Facts live in one registry: `src/features/cosmic-facts/facts.ts` (`COSMIC_FACTS`
 
 Freshness is owned in two different places, one per provider.
 
-- APOD: the adapter `src/lib/astronomy/providers/nasa-apod.ts` keeps no TTL
-  constant. It holds a module-level `lastSnapshot` only, to surface staleness
-  when the provider fails or rate-limits. Day-level freshness comes from ISR on
-  the Cosmos Today route: `export const revalidate = 21600` (six hours) in
+- APOD: sourced from the science.nasa.gov feed
+  (`https://science.nasa.gov/wp-json/wp/v2/apod-basic`), which needs no API key. The
+  adapter `src/lib/astronomy/providers/nasa-apod.ts` keeps no TTL constant. It holds a
+  module-level `lastSnapshot` only, to surface staleness when the provider fails.
+  Day-level freshness comes from ISR on the Cosmos Today route:
+  `export const revalidate = 21600` (six hours) in
   `src/app/[locale]/cosmos-today/page.tsx`. To change APOD freshness, edit that
-  `revalidate` value.
+  `revalidate` value. Do not add an `api.nasa.gov` dependency: that gateway proved
+  unreliable (intermittent 500s and invalid-key 403s).
 - NASA Images: `src/lib/astronomy/providers/nasa-images.ts` caches through
   `cached(key, 24h, ...)` (`TTL_MS = 24 * 60 * 60 * 1000`). The cache itself is
   `src/lib/cache/ttl-cache.ts` (`cached(key, ttlMs, fetcher)`), an in-process TTL
@@ -44,10 +47,9 @@ Each provider is one adapter behind one stable interface. If a source changes:
    shape moved. Keep mapping the raw response onto the internal model so the UI
    never sees a provider shape.
 2. Handle rate limits as a first-class case. APOD throws `RateLimitError`
-   (`src/lib/astronomy/providers/nasa-apod.ts`) on HTTP 429 (quota exhausted) or
-   403 (blocked key), carrying the status and any `x-ratelimit-remaining`; it
-   warns when fewer than 10 requests remain this hour. NASA Images throws
-   `ImageRateLimitError` on the same two statuses.
+   (`src/lib/astronomy/providers/nasa-apod.ts`) on HTTP 429 or 403 (the feed is
+   keyless, so this now only guards an upstream throttle or block), carrying the
+   status. NASA Images throws `ImageRateLimitError` on the same two statuses.
 3. Read the provider logs. `src/lib/astronomy/log.ts` (`logProvider`) emits one
    greppable line per event: `event=ok|error|rate_limited|cache_hit|cache_miss`,
    plus `ms`, `status`, and `errorClass` when present. Errors go to
