@@ -216,6 +216,20 @@ export const id: Dictionary = {
       intro: "Gambar astronomi harian paling baru, terbaru lebih dahulu.",
       cta: "Lihat lebih banyak di Cosmos Hari Ini",
     },
+    nearEarth: {
+      heading: "Dekat Bumi",
+      intro:
+        "Asteroid yang melintas dekat Bumi dalam beberapa pekan ke depan, dari data jarak dekat NASA/JPL (jarak dalam satuan astronomi).",
+      approach: "Terdekat",
+      distance: "Jarak",
+      velocity: "Kecepatan",
+    },
+    earthToday: {
+      heading: "Bumi hari ini",
+      intro:
+        "Citra piringan penuh Bumi paling baru dari wahana DSCOVR, sekitar 1,5 juta kilometer ke arah Matahari.",
+      cta: "Lihat lebih banyak dari EPIC",
+    },
     exoplanetPage: {
       heading: "Dunia di sekitar bintang lain",
       intro:

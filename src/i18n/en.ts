@@ -214,6 +214,20 @@ export const en = {
       intro: "The most recent astronomy images of the day, newest first.",
       cta: "See more on Cosmos Today",
     },
+    nearEarth: {
+      heading: "Near Earth",
+      intro:
+        "Asteroids passing close to Earth in the coming weeks, from NASA/JPL close-approach data (distance in astronomical units).",
+      approach: "Closest",
+      distance: "Distance",
+      velocity: "Speed",
+    },
+    earthToday: {
+      heading: "Earth today",
+      intro:
+        "The most recent full-disc image of Earth from the DSCOVR spacecraft, about 1.5 million kilometres sunward.",
+      cta: "See more from EPIC",
+    },
     exoplanetPage: {
       heading: "Worlds around other stars",
       intro:
