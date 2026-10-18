@@ -13,10 +13,19 @@ afterEach(() => {
 });
 
 describe("journey progress nav", () => {
-  it("marks the current stage with aria-current and shows the visited count", () => {
+  it("marks the current stage with aria-current", () => {
     render(<JourneyProgress activeIndex={2} goTo={() => {}} dict={en} />);
     const current = screen.getAllByRole("button").find((b) => b.getAttribute("aria-current") === "step");
     expect(current).toBeTruthy();
+  });
+
+  it("flags an opened stage with a visited marker", () => {
+    act(() => markVisited("earth"));
+    render(<JourneyProgress activeIndex={1} goTo={() => {}} dict={en} />);
+    const marked = screen
+      .getAllByRole("button")
+      .filter((b) => b.getAttribute("data-visited") === "true");
+    expect(marked.length).toBe(1);
   });
 
   it("hides the reset control until there is progress", () => {
