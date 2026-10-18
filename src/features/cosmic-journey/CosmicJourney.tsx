@@ -159,9 +159,6 @@ export function CosmicJourney({ dict, locale }: { dict: Dictionary; locale: Loca
               </div>
             );
           })}
-          <div className="absolute bottom-[clamp(40px,11vh,110px)] left-[clamp(20px,6vw,96px)] w-[min(34rem,calc(100%-40px))]">
-            <JourneySummary dict={dict} />
-          </div>
         </div>
         <JourneyProgress
           activeIndex={activeIndex}
@@ -170,6 +167,9 @@ export function CosmicJourney({ dict, locale }: { dict: Dictionary; locale: Loca
           className="absolute bottom-6 left-1/2 z-20 -translate-x-1/2 rounded-full border border-[color:var(--line)] bg-void/70 px-3 py-1.5 backdrop-blur"
         />
       </div>
+      <section className="relative z-10 mx-auto w-full max-w-3xl px-6 py-[16vh]">
+        <JourneySummary dict={dict} />
+      </section>
     </div>
   );
 }
