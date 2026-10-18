@@ -461,6 +461,14 @@ export const id: Dictionary = {
       label: "Setel ulang kemajuan",
       done: "Kemajuan dihapus.",
     },
+    summary: {
+      heading: "Perjalananmu",
+      ordersLine: "Kamu melintasi {orders} orde besaran, dari seberkas cahaya hingga tepi alam semesta teramati.",
+      stagesLine: "{visited} dari {total} tahapan dibuka.",
+      factsHeading: "Yang kamu lihat di sepanjang jalan",
+      complete: "Kamu membuka setiap tahapan. Itulah seluruh skala kosmos, dari awal hingga akhir.",
+      incomplete: "Buka tahapan yang belum kamu capai untuk melengkapi skala ini.",
+    },
     landmarks: {
       moonOrbit: "orbit Bulan",
       earthOrbit: "orbit Bumi",
