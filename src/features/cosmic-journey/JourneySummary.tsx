@@ -26,7 +26,7 @@ export function JourneySummary({ dict }: Props) {
     .map((id) => getFact(id))
     .filter((f): f is NonNullable<typeof f> => Boolean(f));
 
-  const complete = visited.length >= STAGES.length;
+  const complete = STAGES.every((stage) => visited.includes(stage.id));
 
   return (
     <section
