@@ -11,16 +11,33 @@ function emit() {
   for (const listener of listeners) listener();
 }
 
+let cachedRaw: string | null = null;
+let cachedValue: string[] = [];
+
 export function readVisited(): string[] {
+  let raw: string | null = null;
   try {
-    const raw = window.localStorage.getItem(STORAGE_KEY);
-    if (!raw) return [];
-    const parsed: unknown = JSON.parse(raw);
-    if (!Array.isArray(parsed)) return [];
-    return parsed.filter((id): id is string => typeof id === "string");
+    raw = window.localStorage.getItem(STORAGE_KEY);
   } catch {
-    return [];
+    cachedRaw = null;
+    cachedValue = [];
+    return cachedValue;
   }
+  if (raw === cachedRaw) return cachedValue;
+  cachedRaw = raw;
+  if (!raw) {
+    cachedValue = [];
+    return cachedValue;
+  }
+  try {
+    const parsed: unknown = JSON.parse(raw);
+    cachedValue = Array.isArray(parsed)
+      ? parsed.filter((id): id is string => typeof id === "string")
+      : [];
+  } catch {
+    cachedValue = [];
+  }
+  return cachedValue;
 }
 
 function write(ids: string[]): void {
@@ -48,10 +65,13 @@ export function resetJourney(): void {
 }
 
 export function subscribeJourney(callback: Listener): () => void {
-  window.addEventListener("storage", callback);
+  const onStorage = (event: StorageEvent) => {
+    if (event.key === null || event.key === STORAGE_KEY) callback();
+  };
+  window.addEventListener("storage", onStorage);
   listeners.add(callback);
   return () => {
-    window.removeEventListener("storage", callback);
+    window.removeEventListener("storage", onStorage);
     listeners.delete(callback);
   };
 }
