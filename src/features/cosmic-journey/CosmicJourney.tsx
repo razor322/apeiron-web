@@ -11,6 +11,7 @@ import { JourneyProgress } from "./JourneyProgress";
 import { ScaleRuler } from "./ScaleRuler";
 import { ScaleReadout } from "./ScaleReadout";
 import { getCalm, subscribeCalm } from "@/lib/motion-preference";
+import { useTrackStage } from "@/lib/journey-progress";
 import type { SceneHandle } from "./scene/scene";
 
 // Opacity of a stage panel while scrubbing, keyed to the stage's own scroll
@@ -36,6 +37,8 @@ export function CosmicJourney({ dict, locale }: { dict: Dictionary; locale: Loca
   const reduced = useSyncExternalStore(subscribeCalm, getCalm, () => true);
 
   const { activeIndex, goTo, progressRef } = useJourneyProgress(reduced);
+
+  useTrackStage(STAGES[activeIndex]?.id ?? STAGES[0]!.id);
 
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
   const sceneRef = useRef<SceneHandle | null>(null);

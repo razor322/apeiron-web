@@ -454,6 +454,13 @@ export const id: Dictionary = {
       "Skala logaritmik: setiap langkah sepuluh kali lipat dari yang di bawahnya, sehingga seluruh rentang skala kosmis muat pada satu sumbu.",
     widthLabel: "Lebar layar",
     lightCrossing: "Cahaya menyeberanginya dalam",
+    progress: {
+      visited: "sudah dibuka",
+    },
+    reset: {
+      label: "Setel ulang kemajuan",
+      done: "Kemajuan dihapus.",
+    },
     landmarks: {
       moonOrbit: "orbit Bulan",
       earthOrbit: "orbit Bumi",

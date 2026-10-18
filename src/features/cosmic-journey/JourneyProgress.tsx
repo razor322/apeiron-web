@@ -1,5 +1,6 @@
 import type { Dictionary } from "@/i18n/en";
 import { STAGES, readCopy } from "./stages";
+import { JourneyResetButton } from "./JourneyResetButton";
 
 type JourneyProgressProps = {
   activeIndex: number;
@@ -9,7 +10,9 @@ type JourneyProgressProps = {
 };
 
 // One focusable control per stage. The accessible name comes from the
-// dictionary; aria-current="step" marks the stage the reader is on.
+// dictionary; aria-current="step" marks the stage the reader is on. A stage the
+// reader has opened keeps a filled marker, but the group stays one control per
+// stage, unchanged for screen readers.
 export function JourneyProgress({
   activeIndex,
   goTo,
@@ -17,10 +20,7 @@ export function JourneyProgress({
   className = "",
 }: JourneyProgressProps) {
   return (
-    <nav
-      aria-label={readCopy(dict, "journey.navLabel")}
-      className={className}
-    >
+    <nav aria-label={readCopy(dict, "journey.navLabel")} className={className}>
       <ol className="flex items-center gap-1 sm:gap-2">
         {STAGES.map((stage, index) => {
           const active = index === activeIndex;
@@ -43,6 +43,7 @@ export function JourneyProgress({
           );
         })}
       </ol>
+      <JourneyResetButton dict={dict} />
     </nav>
   );
 }

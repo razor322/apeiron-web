@@ -452,6 +452,13 @@ export const en = {
       "A logarithmic scale: each step is ten times the one below, so the whole range of cosmic scale fits on a single axis.",
     widthLabel: "Screen width",
     lightCrossing: "Light crosses it in",
+    progress: {
+      visited: "visited",
+    },
+    reset: {
+      label: "Reset progress",
+      done: "Progress cleared.",
+    },
     landmarks: {
       moonOrbit: "Moon's orbit",
       earthOrbit: "Earth's orbit",
