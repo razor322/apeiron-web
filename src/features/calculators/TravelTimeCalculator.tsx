@@ -1,6 +1,7 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import { useSearchParams, usePathname, useRouter } from "next/navigation";
 import type { Dictionary } from "@/i18n/en";
 import type { Locale } from "@/i18n/config";
 import { travelTime } from "@/features/calculators/travel-time";
@@ -9,10 +10,38 @@ import { ErrorState } from "@/components/ui/ErrorState";
 
 type Props = { dict: Dictionary; locale: Locale };
 
+const DEFAULT_DISTANCE = "149600000";
+const DEFAULT_SPEED = "299792.458";
+
+export function parseTravelQuery(search: string): { distance: string; speed: string } {
+  const params = new URLSearchParams(search);
+  const okNumber = (value: string | null, fallback: string) => {
+    if (value === null || value.trim() === "") return fallback;
+    return Number.isFinite(Number(value)) && Number(value) >= 0 ? value : fallback;
+  };
+  return {
+    distance: okNumber(params.get("distance"), DEFAULT_DISTANCE),
+    speed: okNumber(params.get("speed"), DEFAULT_SPEED),
+  };
+}
+
+export function travelQuery(distance: string, speed: string): string {
+  const params = new URLSearchParams({ distance, speed });
+  return `?${params.toString()}`;
+}
+
 export function TravelTimeCalculator({ dict, locale }: Props) {
   const t = dict.calculators.travelTime;
-  const [distanceKm, setDistanceKm] = useState("149600000");
-  const [speedKms, setSpeedKms] = useState("299792.458");
+  const router = useRouter();
+  const pathname = usePathname();
+  const searchParams = useSearchParams();
+  const initial = parseTravelQuery(searchParams.toString());
+  const [distanceKm, setDistanceKm] = useState(initial.distance);
+  const [speedKms, setSpeedKms] = useState(initial.speed);
+
+  useEffect(() => {
+    router.replace(`${pathname}${travelQuery(distanceKm, speedKms)}`, { scroll: false });
+  }, [distanceKm, speedKms, pathname, router]);
 
   const distance = Number(distanceKm);
   const speed = Number(speedKms);

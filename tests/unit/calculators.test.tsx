@@ -1,6 +1,6 @@
 // @vitest-environment jsdom
 import "@testing-library/jest-dom/vitest";
-import { afterEach, describe, it, expect } from "vitest";
+import { afterEach, describe, it, expect, vi } from "vitest";
 import { render, screen, cleanup } from "@testing-library/react";
 import { fireEvent } from "@testing-library/react";
 import { planetAge, PLANET_ORBITS } from "@/features/calculators/planet-age";
@@ -9,6 +9,12 @@ import { PlanetAgeCalculator } from "@/features/calculators/PlanetAgeCalculator"
 import { TravelTimeCalculator } from "@/features/calculators/TravelTimeCalculator";
 import { en } from "@/i18n/en";
 import { id } from "@/i18n/id";
+
+vi.mock("next/navigation", () => ({
+  useSearchParams: () => new URLSearchParams(),
+  usePathname: () => "/en/calculators",
+  useRouter: () => ({ replace: vi.fn() }),
+}));
 
 afterEach(cleanup);
 

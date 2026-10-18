@@ -1,6 +1,7 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import { useSearchParams, usePathname, useRouter } from "next/navigation";
 import type { Dictionary } from "@/i18n/en";
 import type { Locale } from "@/i18n/config";
 import { PLANET_ORBITS, planetAge } from "@/features/calculators/planet-age";
@@ -8,10 +9,37 @@ import { ErrorState } from "@/components/ui/ErrorState";
 
 type Props = { dict: Dictionary; locale: Locale };
 
+const DEFAULT_AGE = "30";
+const DEFAULT_PLANET = "Mars";
+
+export function parseAgeQuery(search: string): { age: string; planet: string } {
+  const params = new URLSearchParams(search);
+  const rawAge = params.get("age") ?? "";
+  const numeric = Number(rawAge);
+  const age =
+    rawAge.trim() !== "" && Number.isFinite(numeric) && numeric >= 0 ? rawAge : DEFAULT_AGE;
+  const planetParam = params.get("planet") ?? "";
+  const planet = PLANET_ORBITS.some((p) => p.name === planetParam) ? planetParam : DEFAULT_PLANET;
+  return { age, planet };
+}
+
+export function ageQuery(age: string, planet: string): string {
+  const params = new URLSearchParams({ age, planet });
+  return `?${params.toString()}`;
+}
+
 export function PlanetAgeCalculator({ dict }: Props) {
   const t = dict.calculators.planetAge;
-  const [age, setAge] = useState("30");
-  const [planet, setPlanet] = useState("Mars");
+  const router = useRouter();
+  const pathname = usePathname();
+  const searchParams = useSearchParams();
+  const initial = parseAgeQuery(searchParams.toString());
+  const [age, setAge] = useState(initial.age);
+  const [planet, setPlanet] = useState(initial.planet);
+
+  useEffect(() => {
+    router.replace(`${pathname}${ageQuery(age, planet)}`, { scroll: false });
+  }, [age, planet, pathname, router]);
 
   const numeric = Number(age);
   let years: number | null = null;

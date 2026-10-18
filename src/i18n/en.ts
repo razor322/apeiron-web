@@ -170,6 +170,11 @@ export const en = {
       errorSpeed: "Enter a positive speed.",
       errorNonNumeric: "Enter a number.",
     },
+    share: {
+      copy: "Copy link to this result",
+      copied: "Link copied.",
+      failed: "Could not copy the link.",
+    },
   },
   cosmosToday: {
     heading: "Cosmos Today",

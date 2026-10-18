@@ -1,4 +1,5 @@
 import { notFound } from "next/navigation";
+import { Suspense } from "react";
 import type { Metadata } from "next";
 import { getDictionary } from "@/i18n/get-dictionary";
 import { isLocale } from "@/i18n/config";
@@ -8,6 +9,7 @@ import { Button } from "@/components/ui/Button";
 import { Heading, Body, Label } from "@/components/ui/Typography";
 import { PlanetAgeCalculator } from "@/features/calculators/PlanetAgeCalculator";
 import { TravelTimeCalculator } from "@/features/calculators/TravelTimeCalculator";
+import { ShareResult } from "@/features/calculators/ShareResult";
 
 export async function generateMetadata({
   params,
@@ -39,12 +41,20 @@ export default async function CalculatorsPage({
         </div>
 
         <section className="flex flex-col gap-4 border-t border-[color:var(--line)] pt-8">
-          <PlanetAgeCalculator dict={dict} locale={locale} />
+          <Suspense fallback={null}>
+            <PlanetAgeCalculator dict={dict} locale={locale} />
+          </Suspense>
         </section>
 
         <section className="flex flex-col gap-4 border-t border-[color:var(--line)] pt-8">
-          <TravelTimeCalculator dict={dict} locale={locale} />
+          <Suspense fallback={null}>
+            <TravelTimeCalculator dict={dict} locale={locale} />
+          </Suspense>
         </section>
+
+        <div className="border-t border-[color:var(--line)] pt-8">
+          <ShareResult dict={dict} />
+        </div>
 
         <div className="border-t border-[color:var(--line)] pt-8">
           <Label>{dict.nav.brand}</Label>

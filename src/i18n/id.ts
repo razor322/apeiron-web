@@ -171,6 +171,11 @@ export const id: Dictionary = {
       errorSpeed: "Masukkan kecepatan positif.",
       errorNonNumeric: "Masukkan angka.",
     },
+    share: {
+      copy: "Salin tautan ke hasil ini",
+      copied: "Tautan disalin.",
+      failed: "Tidak dapat menyalin tautan.",
+    },
     backHome: "Kembali ke perjalanan",
   },
   cosmosToday: {
