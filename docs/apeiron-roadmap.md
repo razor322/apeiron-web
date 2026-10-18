@@ -330,6 +330,10 @@ MVP yang sudah memuat journey, galeri topik, Cosmos Today, data statis bersumber
 | AP-023 | P1 | Katalog eksoplanet TAP | AP-006, AP-009 | Schema, kueri terbatas, cache |
 | AP-024 | P1 | Data asteroid/close approach | AP-006, AP-009 | Query filter, metadata waktu, fallback |
 | AP-025 | P2 | Posisi ISS atau data dinamis tambahan | Evaluasi provider dan kontrak data | Provider terverifikasi dan label update jujur |
+| AP-029 | P1 | Progres tahap journey tersimpan di perangkat | AP-004, AP-005 | ID tahap yang dibuka di localStorage, reset tersedia, tanpa akun/cookie |
+| AP-030 | P1 | Penanda tahap dibuka di navigasi journey | AP-029 | Tahap yang pernah dibuka tertanda; satu kontrol per tahap; aksesibilitas utuh |
+| AP-031 | P1 | Ringkasan akhir perjalanan | AP-029, AP-003 | Rentang orde besaran, jumlah tahap, dan fakta bersumber tampil di outro |
+| AP-032 | P2 | State input kalkulator di URL | AP-020, AP-021 | Hasil dapat dibagikan lewat tautan; nilai tidak sah jatuh ke default |
 | AP-026 | P2 | Newsletter | Provider email, consent, privacy policy | Consent, validasi, unsubscribe, dan pengelolaan data |
 | AP-027 | P2 | Suara atmosfer opsional | Audit UX dan aksesibilitas | Default off, tidak autoplay, kontrol tersedia |
 | AP-028 | P2 | CMS/admin editorial | Kebutuhan tim konten | Workflow editor dan model akses ditentukan |
@@ -419,3 +423,22 @@ Pekerjaan dianggap selesai hanya jika:
 ## 16. Rekomendasi Langkah Pertama
 
 Mulai dari **M0 dan M1 secara berurutan**, tetapi jangan menunggu seluruh konten diproduksi untuk membuat prototype M2. Susun fact registry untuk tujuh tahap, pilih aset sementara yang haknya jelas, siapkan shell aplikasi dan token desain, kemudian bangun perjalanan scroll dengan data kurasi internal. Setelah narasi dan interaksi terasa tepat pada perangkat sungguhan, integrasikan APOD dan NASA Images melalui adapter server-side. Tambahkan Horizons, Exoplanet Archive, kalkulator, dan data dinamis hanya setelah fondasi stabil.
+
+---
+
+## 17. M8 - Engagement Journey (Post-MVP)
+
+**Tujuan:** memberi pembaca rasa kemajuan saat menyusuri Cosmic Journey tanpa menambah akun, backend, atau cookie. Semua state tersimpan di perangkat, sekelas preferensi motion yang sudah ada (`apeiron:motion`).
+
+**Lingkup:** AP-029 sampai AP-032.
+
+| Pekerjaan | Hasil | Release gate |
+|---|---|---|
+| AP-029 Progres tahap tersimpan | Daftar ID tahap yang dibuka di `localStorage` key `apeiron:journey`; reset tersedia | Tanpa akun/cookie; storage diblokir tidak crash |
+| AP-030 Penanda tahap dibuka | Tahap yang pernah dibuka tertanda di navigasi; satu kontrol per tahap | Aksesibilitas utuh (`aria-current`, `sr-only`) |
+| AP-031 Ringkasan akhir perjalanan | Rentang orde besaran, jumlah tahap, dan fakta bersumber tampil di outro | Setiap angka bersumber; tidak ada angka baru |
+| AP-032 State kalkulator di URL | Input kalkulator tersimpan di query, tautan dapat dibagikan | Nilai tidak sah jatuh ke default; copy-link melaporkan hasil |
+
+**Batasan:** gamifikasi di sini berarti interaksi yang terasa responsif dan memotivasi, bukan poin atau kompetisi. Tidak ada streak yang menghukum, tidak ada notifikasi mengejar, tidak ada FOMO. Progres selalu dapat direset dan progres bukan animasi, jadi tidak terpengaruh reduced motion.
+
+**Ditunda:** menandai kartu Explore yang pernah dibuka (kelas storage yang sama). Kerjakan setelah M8 Journey selesai, bila terbukti berguna.

@@ -65,3 +65,5 @@ docs/superpowers/
 # stray debug/screenshot scripts
 shot.mjs
 
+.codegraph/
+
