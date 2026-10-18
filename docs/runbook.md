@@ -79,6 +79,13 @@ Each provider is one adapter behind one stable interface. If a source changes:
    the store is in-process, so a restart empties it.
 5. After rolling back, run the full gate below before re-releasing.
 
+## Journey progress
+
+The Cosmic Journey records the stages a reader has opened under the localStorage
+key `apeiron:journey`, a JSON array of stage ids. No account, no cookie, no
+server. The "Reset progress" control in the journey nav clears it. Because it is
+device-local, support can always ask a reader to reset or clear site data.
+
 ## Pre-launch go/no-go checklist (PRD section 12)
 
 Run in order and record output. All must PASS.
