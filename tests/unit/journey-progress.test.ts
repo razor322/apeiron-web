@@ -1,39 +1,67 @@
-import { describe, it, expect } from "vitest";
-import { STAGES, activeStageIndex } from "@/features/cosmic-journey/stages";
+// @vitest-environment jsdom
+import { afterEach, describe, it, expect, beforeEach } from "vitest";
+import { readVisited, markVisited, resetJourney, subscribeJourney } from "@/lib/journey-progress";
 
-describe("journey stages", () => {
-  it("starts at the hero, passes a mid transition, and ends at the outro", () => {
-    expect(STAGES[0]!.id).toBe("hero");
-    expect(STAGES[1]!.id).toBe("mid");
-    expect(STAGES[STAGES.length - 1]!.id).toBe("outro");
+const KEY = "apeiron:journey";
+
+beforeEach(() => {
+  window.localStorage.clear();
+});
+afterEach(() => {
+  window.localStorage.clear();
+});
+
+describe("journey progress store", () => {
+  it("starts empty", () => {
+    expect(readVisited()).toEqual([]);
   });
 
-  it("travels the seven named stages in order", () => {
-    const content = STAGES.filter((s) => s.kind === "content" || s.kind === "outro");
-    expect(content.map((s) => s.id)).toEqual([
-      "earth",
-      "solar-system",
-      "star",
-      "galaxy",
-      "universe",
-      "outro",
-    ]);
+  it("marks a stage visited and is idempotent", () => {
+    markVisited("earth");
+    markVisited("earth");
+    expect(readVisited()).toEqual(["earth"]);
   });
 
-  it("every stage has an accessible label", () => {
-    for (const s of STAGES) expect(s.ariaLabel.length).toBeGreaterThan(0);
+  it("keeps first-open order and never removes an id", () => {
+    markVisited("earth");
+    markVisited("star");
+    markVisited("earth");
+    expect(readVisited()).toEqual(["earth", "star"]);
   });
 
-  it("maps scroll to the active stage by range", () => {
-    expect(activeStageIndex(0)).toBe(0);
-    expect(activeStageIndex(1)).toBe(STAGES.length - 1);
-    // Every stage is reachable and the index is monotonic in progress.
-    let last = -1;
-    for (let p = 0; p <= 1; p += 0.02) {
-      const i = activeStageIndex(p);
-      expect(i).toBeGreaterThanOrEqual(last);
-      last = i;
-    }
-    expect(last).toBe(STAGES.length - 1);
+  it("resets the list", () => {
+    markVisited("earth");
+    resetJourney();
+    expect(readVisited()).toEqual([]);
+  });
+
+  it("notifies subscribers on change, not on a repeat mark", () => {
+    let calls = 0;
+    const unsubscribe = subscribeJourney(() => {
+      calls += 1;
+    });
+    markVisited("earth");
+    markVisited("earth");
+    resetJourney();
+    unsubscribe();
+    expect(calls).toBe(2);
+  });
+
+  it("returns empty and does not throw when storage is blocked", () => {
+    const original = Object.getOwnPropertyDescriptor(window, "localStorage");
+    Object.defineProperty(window, "localStorage", {
+      configurable: true,
+      get() {
+        throw new Error("blocked");
+      },
+    });
+    expect(() => markVisited("earth")).not.toThrow();
+    expect(readVisited()).toEqual([]);
+    if (original) Object.defineProperty(window, "localStorage", original);
+  });
+
+  it("ignores a corrupted stored value", () => {
+    window.localStorage.setItem(KEY, "{not json");
+    expect(readVisited()).toEqual([]);
   });
 });
