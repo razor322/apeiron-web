@@ -69,11 +69,14 @@ export function useJourneyProgress(reduced: boolean): JourneyProgress {
         p: 1,
         ease: "none",
         onUpdate: () => apply(state.p),
+        // scrub: 0.6 gives an eased catch-up (about 0.6s), the feel the prototype
+        // reaches with its cur += (target - cur) * (1 - exp(-dt * 6)) loop,
+        // instead of following the raw scroll position step for step.
         scrollTrigger: {
           trigger: document.body,
           start: "top top",
           end: "bottom bottom",
-          scrub: true,
+          scrub: 0.6,
           onRefresh: (self) => {
             state.p = self.progress;
             apply(self.progress);
