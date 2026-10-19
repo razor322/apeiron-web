@@ -477,6 +477,11 @@ export const id: Dictionary = {
       barnard: "Bintang Barnard",
       others: "",
     },
+    objects: {
+      sun: "Matahari",
+      moon: "Bulan",
+      cardHint: "Buka",
+    },
     stages: {
       hero: {
         label: "Pembuka",

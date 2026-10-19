@@ -475,6 +475,11 @@ export const en = {
       barnard: "Barnard's Star",
       others: "",
     },
+    objects: {
+      sun: "The Sun",
+      moon: "The Moon",
+      cardHint: "Open",
+    },
     stages: {
       hero: {
         label: "Opening",
