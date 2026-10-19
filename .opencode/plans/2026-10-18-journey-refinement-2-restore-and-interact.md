@@ -1,4 +1,4 @@
-# Journey Refinement 2: Strip, Restore, and Make the Cosmos Interactive
+# Journey Refinement 2 (ALL TASKS DONE, merged to main): Strip, Restore, and Make the Cosmos Interactive
 
 > **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [ ]`) syntax for tracking.
 
@@ -65,27 +65,29 @@ Task order: strip (1), restore and Moon (2), planets (3), cosmos grid and canvas
 - Consumes: nothing.
 - Produces: neither journey renders a progress bar or reset control.
 
-- [ ] **Step 1: Remove it from both journeys**
+> **Status: DONE** (commit `b6ec090`, review clean). 169 tests pass, lint 0, typecheck 0.
+
+- [x] **Step 1: Remove it from both journeys**
 
 In `src/features/cosmic-journey/CosmicJourney.tsx`: delete the import `import { JourneyProgressBar } from "./JourneyProgressBar";` and delete the `<JourneyProgressBar ... />` element (the one with `className="absolute bottom-6 left-1/2 z-20 ..."`).
 
 In `src/features/cosmic-journey/CalmJourney.tsx`: delete the import `import { JourneyProgressBar } from "./JourneyProgressBar";` and delete the `<JourneyProgressBar ... />` element (the one with `className="fixed bottom-6 left-1/2 z-20 ..."`).
 
-- [ ] **Step 2: Delete the component and its test**
+- [x] **Step 2: Delete the component and its test**
 
 ```powershell
 Remove-Item -LiteralPath "src/features/cosmic-journey/JourneyProgressBar.tsx"
 Remove-Item -LiteralPath "tests/unit/journey-progress-bar.test.tsx"
 ```
 
-- [ ] **Step 3: Verify**
+- [x] **Step 3: Verify**
 
 Run: `bun run typecheck ; bun run lint`
 Expected: exit 0; `git grep JourneyProgressBar` finds nothing in `src` or `tests`.
 Run: `bunx vitest run`
 Expected: PASS (one fewer file).
 
-- [ ] **Step 4: Commit**
+- [x] **Step 4: Commit**
 
 ```bash
 git add src/features/cosmic-journey/JourneyProgressBar.tsx src/features/cosmic-journey/CosmicJourney.tsx src/features/cosmic-journey/CalmJourney.tsx tests/unit/journey-progress-bar.test.tsx
@@ -94,7 +96,11 @@ git commit -m "refactor: remove the journey progress bar and reset control"
 
 ---
 
+> **Status: DONE** (commit `0c595c6`, review clean). 169 tests pass, lint 0, typecheck 0, build green.
+
 ### Task 2: Restore the monotone curve and show the Moon at Earth
+
+> **Status: DONE** (commit 0c595c6, review clean). 169 tests pass, lint 0, typecheck 0, build green.
 
 **Files:**
 - Modify: `src/features/cosmic-journey/exponent.ts`
@@ -105,7 +111,7 @@ git commit -m "refactor: remove the journey progress bar and reset control"
 - Consumes: nothing new.
 - Produces: `exponentAtProgress` is monotone again; the scene KEYFRAMES match; the Earth surface stage draws a visible Moon.
 
-- [ ] **Step 1: Write the failing test (monotone contract)**
+- [x] **Step 1: Write the failing test (monotone contract)**
 
 Replace the whole body of `tests/unit/exponent.test.ts` with:
 
@@ -138,12 +144,12 @@ describe("exponentAtProgress", () => {
 });
 ```
 
-- [ ] **Step 2: Run to verify it fails**
+- [x] **Step 2: Run to verify it fails**
 
 Run: `bunx vitest run tests/unit/exponent.test.ts`
 Expected: FAIL on the monotone test (the current curve has the orbit dip at p 0.22-0.30).
 
-- [ ] **Step 3: Revert the curve in `exponent.ts`**
+- [x] **Step 3: Revert the curve in `exponent.ts`**
 
 Replace `KEYFRAMES` in `src/features/cosmic-journey/exponent.ts` with:
 
@@ -166,18 +172,18 @@ const KEYFRAMES: [number, number][] = [
 ];
 ```
 
-- [ ] **Step 4: Run to verify it passes**
+- [x] **Step 4: Run to verify it passes**
 
 Run: `bunx vitest run tests/unit/exponent.test.ts`
 Expected: PASS, 3 tests.
 
-- [ ] **Step 5: Mirror the curve and delete the orbit band in `scene.ts`**
+- [x] **Step 5: Mirror the curve and delete the orbit band in `scene.ts`**
 
 In `src/features/cosmic-journey/scene/scene.ts`:
 - Replace its `KEYFRAMES` with the identical monotone list from Step 3.
 - Delete the whole "Earth's orbit seen from outside" block: the `const eoA = ...` line and its `if (eoA > 0.01) { ... }` body. Delete nothing else around it.
 
-- [ ] **Step 6: Add a Moon visible at the Earth surface stage**
+- [x] **Step 6: Add a Moon visible at the Earth surface stage**
 
 In `scene.ts`, the Moon block currently gates on `const mA = smooth(8, 8.6, e) * (1 - smooth(10, 10.8, e)) * localFade;`, which never fires at the Earth surface scale (e around 7.2). Replace that gate and the drawing so the Moon shows beside Earth while the surface is on screen.
 
@@ -230,12 +236,12 @@ Replace the existing Moon block (from its comment through its closing brace) wit
 
 Note: this block must run after `ex`, `ey`, `Rpx`, `AU`, `LM`, `RM`, and `project` are defined in `render` (they are, by the time the old Moon block ran). Keep its position in `render`.
 
-- [ ] **Step 7: Run suite, typecheck, lint, build**
+- [x] **Step 7: Run suite, typecheck, lint, build**
 
 Run: `bunx vitest run ; bun run typecheck ; bun run lint ; bun run build`
 Expected: PASS, exit 0.
 
-- [ ] **Step 8: Commit**
+- [x] **Step 8: Commit**
 
 ```bash
 git add src/features/cosmic-journey/exponent.ts src/features/cosmic-journey/scene/scene.ts tests/unit/exponent.test.ts
@@ -244,7 +250,11 @@ git commit -m "fix: restore the monotone zoom and show the Moon at Earth"
 
 ---
 
+> **Status: DONE** (commit 9286463, review clean). 171 tests pass, lint 0, typecheck 0.
+
 ### Task 3: Planet row on the Solar System stage
+
+> **Status: DONE** (commit 9286463, review clean). 171 tests pass, lint 0, typecheck 0.
 
 **Files:**
 - Create: `src/features/cosmic-journey/PlanetRow.tsx`
@@ -258,7 +268,7 @@ git commit -m "fix: restore the monotone zoom and show the Moon at Earth"
 - Consumes: `PLANETS` from `src/features/explorer/planets.ts` (each profile has `slug`, `nameKey`, `taglineKey`); `getText(dict, key)` from `src/features/explorer/categories.ts`; `next/link`; `readCopy` from `./stages`.
 - Produces: `PlanetRow({ locale, dict, className })`; `JourneyStage` gains a required `locale: Locale` prop.
 
-- [ ] **Step 1: Add dictionary keys**
+- [x] **Step 1: Add dictionary keys**
 
 In `src/i18n/en.ts`, inside `journey`, add:
 
@@ -271,7 +281,7 @@ In `src/i18n/en.ts`, inside `journey`, add:
 
 Mirror the same keys in `src/i18n/id.ts` (for example `heading: "Delapan planet"`, `intro: "Tiap dunia yang terikat Matahari. Buka satu untuk melihat ukuran, jarak, dan kecepatannya."`). Run `bunx vitest run tests/unit/i18n.test.ts` and expect PASS.
 
-- [ ] **Step 2: Write the failing test**
+- [x] **Step 2: Write the failing test**
 
 ```tsx
 // tests/unit/planet-row.test.tsx
@@ -304,12 +314,12 @@ describe("planet row", () => {
 
 The accessible name is asserted as the slug. If the visible label is the localized planet name (for example "Mercury"), the implementer must change the assertion to `new RegExp(p.nameKey.split(".").pop()!, "i")` so the test matches what is rendered. Pick one and keep it consistent.
 
-- [ ] **Step 3: Run to verify it fails**
+- [x] **Step 3: Run to verify it fails**
 
 Run: `bunx vitest run tests/unit/planet-row.test.tsx`
 Expected: FAIL, module not found.
 
-- [ ] **Step 4: Write `PlanetRow`**
+- [x] **Step 4: Write `PlanetRow`**
 
 ```tsx
 // src/features/cosmic-journey/PlanetRow.tsx
@@ -362,12 +372,12 @@ export function PlanetRow({
 }
 ```
 
-- [ ] **Step 5: Run to verify it passes**
+- [x] **Step 5: Run to verify it passes**
 
 Run: `bunx vitest run tests/unit/planet-row.test.tsx`
 Expected: PASS, 2 tests.
 
-- [ ] **Step 6: Wire it into `JourneyStage` and pass `locale`**
+- [x] **Step 6: Wire it into `JourneyStage` and pass `locale`**
 
 In `src/features/cosmic-journey/JourneyStage.tsx`:
 - Add `import type { Locale } from "@/i18n/config";` and `import { PlanetRow } from "./PlanetRow";`.
@@ -385,12 +395,12 @@ In `src/features/cosmic-journey/CosmicJourney.tsx`, both `<JourneyStage ... />` 
 
 In `src/features/cosmic-journey/CalmJourney.tsx`, add `locale: Locale` to its props, forward `locale` from `CosmicJourney` (it already has `locale`), and pass `locale={locale}` to its `<JourneyStage ... />` in `CalmStage` (thread `locale` through `CalmStage` too).
 
-- [ ] **Step 7: Run suite, typecheck, lint**
+- [x] **Step 7: Run suite, typecheck, lint**
 
 Run: `bunx vitest run ; bun run typecheck ; bun run lint`
 Expected: PASS, exit 0.
 
-- [ ] **Step 8: Commit**
+- [x] **Step 8: Commit**
 
 ```bash
 git add src/features/cosmic-journey/PlanetRow.tsx src/features/cosmic-journey/JourneyStage.tsx src/features/cosmic-journey/CosmicJourney.tsx src/features/cosmic-journey/CalmJourney.tsx src/i18n/en.ts src/i18n/id.ts tests/unit/planet-row.test.tsx
@@ -399,7 +409,11 @@ git commit -m "feat: list and link the eight planets on the Solar System stage"
 
 ---
 
+> **Status: DONE** (commits 9d7214f, 5291720, review clean). 172 tests pass, lint 0, typecheck 0.
+
 ### Task 4: Cosmos grid on the Universe stage and canvas click targets
+
+> **Status: DONE** (commits 9d7214f, 5291720, review clean). 172 tests pass, lint 0, typecheck 0.
 
 **Files:**
 - Create: `src/features/cosmic-journey/CosmosGrid.tsx`
@@ -415,7 +429,7 @@ git commit -m "feat: list and link the eight planets on the Solar System stage"
   - `CosmosGrid({ locale, dict, className })` linking to `/{locale}/explore/{slug}` for every category.
   - In `scene.ts`, `SceneHandle.hitTest(x: number, y: number): string | null` returning a category slug (`"planet"`, `"star"`, `"galaxy"`) when the point lands on a drawn body, else `null`.
 
-- [ ] **Step 1: Add dictionary keys**
+- [x] **Step 1: Add dictionary keys**
 
 In `src/i18n/en.ts`, inside `journey`, add:
 
@@ -428,7 +442,7 @@ In `src/i18n/en.ts`, inside `journey`, add:
 
 Mirror in `src/i18n/id.ts`. Parity: PASS.
 
-- [ ] **Step 2: Write the failing test**
+- [x] **Step 2: Write the failing test**
 
 ```tsx
 // tests/unit/cosmos-grid.test.tsx
@@ -456,12 +470,12 @@ describe("cosmos grid", () => {
 
 Note: `planet` has its own index route at `/explore/planet` (a real page listing the eight planets), which Next serves ahead of the `[slug]` topic route. The other categories land on `/explore/[slug]`. If the accessible-name match is brittle because the visible text is a localized name, match by the dictionary name via `getText` instead; keep the `href` assertion.
 
-- [ ] **Step 3: Run to verify it fails**
+- [x] **Step 3: Run to verify it fails**
 
 Run: `bunx vitest run tests/unit/cosmos-grid.test.tsx`
 Expected: FAIL, module not found.
 
-- [ ] **Step 4: Write `CosmosGrid`**
+- [x] **Step 4: Write `CosmosGrid`**
 
 ```tsx
 // src/features/cosmic-journey/CosmosGrid.tsx
@@ -507,12 +521,12 @@ export function CosmosGrid({
 }
 ```
 
-- [ ] **Step 5: Run to verify it passes**
+- [x] **Step 5: Run to verify it passes**
 
 Run: `bunx vitest run tests/unit/cosmos-grid.test.tsx`
 Expected: PASS.
 
-- [ ] **Step 6: Render it on the universe stage**
+- [x] **Step 6: Render it on the universe stage**
 
 In `JourneyStage.tsx`, after the `PlanetRow` block from Task 3, add:
 
@@ -524,7 +538,7 @@ In `JourneyStage.tsx`, after the `PlanetRow` block from Task 3, add:
 
 Add the import `import { CosmosGrid } from "./CosmosGrid";`.
 
-- [ ] **Step 7: Add canvas hit-testing and the click handler**
+- [x] **Step 7: Add canvas hit-testing and the click handler**
 
 In `src/features/cosmic-journey/scene/scene.ts`, extend the `SceneHandle` type with `hitTest(x: number, y: number): string | null`. Inside `createScene`, keep a module-scoped `let hits: { slug: string; x: number; y: number; r: number }[] = []`, cleared at the start of each `render`. While drawing the eight planets (the `PLANETS` loop, when `plA > 0.01`), push `{ slug: "planet", x: q[0], y: q[1], r: Math.max(pr, 8) }` for each drawn planet. While drawing the nearby stars (the `NEARBY_STARS` loop, when `starA > 0.01`), push `{ slug: "star", x: ns.x * cw, y: ns.y * ch, r: 26 }`. While drawing the galaxy field (when `gwA > 0.01`), push one broad hit at screen centre `{ slug: "galaxy", x: cw / 2, y: ch / 2, r: Math.min(cw, ch) * 0.3 }`. Return from `createScene` an added method:
 
@@ -564,12 +578,12 @@ In `src/features/cosmic-journey/CosmicJourney.tsx`, add a click handler on the `
 
 The canvas stays `aria-hidden`; the `CosmosGrid` and `PlanetRow` are the keyboard path, so a miss on the canvas is harmless.
 
-- [ ] **Step 8: Run suite, typecheck, lint, build**
+- [x] **Step 8: Run suite, typecheck, lint, build**
 
 Run: `bunx vitest run ; bun run typecheck ; bun run lint ; bun run build`
 Expected: PASS, exit 0.
 
-- [ ] **Step 9: Commit**
+- [x] **Step 9: Commit**
 
 ```bash
 git add src/features/cosmic-journey/CosmosGrid.tsx src/features/cosmic-journey/JourneyStage.tsx src/features/cosmic-journey/CosmicJourney.tsx src/features/cosmic-journey/scene/scene.ts src/i18n/en.ts src/i18n/id.ts tests/unit/cosmos-grid.test.tsx
@@ -577,6 +591,10 @@ git commit -m "feat: make the Observable Universe a navigable entry point"
 ```
 
 ---
+
+### Task 5: Earth-position facts on the journey
+
+> **Status: DONE** (commit f6766d8, review clean). 174 tests pass, lint 0, typecheck 0, build green.
 
 ### Task 5: Earth-position facts on the journey
 
@@ -590,7 +608,7 @@ git commit -m "feat: make the Observable Universe a navigable entry point"
 - Consumes: `getFact` from `facts.ts`; the earth stage's `factIds` render through `JourneyStage`.
 - Produces: two new facts (`milky-way-position`, `milky-way-orbit-time`) with the verified source; the earth stage lists them so they render in the journey's Earth stage (which is the home too).
 
-- [ ] **Step 1: Add the facts**
+- [x] **Step 1: Add the facts**
 
 In `src/features/cosmic-facts/facts.ts`, add two entries to `COSMIC_FACTS`, using the exact wording the cited NASA page states:
 
@@ -625,7 +643,7 @@ In `src/features/cosmic-facts/facts.ts`, add two entries to `COSMIC_FACTS`, usin
 
 Set `verifiedAt` to the date the page is re-checked during implementation (today, `YYYY-MM-DD`). Do not add the 26,000 light-year figure or the name "Orion Arm": the cited source does not state them.
 
-- [ ] **Step 2: Write the failing test**
+- [x] **Step 2: Write the failing test**
 
 ```ts
 // tests/unit/earth-position-facts.test.ts
@@ -650,12 +668,12 @@ describe("earth position facts", () => {
 });
 ```
 
-- [ ] **Step 3: Run to verify it fails, then passes**
+- [x] **Step 3: Run to verify it fails, then passes**
 
 Run: `bunx vitest run tests/unit/earth-position-facts.test.ts`
 Expected before Step 1's change lands in the file: FAIL (undefined). After Step 1: PASS, 2 tests. Also run `bunx vitest run tests/unit/facts.test.ts` and expect PASS (the registry stays well-formed).
 
-- [ ] **Step 4: Surface them on the Earth stage**
+- [x] **Step 4: Surface them on the Earth stage**
 
 In `src/features/cosmic-journey/stages.ts`, add the two ids to the earth stage's `factIds`:
 
@@ -665,12 +683,12 @@ In `src/features/cosmic-journey/stages.ts`, add the two ids to the earth stage's
 
 These render through the existing facts `<details>` in `JourneyStage`, with `DataLabel` and `SourceLink`, so each number keeps its source and date.
 
-- [ ] **Step 5: Run suite, typecheck, lint, build**
+- [x] **Step 5: Run suite, typecheck, lint, build**
 
 Run: `bunx vitest run ; bun run typecheck ; bun run lint ; bun run build`
 Expected: PASS, exit 0.
 
-- [ ] **Step 6: Commit**
+- [x] **Step 6: Commit**
 
 ```bash
 git add src/features/cosmic-facts/facts.ts src/features/cosmic-journey/stages.ts tests/unit/earth-position-facts.test.ts
@@ -681,10 +699,14 @@ git commit -m "feat: add Earth's place in the Milky Way to the journey"
 
 ### Task 6: Full gate and live verification
 
+> **Status: DONE** (gate green 174/174, live verified at :3000; commit 445001b for the dead-key cleanup).
+
+### Task 6: Full gate and live verification
+
 **Files:**
 - Modify: `docs/runbook.md` only if a fact or behavior note is needed.
 
-- [ ] **Step 1: Run the full gate**
+- [x] **Step 1: Run the full gate**
 
 ```powershell
 bunx vitest run
@@ -695,7 +717,7 @@ bun run build
 
 Expected: all pass.
 
-- [ ] **Step 2: Live check at port 3000**
+- [x] **Step 2: Live check at port 3000**
 
 Dev server is at http://localhost:3000. Confirm, recording each as evidence:
 
@@ -704,7 +726,7 @@ Dev server is at http://localhost:3000. Confirm, recording each as evidence:
 - The Solar System stage lists the eight planets, each a link; hovering shows its tagline; clicking opens `/explore/planet/<slug>`.
 - The Observable Universe stage shows the cosmos grid; each tile links into Explore; clicking a drawn planet/star on the canvas navigates.
 
-- [ ] **Step 3: Commit any doc change**
+- [x] **Step 3: Commit any doc change**
 
 ```bash
 git add docs/runbook.md
