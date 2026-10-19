@@ -460,8 +460,9 @@ export const en = {
     progress: {
       visited: "visited",
     },
-    reset: {
-      label: "Reset progress",
+    progressBar: {
+      label: "Journey progress",
+      reset: "Reset progress",
       done: "Progress cleared.",
     },
     landmarks: {

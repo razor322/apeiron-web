@@ -7,7 +7,7 @@ import { STAGES, readCopy } from "./stages";
 import { useJourneyProgress } from "./use-journey-progress";
 import { JourneyStage } from "./JourneyStage";
 import { CalmJourney } from "./CalmJourney";
-import { JourneyProgress } from "./JourneyProgress";
+import { JourneyProgressBar } from "./JourneyProgressBar";
 import { ScaleRuler } from "./ScaleRuler";
 import { ScaleReadout } from "./ScaleReadout";
 import { getCalm, subscribeCalm } from "@/lib/motion-preference";
@@ -36,7 +36,7 @@ export function CosmicJourney({ dict, locale }: { dict: Dictionary; locale: Loca
   // experience once the client confirms motion is allowed.
   const reduced = useSyncExternalStore(subscribeCalm, getCalm, () => true);
 
-  const { activeIndex, goTo, progressRef } = useJourneyProgress(reduced);
+  const { activeIndex, progressRef } = useJourneyProgress(reduced);
 
   useTrackStage(STAGES[activeIndex]?.id ?? STAGES[0]!.id);
 
@@ -103,7 +103,7 @@ export function CosmicJourney({ dict, locale }: { dict: Dictionary; locale: Loca
   if (reduced) {
     // Reduced path: a plain card per stage with a real image, no pin, no scrub,
     // no canvas animation. Completable by plain scroll and keyboard.
-    return <CalmJourney dict={dict} activeIndex={activeIndex} goTo={goTo} sky={sky} />;
+    return <CalmJourney dict={dict} activeIndex={activeIndex} sky={sky} />;
   }
 
   // Motion path: one fixed stage viewport pinned by sticky, the tall wrapper
@@ -159,11 +159,11 @@ export function CosmicJourney({ dict, locale }: { dict: Dictionary; locale: Loca
             );
           })}
         </div>
-        <JourneyProgress
+        <JourneyProgressBar
           activeIndex={activeIndex}
-          goTo={goTo}
+          progressRef={progressRef}
           dict={dict}
-          className="absolute bottom-6 left-1/2 z-20 -translate-x-1/2 rounded-full border border-[color:var(--line)] bg-void/70 px-3 py-1.5 backdrop-blur"
+          className="absolute bottom-6 left-1/2 z-20 -translate-x-1/2 rounded-full border border-[color:var(--line)] bg-void/70 px-4 py-2 backdrop-blur"
         />
       </div>
     </div>

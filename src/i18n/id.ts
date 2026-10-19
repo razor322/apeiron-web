@@ -462,8 +462,9 @@ export const id: Dictionary = {
     progress: {
       visited: "sudah dibuka",
     },
-    reset: {
-      label: "Setel ulang kemajuan",
+    progressBar: {
+      label: "Kemajuan perjalanan",
+      reset: "Setel ulang kemajuan",
       done: "Kemajuan dihapus.",
     },
     landmarks: {
