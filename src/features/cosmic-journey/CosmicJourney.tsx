@@ -7,7 +7,6 @@ import { STAGES, readCopy } from "./stages";
 import { useJourneyProgress } from "./use-journey-progress";
 import { JourneyStage } from "./JourneyStage";
 import { CalmJourney } from "./CalmJourney";
-import { JourneyProgressBar } from "./JourneyProgressBar";
 import { ScaleRuler } from "./ScaleRuler";
 import { ScaleReadout } from "./ScaleReadout";
 import { getCalm, subscribeCalm } from "@/lib/motion-preference";
@@ -161,12 +160,6 @@ export function CosmicJourney({ dict, locale }: { dict: Dictionary; locale: Loca
             );
           })}
         </div>
-        <JourneyProgressBar
-          activeIndex={activeIndex}
-          progressRef={progressRef}
-          dict={dict}
-          className="absolute bottom-6 left-1/2 z-20 -translate-x-1/2 rounded-full border border-[color:var(--line)] bg-void/70 px-4 py-2 backdrop-blur"
-        />
       </div>
     </div>
   );

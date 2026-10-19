@@ -6,7 +6,6 @@ import { STAGES, readCopy, type JourneyStageDef } from "./stages";
 import { getJourneyImage } from "./journey-images";
 import { JourneyStage } from "./JourneyStage";
 import { JourneyParallax } from "./JourneyParallax";
-import { JourneyProgressBar } from "./JourneyProgressBar";
 import { ScaleRuler } from "./ScaleRuler";
 
 // The calm (reduced-motion) journey: a plain, single-column set of cards, one per
@@ -39,11 +38,6 @@ export function CalmJourney({
           />
         </div>
       </div>
-      <JourneyProgressBar
-        activeIndex={activeIndex}
-        dict={dict}
-        className="fixed bottom-6 left-1/2 z-20 -translate-x-1/2 rounded-full border border-[color:var(--line)] bg-void/70 px-4 py-2 backdrop-blur"
-      />
     </main>
   );
 }
