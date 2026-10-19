@@ -4,7 +4,7 @@ import { JOURNEY_OBJECTS, getJourneyObject, slugForId } from "@/features/cosmic-
 describe("journey objects", () => {
   it("covers the Sun, the Moon, and all eight planets", () => {
     const ids = JOURNEY_OBJECTS.map((o) => o.id);
-    for (const id of ["sun", "moon", "planet-mercury", "planet-venus", "planet-earth", "planet-mars", "planet-jupiter", "planet-saturn", "planet-uranus", "planet-neptune"]) {
+    for (const id of ["sun", "moon", "planet-mercury", "planet-venus", "planet-earth", "planet-mars", "planet-jupiter", "planet-saturn", "planet-uranus", "planet-neptune", "star-proxima", "star-alphaCentauri", "star-sirius", "star-barnard", "galaxy"]) {
       expect(ids).toContain(id);
     }
   });
