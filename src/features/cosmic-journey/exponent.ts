@@ -5,18 +5,18 @@ export const MAX_EXPONENT = 27;
 
 const KEYFRAMES: [number, number][] = [
   [0, 0.3],
-  [0.07, 0.3],
-  [0.17, 5.2],
-  [0.28, 7.2],
-  [0.38, 7.2],
-  [0.5, 9.2],
-  [0.57, 9.2],
-  [0.68, 11.3],
-  [0.74, 11.3],
-  [0.86, 13.05],
-  [0.9, 13.05],
-  [0.94, 21],
-  [0.97, 27],
+  [0.06, 0.3],
+  [0.14, 5.2],
+  [0.2, 6.8],
+  [0.34, 7.2],
+  [0.4, 9.2],
+  [0.52, 11.3],
+  [0.58, 13.0],
+  [0.7, 16.0],
+  [0.76, 18.0],
+  [0.84, 21.0],
+  [0.9, 24.5],
+  [0.94, 27],
   [1, 27],
 ];
 
@@ -30,4 +30,15 @@ export function exponentAtProgress(progress: number): number {
     }
   }
   return MAX_EXPONENT;
+}
+
+// The smallest progress whose curve value reaches at least `target`. Used to
+// place each stage's scroll window on the curve, so the ruler label, the stage
+// copy, and the canvas camera all describe the same moment.
+export function progressAtExponent(target: number): number {
+  const step = 0.001;
+  for (let p = 0; p <= 1; p += step) {
+    if (exponentAtProgress(p) >= target) return Math.min(1, p);
+  }
+  return 1;
 }
