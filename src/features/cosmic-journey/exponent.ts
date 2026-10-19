@@ -31,3 +31,14 @@ export function exponentAtProgress(progress: number): number {
   }
   return MAX_EXPONENT;
 }
+
+// The smallest progress whose curve value reaches at least `target`. Used to
+// derive each stage's scroll window from the exponent it describes, so the
+// ruler label, the stage copy, and the canvas all speak about the same moment.
+export function progressAtExponent(target: number): number {
+  const step = 0.001;
+  for (let p = 0; p <= 1; p += step) {
+    if (exponentAtProgress(p) >= target) return Math.min(1, p);
+  }
+  return 1;
+}
