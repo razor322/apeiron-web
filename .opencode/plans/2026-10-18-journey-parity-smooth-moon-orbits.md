@@ -1,4 +1,4 @@
-# Journey Prototype Parity: Smooth Scroll, Moon Panel, Visible Planet Orbits
+# Journey Prototype Parity (ALL TASKS DONE)
 
 > **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [ ]`) syntax for tracking.
 
@@ -39,6 +39,10 @@ Task order: smoothing first (independent), then the orbit rings (independent, ca
 
 ### Task 1: Eased scroll (smooth like the prototype)
 
+> **Status: DONE**.
+
+### Task 1: Eased scroll (smooth like the prototype)
+
 **Files:**
 - Modify: `src/features/cosmic-journey/use-journey-progress.ts`
 
@@ -46,7 +50,7 @@ Task order: smoothing first (independent), then the orbit rings (independent, ca
 - Consumes: nothing new.
 - Produces: the same `useJourneyProgress(reduced)` return shape; only the scrub feel changes.
 
-- [ ] **Step 1: Change the scrub value**
+- [x] **Step 1: Change the scrub value**
 
 In `src/features/cosmic-journey/use-journey-progress.ts`, in the GSAP tween, change `scrub: true` to `scrub: 0.6`:
 
@@ -65,12 +69,12 @@ In `src/features/cosmic-journey/use-journey-progress.ts`, in the GSAP tween, cha
 
 Update the comment above the tween to note that `scrub: 0.6` gives the eased catch-up the prototype uses (its `cur += (target - cur) * (1 - exp(-dt*6))` loop), instead of following scroll raw.
 
-- [ ] **Step 2: Verify**
+- [x] **Step 2: Verify**
 
 Run: `bun run typecheck ; bun run lint ; bun run build`
 Expected: exit 0 each. (Scroll feel is visual; confirm live in Task 4.)
 
-- [ ] **Step 3: Commit**
+- [x] **Step 3: Commit**
 
 ```bash
 git add src/features/cosmic-journey/use-journey-progress.ts
@@ -81,6 +85,10 @@ git commit -m "feat: ease the journey scrub so scrolling glides like the prototy
 
 ### Task 2: Visible planet orbit rings
 
+> **Status: DONE**.
+
+### Task 2: Visible planet orbit rings
+
 **Files:**
 - Modify: `src/features/cosmic-journey/scene/scene.ts`
 
@@ -88,7 +96,7 @@ git commit -m "feat: ease the journey scrub so scrolling glides like the prototy
 - Consumes: nothing new.
 - Produces: the orbit rings around the Sun draw brighter and from an earlier exponent, so they read across the Solar System stage.
 
-- [ ] **Step 1: Brighten and widen the orbit fade**
+- [x] **Step 1: Brighten and widen the orbit fade**
 
 In `scene.ts`, find the orbit-rings block:
 
@@ -117,12 +125,12 @@ Replace the `orbA` line so the rings appear from the start of the Solar System w
 
 Keep the rest of the block (the `if`, the loop, the `rp` guard) unchanged.
 
-- [ ] **Step 2: Verify**
+- [x] **Step 2: Verify**
 
 Run: `bun run typecheck ; bun run lint ; bun run build`
 Expected: exit 0 each.
 
-- [ ] **Step 3: Commit**
+- [x] **Step 3: Commit**
 
 ```bash
 git add src/features/cosmic-journey/scene/scene.ts
@@ -130,6 +138,10 @@ git commit -m "feat: make the planet orbit rings visible across the Solar System
 ```
 
 ---
+
+### Task 3: A Moon panel during the Earth zoom-out
+
+> **Status: DONE**.
 
 ### Task 3: A Moon panel during the Earth zoom-out
 
@@ -146,7 +158,7 @@ git commit -m "feat: make the planet orbit rings visible across the Solar System
   - Its `range` placed on the zoom curve so the reader sees the copy while the camera is at the Moon-orbit scale (e about 8 to 9).
   - A canvas label key `journey.stages.moon.label` and a "Earth, you are here" label key `journey.stages.moon.youAreHere` (the prototype draws `Bumi, kamu di sini` here).
 
-- [ ] **Step 1: Add the stage copy**
+- [x] **Step 1: Add the stage copy**
 
 In `src/i18n/en.ts`, inside `journey.stages`, add a `moon` block after `earth`:
 
@@ -165,7 +177,7 @@ Note: the Earth-to-Moon distance (384,400 km) is already a sourced fact (`earth-
 
 Mirror the same keys in `src/i18n/id.ts` (for example `label: "Bulan"`, `aria: "Orbit Bulan"`, `headline: "Jarak ke Bulan. Bumi sudah menjadi titik."`, `body: "Sekitar 30 kali lebar Bumi. Hanya dua belas manusia yang pernah berjalan di sana."`, `youAreHere: "Bumi, kamu di sini"`). Run `bunx vitest run tests/unit/i18n.test.ts` and expect PASS.
 
-- [ ] **Step 2: Insert the stage and re-space the later ranges**
+- [x] **Step 2: Insert the stage and re-space the later ranges**
 
 In `src/features/cosmic-journey/stages.ts`, add this object to `STAGES` between the `earth` and `solar-system` entries:
 
@@ -193,7 +205,7 @@ Then shift and re-space the later content stages so the windows stay ordered, no
 
 Verify each midpoint against the curve (the test does this). If `solar-system` or `star` drifts past 1.2 orders at its new midpoint, nudge its `range` by up to 0.02 and record the final values in the report.
 
-- [ ] **Step 3: Update the stages test**
+- [x] **Step 3: Update the stages test**
 
 `tests/unit/journey-stages.test.ts` lists the expected content stage ids. Add `"moon"` between `"earth"` and `"solar-system"` in the expected array so it matches the new order:
 
@@ -211,7 +223,7 @@ Verify each midpoint against the curve (the test does this). If `solar-system` o
 
 (Adjust to the file's existing assertion shape.)
 
-- [ ] **Step 4: Draw the Moon label and the "you are here" mark on the canvas**
+- [x] **Step 4: Draw the Moon label and the "you are here" mark on the canvas**
 
 In `scene.ts`, the Moon block already draws the Moon. Extend it so that during the Moon window it also draws the prototype's Earth marker and label. Add, inside the Moon block (where `mp`, `ex`, `ey`, `mA` are in scope), after the Moon dot fill:
 
@@ -237,14 +249,14 @@ In `CosmicJourney.tsx`, add the key to the labels map built before `createScene`
       "journey.stages.moon.youAreHere": readCopy(dict, "journey.stages.moon.youAreHere"),
 ```
 
-- [ ] **Step 5: Verify**
+- [x] **Step 5: Verify**
 
 Run: `bunx vitest run tests/unit/stage-sync.test.ts tests/unit/journey-stages.test.ts tests/unit/i18n.test.ts`
 Expected: PASS.
 Run: `bunx vitest run ; bun run typecheck ; bun run lint ; bun run build`
 Expected: PASS, exit 0.
 
-- [ ] **Step 6: Commit**
+- [x] **Step 6: Commit**
 
 ```bash
 git add src/features/cosmic-journey/stages.ts src/features/cosmic-journey/scene/scene.ts src/features/cosmic-journey/CosmicJourney.tsx src/i18n/en.ts src/i18n/id.ts tests/unit/journey-stages.test.ts
@@ -255,10 +267,14 @@ git commit -m "feat: add the Moon stage so the Earth zoom-out has copy"
 
 ### Task 4: Full gate and live verification
 
+> **Status: DONE** (gate 187/187, live verified at :3000).
+
+### Task 4: Full gate and live verification
+
 **Files:**
 - Modify: `docs/runbook.md` only if a note is needed.
 
-- [ ] **Step 1: Run the full gate**
+- [x] **Step 1: Run the full gate**
 
 ```powershell
 bunx vitest run
@@ -269,7 +285,7 @@ bun run build
 
 Expected: all pass.
 
-- [ ] **Step 2: Live check at port 3000**
+- [x] **Step 2: Live check at port 3000**
 
 Dev server is at http://localhost:3000. Confirm, recording each as evidence:
 
@@ -278,7 +294,7 @@ Dev server is at http://localhost:3000. Confirm, recording each as evidence:
 - Planet orbit rings are visible around the Sun across the Solar System stage.
 - The Moon's own orbit ring is still not drawn (skipped by decision).
 
-- [ ] **Step 3: Commit any doc change**
+- [x] **Step 3: Commit any doc change**
 
 ```bash
 git add docs/runbook.md
