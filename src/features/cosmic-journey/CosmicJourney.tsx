@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useSyncExternalStore } from "react";
+import { useRouter } from "next/navigation";
 import type { Dictionary } from "@/i18n/en";
 import type { Locale } from "@/i18n/config";
 import { STAGES, readCopy } from "./stages";
@@ -34,6 +35,8 @@ export function CosmicJourney({ dict, locale }: { dict: Dictionary; locale: Loca
   // journey (the server snapshot is `true`). We only upgrade to the pinned
   // experience once the client confirms motion is allowed.
   const reduced = useSyncExternalStore(subscribeCalm, getCalm, () => true);
+
+  const router = useRouter();
 
   const { activeIndex, progressRef } = useJourneyProgress(reduced);
 
@@ -124,8 +127,7 @@ export function CosmicJourney({ dict, locale }: { dict: Dictionary; locale: Loca
               event.clientY - rect.top,
             );
             if (slug) {
-              const href = slug === "planet" ? "planet" : slug;
-              window.location.assign(`/${locale}/explore/${href}`);
+              router.push(`/${locale}/explore/${slug}`);
             }
           }}
           className="absolute inset-0 h-full w-full"
