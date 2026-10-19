@@ -276,8 +276,7 @@ export function createScene(canvas: HTMLCanvasElement, labels?: SceneLabels): Sc
     const mO = smooth(8, 9.2, e) * (1 - smooth(9.2, 10.4, e));
     const t1 = smooth(9.6, 11.3, e);
     const t2 = smooth(11.3, 13.05, e);
-    // Sweep: as the zoom reaches the Solar System, pan the camera left along the
-    // ecliptic so the orbit of Earth passes across the frame, then settle back
+    // Sweep: as the zoom reaches the Solar System, pan the camera along the ecliptic so the orbit of Earth passes across the frame, then settle back
     // onto the Sun so the planets read as one system around one star.
     const sweep = smooth(9.0, 11.0, e) * (1 - smooth(12.0, 13.5, e));
     const camx = AU * (1 - 0.5 * t1 - 0.5 * t2) + 1.6e8 * mO + AU * 0.9 * sweep;
