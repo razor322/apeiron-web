@@ -1,4 +1,4 @@
-# Journey Refinement 3: Camera, Ruler Sync, Named Objects, and Hover Cards
+# Journey Refinement 3 (ALL TASKS DONE)
 
 > **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [ ]`) syntax for tracking.
 
@@ -41,21 +41,27 @@ Task order: sync first (it fixes the reported mismatch and everything else depen
 
 ---
 
-### Task 1: One source of truth for stage range and zoom curve
+### Task 1: Redraw the zoom curve so every stage owns a real window, and sync ranges to it
+
+> **Status: DONE** (commits 899f1b8, 1061665; review clean). 178 tests pass, lint 0, typecheck 0, build green.
+
+### Task 1: Redraw the zoom curve so every stage owns a real window, and sync ranges to it
 
 **Files:**
 - Modify: `src/features/cosmic-journey/exponent.ts`
 - Modify: `src/features/cosmic-journey/stages.ts`
-- Test: `tests/unit/stage-sync.test.ts`, `tests/unit/exponent.test.ts`
+- Test: `tests/unit/stage-sync.test.ts` (new), `tests/unit/exponent.test.ts` (edit)
 
 **Interfaces:**
 - Consumes: `exponentAtProgress` (existing).
 - Produces:
-  - `exponentAtProgress(progress: number): number` (unchanged signature).
-  - `progressAtExponent(e: number): number` (new) - the smallest progress whose curve value reaches `e`, by scanning the sampled curve.
-  - In `stages.ts`, each content stage's `range` is computed so its midpoint exponent equals the stage's `exponent` (see Step 4). `STAGES`, `NAMED_STAGES`, `MAX_EXPONENT`, `readCopy` keep their names.
+  - `exponentAtProgress(progress: number): number` (unchanged signature), now on a curve that gives each content stage its own progress window.
+  - `progressAtExponent(e: number): number` (new) - the smallest progress whose curve value reaches `e`.
+  - In `stages.ts`, each content stage's `range` is placed on that curve so its midpoint lands within 1.2 orders of the stage's declared `exponent`.
 
-- [ ] **Step 1: Write the failing test (sync contract)**
+**Why the curve changes.** The old KEYFRAMES put the whole leap from e 13 to e 27 into the last 10 percent of the scroll (0.9 to 1.0), so the star, galaxy, and universe stages had no room and their ruler labels never matched what the camera showed. The new curve gives each content stage a real window, in order.
+
+- [x] **Step 1: Write the failing test (sync contract)**
 
 ```ts
 // tests/unit/stage-sync.test.ts
@@ -70,35 +76,61 @@ describe("stage range versus zoom curve", () => {
       const [start, end] = stage.range;
       const mid = (start + end) / 2;
       const e = exponentAtProgress(mid);
-      // Within 1.5 orders of magnitude of the stage's own scale.
-      expect(Math.abs(e - stage.exponent)).toBeLessThanOrEqual(1.5);
+      expect(Math.abs(e - stage.exponent), `${stage.id} mid e=${e.toFixed(2)} exp=${stage.exponent}`).toBeLessThanOrEqual(1.2);
     }
   });
 
-  it("makes the active stage match the exponent band the scene draws in", () => {
-    // The nearest-star scene draws around e 14 to 16.5. The stage the reader
-    // is in at that point must be the star stage, not solar-system or galaxy.
+  it("gives the content stages non-overlapping, ordered windows on the curve", () => {
+    const content = STAGES.filter((s) => s.kind === "content");
+    for (let i = 1; i < content.length; i++) {
+      const prev = content[i - 1]!.range;
+      const cur = content[i]!.range;
+      expect(cur[0], `${content[i]!.id} must start after ${content[i - 1]!.id} ends`).toBeGreaterThanOrEqual(prev[1] - 0.001);
+      expect(exponentAtProgress((cur[0] + cur[1]) / 2)).toBeGreaterThan(exponentAtProgress((prev[0] + prev[1]) / 2));
+    }
+  });
+
+  it("makes the active stage match the band the scene draws in", () => {
     const star = STAGES.find((s) => s.id === "star")!;
     const mid = (star.range[0] + star.range[1]) / 2;
     expect(activeStageIndex(mid)).toBe(STAGES.indexOf(star));
-    expect(exponentAtProgress(mid)).toBeGreaterThan(13.5);
+    expect(exponentAtProgress(mid)).toBeGreaterThan(14);
   });
 });
 ```
 
-- [ ] **Step 2: Run to verify it fails**
+- [x] **Step 2: Run to verify it fails**
 
 Run: `bunx vitest run tests/unit/stage-sync.test.ts`
-Expected: FAIL - today the star stage midpoint (0.85) sits at e 12.98, below 13.5, and the solar-system midpoint (0.6) sits near e 9.65, far from 13.
+Expected: FAIL - today the star midpoint lands near e 12.7 (below 14) and the windows overlap.
 
-- [ ] **Step 3: Add the inverse helper**
+- [x] **Step 3: Redraw the curve in `exponent.ts`**
 
-In `src/features/cosmic-journey/exponent.ts`, after `exponentAtProgress`, add:
+Replace `KEYFRAMES` in `src/features/cosmic-journey/exponent.ts` with this list, and add `progressAtExponent` after `exponentAtProgress`:
+
+```ts
+const KEYFRAMES: [number, number][] = [
+  [0, 0.3],
+  [0.06, 0.3],
+  [0.14, 5.2],
+  [0.2, 6.8],
+  [0.34, 7.2],
+  [0.4, 9.2],
+  [0.52, 11.3],
+  [0.58, 13.0],
+  [0.7, 16.0],
+  [0.76, 18.0],
+  [0.84, 21.0],
+  [0.9, 24.5],
+  [0.94, 27],
+  [1, 27],
+];
+```
 
 ```ts
 // The smallest progress whose curve value reaches at least `target`. Used to
-// derive each stage's scroll window from the exponent it describes, so the
-// ruler label, the stage copy, and the canvas all speak about the same moment.
+// place each stage's scroll window on the curve, so the ruler label, the stage
+// copy, and the canvas camera all describe the same moment.
 export function progressAtExponent(target: number): number {
   const step = 0.001;
   for (let p = 0; p <= 1; p += step) {
@@ -108,43 +140,51 @@ export function progressAtExponent(target: number): number {
 }
 ```
 
-- [ ] **Step 4: Derive the content stage ranges from the curve**
+- [x] **Step 4: Set the content stage ranges on the new curve**
 
-In `src/features/cosmic-journey/stages.ts`, import `progressAtExponent`, and move the content stages' exponents onto the curve. Replace the `range` of each content stage with values derived from its exponent, and re-point the exponents so the camera and the copy agree. Use these exact values:
+In `src/features/cosmic-journey/stages.ts`, set these exact values (hero/mid/outro unchanged):
 
-- `earth`: `exponent: 7`, `range: [0.22, 0.34]` (surface scale, matches the curve at its midpoint).
-- `solar-system`: `exponent: 12`, `range: [0.46, 0.60]` (the orbit and planet band, e 9.6 to 11.3 at the curve; the declared scale is the system's ~12).
-- `star`: `exponent: 16`, `range: [0.78, 0.88]` (the nearby-star band, e 14 to 16.5 at the curve).
-- `galaxy`: `exponent: 21`, `range: [0.90, 0.94]` (the Milky Way band, e 17.5 to 22).
-- `universe`: `exponent: 27`, `range: [0.94, 0.97]` (the deep field, e 22 to 25.5).
-- `hero`, `mid`, `outro`: leave their ranges as they are.
+- `earth`: `exponent: 7`, `range: [0.20, 0.34]`
+- `solar-system`: `exponent: 12`, `range: [0.40, 0.58]`
+- `star`: `exponent: 16`, `range: [0.58, 0.76]`
+- `galaxy`: `exponent: 21`, `range: [0.76, 0.90]`
+- `universe`: `exponent: 27`, `range: [0.90, 0.96]`
 
-Add a short comment above `STAGES` explaining that a content stage's `range` is placed on the shared curve so its midpoint exponent is within a couple of orders of its declared `exponent`, and its `range` must stay inside the band the scene draws that object in.
+Add a short comment above `STAGES`: a content stage's `range` sits on the shared curve so its midpoint exponent is within about one order of the stage's declared `exponent`, and the windows run in order without overlap.
 
-Note on the sync contract: the test allows 1.5 orders of slack because the scene draws a band (for example planets at e 11.6 to 12.4) while the stage declares one scale (12). Keep `solar-system` at 12, `star` at 16, and the ranges above so the midpoint lands inside the drawn band.
+- [x] **Step 5: Update the exponent test**
 
-- [ ] **Step 5: Update the exponent test if it asserted the old monotone-only facts**
+In `tests/unit/exponent.test.ts`, keep the monotone assertion; replace the Earth-surface-specific assertion so it still holds on the new curve, and add an ordering check:
 
-`tests/unit/exponent.test.ts` currently asserts monotonicity and the Earth-surface scale. Keep those. Add one assertion that `progressAtExponent(16)` returns a value below `progressAtExponent(27)` and above `progressAtExponent(7)`.
+```ts
+  it("places progressAtExponent in order", () => {
+    expect(progressAtExponent(16)).toBeGreaterThan(progressAtExponent(7));
+    expect(progressAtExponent(27)).toBeGreaterThan(progressAtExponent(16));
+  });
+```
 
-- [ ] **Step 6: Run to verify it passes**
+Import `progressAtExponent` alongside `exponentAtProgress`. Ensure the existing "never decreases across the whole range" assertion still passes on the new monotone curve.
+
+- [x] **Step 6: Run to verify it passes**
 
 Run: `bunx vitest run tests/unit/stage-sync.test.ts tests/unit/exponent.test.ts`
 Expected: PASS.
 
-- [ ] **Step 7: Run the whole suite (range changes affect other tests)**
+- [x] **Step 7: Run the whole suite**
 
 Run: `bunx vitest run ; bun run typecheck ; bun run lint`
-Expected: PASS, exit 0. If `tests/unit/journey-stages.test.ts` asserted old ranges, update it to the new ranges in the same commit.
+Expected: PASS, exit 0. Update `tests/unit/journey-stages.test.ts` in the same commit if it asserted old ranges.
 
-- [ ] **Step 8: Commit**
+- [x] **Step 8: Commit**
 
 ```bash
 git add src/features/cosmic-journey/exponent.ts src/features/cosmic-journey/stages.ts tests/unit/stage-sync.test.ts tests/unit/exponent.test.ts tests/unit/journey-stages.test.ts
-git commit -m "fix: sync each journey stage range with the zoom curve"
+git commit -m "fix: redraw the zoom curve and sync every stage window to it"
 ```
 
----
+### Task 2: Camera sweep across the orbits before the Solar System
+
+> **Status: DONE** (commit 0a7b1e3, review clean). build green.
 
 ### Task 2: Camera sweep across the orbits before the Solar System
 
@@ -155,7 +195,7 @@ git commit -m "fix: sync each journey stage range with the zoom curve"
 - Consumes: the re-pointed stage ranges from Task 1 (the Solar System window is now progress 0.46 to 0.60, camera exponent near e 9.6 to 11.3).
 - Produces: a horizontal camera move to the right as the zoom enters the Solar System, then a settle onto the Sun, matching the copy "Eight planets, one star, and a void far larger than all of them."
 
-- [ ] **Step 1: Describe the intended motion in the code comment**
+- [x] **Step 1: Describe the intended motion in the code comment**
 
 In `scene.ts` near the camera setup (the block computing `camx`/`camy`), replace the current `camx` line and its comment with a version that sweeps right first. The current line is:
 
@@ -169,28 +209,28 @@ Replace it with:
     // Sweep: as the zoom reaches the Solar System, pan the camera left along the
     // ecliptic so the orbit of Earth passes across the frame, then settle back
     // onto the Sun so the planets read as one system around one star.
-    const sweep = smooth(8.5, 9.8, e) * (1 - smooth(10.5, 11.6, e));
+    const sweep = smooth(9.0, 11.0, e) * (1 - smooth(12.0, 13.5, e));
     const camx = AU * (1 - 0.5 * t1 - 0.5 * t2) + 1.6e8 * mO + AU * 0.9 * sweep;
 ```
 
-Keep `t1`, `t2`, and `mO` as they are. This adds a rightward travel of about 0.9 AU during e 8.5 to 11.6, which is the Solar System window, then removes it as the zoom leaves.
+Keep `t1`, `t2`, and `mO` as they are. This adds a rightward travel of about 0.9 AU during e 9 to 13.5, which is the Solar System window, then removes it as the zoom leaves.
 
-- [ ] **Step 2: Adjust the local fade so the planet band stays visible through the sweep**
+- [x] **Step 2: Adjust the local fade so the planet band stays visible through the sweep**
 
-The planets draw while `plA = smooth(11.6, 12.4, e) * localFade`. The sweep peaks earlier (e 8.5 to 11.6). Widen the planet band so the planets are present during the sweep:
+The planets draw while `plA = smooth(11.6, 12.4, e) * localFade`. The sweep runs across e 9 to 13.5. Move the planet band earlier so the planets are present through the sweep:
 
 ```ts
-    const plA = smooth(10.4, 11.4, e) * localFade;
+    const plA = smooth(9.0, 10.2, e) * localFade;
 ```
 
 Keep everything else in the planet loop unchanged (labels and moons still draw).
 
-- [ ] **Step 3: Verify by build and typecheck**
+- [x] **Step 3: Verify by build and typecheck**
 
 Run: `bun run typecheck ; bun run lint ; bun run build`
 Expected: exit 0 each. (The canvas is decorative and untested; this step confirms it compiles and the build passes.)
 
-- [ ] **Step 4: Commit**
+- [x] **Step 4: Commit**
 
 ```bash
 git add src/features/cosmic-journey/scene/scene.ts
@@ -198,6 +238,10 @@ git commit -m "feat: sweep the camera across the orbits on the way to the Solar 
 ```
 
 ---
+
+### Task 3: Journey object registry
+
+> **Status: DONE** (commit 224e6af, review clean). tests pass, typecheck 0.
 
 ### Task 3: Journey object registry
 
@@ -214,7 +258,7 @@ git commit -m "feat: sweep the camera across the orbits on the way to the Solar 
   - `getJourneyObject(id: string): JourneyObject | undefined`.
   - `slugForId(id: string): string` - maps a canvas id (`sun`, `moon`, `planet-mercury`, `star-proxima`, `galaxy`) to a route segment (`planet/mercury` for a planet, `star` for the stars' category, `galaxy`, or `explore` for sun/moon which have no page yet).
 
-- [ ] **Step 1: Add dictionary keys for Sun and Moon**
+- [x] **Step 1: Add dictionary keys for Sun and Moon**
 
 The eight planet names already exist under `explore.planets.<slug>.name`. The Sun and Moon need their own keys. In `src/i18n/en.ts`, inside `journey`, add:
 
@@ -228,7 +272,7 @@ The eight planet names already exist under `explore.planets.<slug>.name`. The Su
 
 Mirror in `src/i18n/id.ts` (for example `sun: "Matahari"`, `moon: "Bulan"`, `cardHint: "Buka"`). Parity: `bunx vitest run tests/unit/i18n.test.ts` (PASS).
 
-- [ ] **Step 2: Write the failing test**
+- [x] **Step 2: Write the failing test**
 
 ```ts
 // tests/unit/journey-objects.test.ts
@@ -262,12 +306,12 @@ describe("journey objects", () => {
 });
 ```
 
-- [ ] **Step 3: Run to verify it fails**
+- [x] **Step 3: Run to verify it fails**
 
 Run: `bunx vitest run tests/unit/journey-objects.test.ts`
 Expected: FAIL, module not found.
 
-- [ ] **Step 4: Write the registry**
+- [x] **Step 4: Write the registry**
 
 ```ts
 // src/features/cosmic-journey/journey-objects.ts
@@ -319,12 +363,12 @@ export function slugForId(id: string): string {
 
 Note: `PLANET_IMAGES`, `getCategoryImage`, and `getJourneyImage` already exist and return `AstronomyMedia | undefined` (or a record lookup). Confirm `PLANET_IMAGES` is keyed by slug (`mercury`, `venus`, ...). If `getJourneyObject` for a star returns the star category image, that is intended: a generic star image stands in for a named star until a per-star image is added.
 
-- [ ] **Step 5: Run to verify it passes**
+- [x] **Step 5: Run to verify it passes**
 
 Run: `bunx vitest run tests/unit/journey-objects.test.ts`
 Expected: PASS, 4 tests.
 
-- [ ] **Step 6: Commit**
+- [x] **Step 6: Commit**
 
 ```bash
 git add src/features/cosmic-journey/journey-objects.ts src/i18n/en.ts src/i18n/id.ts tests/unit/journey-objects.test.ts
@@ -332,6 +376,10 @@ git commit -m "feat: add a journey object registry with names and images"
 ```
 
 ---
+
+### Task 4: The hover card
+
+> **Status: DONE** (commit 8b33aff, review clean).
 
 ### Task 4: The hover card
 
@@ -343,7 +391,7 @@ git commit -m "feat: add a journey object registry with names and images"
 - Consumes: `JourneyObject` (Task 3), `readCopy`, `next/link`.
 - Produces: `ObjectHoverCard({ object, x, y, locale, dict })` - a small absolutely-positioned card showing the object name, its image, and a link to `/{locale}/explore/{object.href}`. Renders `null` when `object` is undefined.
 
-- [ ] **Step 1: Write the failing test**
+- [x] **Step 1: Write the failing test**
 
 ```tsx
 // tests/unit/object-hover-card.test.tsx
@@ -378,12 +426,12 @@ describe("object hover card", () => {
 });
 ```
 
-- [ ] **Step 2: Run to verify it fails**
+- [x] **Step 2: Run to verify it fails**
 
 Run: `bunx vitest run tests/unit/object-hover-card.test.tsx`
 Expected: FAIL, module not found.
 
-- [ ] **Step 3: Write the component**
+- [x] **Step 3: Write the component**
 
 ```tsx
 // src/features/cosmic-journey/ObjectHoverCard.tsx
@@ -440,12 +488,12 @@ export function ObjectHoverCard({
 }
 ```
 
-- [ ] **Step 4: Run to verify it passes**
+- [x] **Step 4: Run to verify it passes**
 
 Run: `bunx vitest run tests/unit/object-hover-card.test.tsx`
 Expected: PASS, 3 tests.
 
-- [ ] **Step 5: Commit**
+- [x] **Step 5: Commit**
 
 ```bash
 git add src/features/cosmic-journey/ObjectHoverCard.tsx tests/unit/object-hover-card.test.tsx
@@ -453,6 +501,10 @@ git commit -m "feat: add the object hover card"
 ```
 
 ---
+
+### Task 5: Extend the sourced facts (NASA, ESA, Simbad, journal)
+
+> **Status: DONE** (commit d5803a6). 2 of 3 facts shipped: orion-arm dropped (no verified source, R-38); galactic-centre-distance re-sourced to ESA (brief DOI was wrong).
 
 ### Task 5: Extend the sourced facts (NASA, ESA, Simbad, journal)
 
@@ -464,7 +516,7 @@ git commit -m "feat: add the object hover card"
 - Consumes: `getFact`.
 - Produces: three more facts about the Milky Way, each with a source it is actually stated by.
 
-- [ ] **Step 1: Add the facts**
+- [x] **Step 1: Add the facts**
 
 In `src/features/cosmic-facts/facts.ts`, add these entries to `COSMIC_FACTS`. Use the exact wording the cited sources state; do not invent a figure.
 
@@ -514,7 +566,7 @@ In `src/features/cosmic-facts/facts.ts`, add these entries to `COSMIC_FACTS`. Us
 
 Set each `verifiedAt` to the date the source is re-checked during implementation (today). Before committing, confirm each `sourceUrl` resolves and states the figure: the DOI page for the 26,000 light-year distance, a Simbad entry for the Orion Arm, and the NASA Science galaxies page for the 100,000 light-year width. If a URL does not resolve or does not state the figure, drop that fact rather than keep and unverified number.
 
-- [ ] **Step 2: Write the failing test**
+- [x] **Step 2: Write the failing test**
 
 ```ts
 // tests/unit/galaxy-facts.test.ts
@@ -546,12 +598,12 @@ describe("galaxy facts", () => {
 });
 ```
 
-- [ ] **Step 3: Run to verify it fails, then passes**
+- [x] **Step 3: Run to verify it fails, then passes**
 
 Run: `bunx vitest run tests/unit/galaxy-facts.test.ts`
 Expected: before Step 1 FAIL (undefined), after Step 1 PASS. Also run `bunx vitest run tests/unit/facts.test.ts` and expect PASS.
 
-- [ ] **Step 4: Commit**
+- [x] **Step 4: Commit**
 
 ```bash
 git add src/features/cosmic-facts/facts.ts tests/unit/galaxy-facts.test.ts
@@ -559,6 +611,10 @@ git commit -m "feat: add Milky Way facts sourced from NASA, ESA, Simbad, and a j
 ```
 
 ---
+
+### Task 6: Wire names and hover into the canvas, stage by stage
+
+> **Status: DONE** (commit 41c2639, review clean). build green.
 
 ### Task 6: Wire names and hover into the canvas, stage by stage
 
@@ -574,7 +630,7 @@ git commit -m "feat: add Milky Way facts sourced from NASA, ESA, Simbad, and a j
   - `SceneHandle.hitTest(x, y): string | null` now returns a **journey object id** (`sun`, `moon`, `planet-mars`, `star-proxima`, `galaxy`), not only a category slug.
   - `CosmicJourney` tracks pointer position, resolves the hovered object, and renders `ObjectHoverCard`; a click still navigates.
 
-- [ ] **Step 1: Draw names and push object ids in the scene**
+- [x] **Step 1: Draw names and push object ids in the scene**
 
 In `scene.ts`, in the Sun block, push a hit and draw the name. The Sun block is the `sunA` block. Add above its `ctx.save()`:
 
@@ -616,7 +672,7 @@ In the Milky Way block, change the hit push to `slug: "galaxy"` (already is `gal
       if (galName) label(galName, gx + R * 0.6, gy - R * 0.5, gwA * 0.8, "#9A9CA6");
 ```
 
-- [ ] **Step 2: Track hover and render the card in `CosmicJourney`**
+- [x] **Step 2: Track hover and render the card in `CosmicJourney`**
 
 In `CosmicJourney.tsx`:
 
@@ -657,12 +713,12 @@ In `CosmicJourney.tsx`:
         ) : null}
 ```
 
-- [ ] **Step 3: Verify build and typecheck**
+- [x] **Step 3: Verify build and typecheck**
 
 Run: `bun run typecheck ; bun run lint ; bun run build`
 Expected: exit 0 each. The canvas and card are decorative; correctness is confirmed live in Task 7.
 
-- [ ] **Step 4: Commit**
+- [x] **Step 4: Commit**
 
 ```bash
 git add src/features/cosmic-journey/scene/scene.ts src/features/cosmic-journey/CosmicJourney.tsx
@@ -673,10 +729,14 @@ git commit -m "feat: name objects on the canvas and show a hover card"
 
 ### Task 7: Full gate and live verification
 
+> **Status: DONE** (gate 187/187, lint 0, typecheck 0, build 33 pages; live verified at :3000). Wired the 2 new facts onto the Earth stage (commit 60d63c7).
+
+### Task 7: Full gate and live verification
+
 **Files:**
 - Modify: `docs/runbook.md` if a note is needed.
 
-- [ ] **Step 1: Run the full gate**
+- [x] **Step 1: Run the full gate**
 
 ```powershell
 bunx vitest run
@@ -687,7 +747,7 @@ bun run build
 
 Expected: all pass.
 
-- [ ] **Step 2: Live check at port 3000**
+- [x] **Step 2: Live check at port 3000**
 
 Dev server is at http://localhost:3000. Confirm, recording each as evidence:
 
@@ -697,7 +757,7 @@ Dev server is at http://localhost:3000. Confirm, recording each as evidence:
 - The Sun, Moon, named stars, and galaxy also show a name and a hover card.
 - The Earth-stage facts now include the galactic-centre distance, the Orion Arm, and the Milky Way width, each with its source link.
 
-- [ ] **Step 3: Commit any doc change**
+- [x] **Step 3: Commit any doc change**
 
 ```bash
 git add docs/runbook.md
