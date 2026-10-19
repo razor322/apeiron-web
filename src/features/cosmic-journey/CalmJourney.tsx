@@ -5,6 +5,7 @@ import type { Dictionary } from "@/i18n/en";
 import { STAGES, readCopy, type JourneyStageDef } from "./stages";
 import { getJourneyImage } from "./journey-images";
 import { JourneyStage } from "./JourneyStage";
+import { JourneyParallax } from "./JourneyParallax";
 import { JourneyProgressBar } from "./JourneyProgressBar";
 import { ScaleRuler } from "./ScaleRuler";
 
@@ -59,15 +60,17 @@ function CalmStage({ stage, dict }: { stage: JourneyStageDef; dict: Dictionary }
       className="flex flex-col gap-6 border-t border-[color:var(--line)] py-16 first:border-t-0"
     >
       {showImage ? (
-        // eslint-disable-next-line @next/next/no-img-element
-        <img
-          src={image!.previewUrl}
-          alt={image!.altText}
-          loading="lazy"
-          decoding="async"
-          onError={() => setFailed(true)}
-          className="aspect-[16/9] w-full rounded-sm border border-[color:var(--line)] object-cover"
-        />
+        <JourneyParallax className="overflow-hidden rounded-sm border border-[color:var(--line)]">
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img
+            src={image!.previewUrl}
+            alt={image!.altText}
+            loading="lazy"
+            decoding="async"
+            onError={() => setFailed(true)}
+            className="aspect-[16/9] w-full object-cover"
+          />
+        </JourneyParallax>
       ) : null}
       <JourneyStage stage={stage} dict={dict} />
       {showImage ? (
