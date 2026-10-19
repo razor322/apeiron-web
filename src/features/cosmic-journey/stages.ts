@@ -55,7 +55,7 @@ export const STAGES: JourneyStageDef[] = [
     ariaLabel: "journey.stages.earth.aria",
     figureKey: "journey.stages.earth.figure",
     kind: "content",
-    factIds: ["earth-diameter", "earth-moon-distance", "milky-way-position", "milky-way-orbit-time"],
+    factIds: ["earth-diameter", "earth-moon-distance", "milky-way-position", "milky-way-diameter", "galactic-centre-distance", "milky-way-orbit-time"],
     range: [0.2, 0.34],
     exponent: 7,
   },
