@@ -68,6 +68,36 @@ export const COSMIC_FACTS: CosmicFact[] = [
     verifiedAt: "2026-10-19",
   },
   {
+    id: "galactic-centre-distance",
+    title: "Distance to the galactic centre",
+    value: 26000,
+    displayValue: "about 26,000",
+    unit: "light-years",
+    summary:
+      "The Solar System lies about 26,000 light-years from the centre of the Milky Way, where the supermassive black hole Sagittarius A* sits.",
+    scaleStage: "galaxy",
+    confidenceType: "approximate",
+    sourceName: "ESA, Guide to our galaxy",
+    sourceUrl: "https://www.esa.int/Science_Exploration/Space_Science/Gaia/Guide_to_our_Galaxy",
+    verifiedAt: "2026-10-19",
+    methodologyNote:
+      "ESA's Gaia guide places the Sun at a distance of about 26,000 light-years from the Galactic Centre.",
+  },
+  {
+    id: "milky-way-diameter",
+    title: "Width of the Milky Way",
+    value: 100000,
+    displayValue: "more than 100,000",
+    unit: "light-years",
+    summary:
+      "The Milky Way is a spiral galaxy whose disk of stars spans more than 100,000 light-years.",
+    scaleStage: "galaxy",
+    confidenceType: "measured",
+    sourceName: "NASA Science",
+    sourceUrl: "https://science.nasa.gov/universe/galaxies/",
+    verifiedAt: "2026-10-19",
+  },
+  {
     id: "milky-way-orbit-time",
     title: "One orbit of the Milky Way",
     value: 240000000,
