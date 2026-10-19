@@ -1,7 +1,7 @@
 "use client";
 
-import { useCallback, useEffect, useRef, useState, type MutableRefObject } from "react";
-import { STAGES, activeStageIndex } from "./stages";
+import { useEffect, useRef, useState, type MutableRefObject } from "react";
+import { activeStageIndex } from "./stages";
 
 function readProgress(): number {
   const max = document.documentElement.scrollHeight - window.innerHeight;
@@ -11,7 +11,6 @@ function readProgress(): number {
 
 type JourneyProgress = {
   activeIndex: number;
-  goTo: (index: number) => void;
   // Live scroll progress for the current frame. Held in a ref, not React state,
   // so scrubbing does not re-render the tree 60 times a second; consumers read
   // it inside their own rAF loop and write to the DOM directly.
@@ -94,18 +93,5 @@ export function useJourneyProgress(reduced: boolean): JourneyProgress {
     };
   }, [reduced]);
 
-  const goTo = useCallback(
-    (index: number) => {
-      // Reflect the keyboard choice immediately so the progress nav is correct
-      // even before ScrollTrigger has attached or the smooth scroll settles.
-      activeRef.current = index;
-      setActiveIndex(index);
-      const max = document.documentElement.scrollHeight - window.innerHeight;
-      const target = ((index + 0.5) / STAGES.length) * Math.max(0, max);
-      window.scrollTo({ top: target, behavior: reduced ? "auto" : "smooth" });
-    },
-    [reduced],
-  );
-
-  return { activeIndex, goTo, progressRef };
+  return { activeIndex, progressRef };
 }

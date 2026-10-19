@@ -453,19 +453,14 @@ export const id: Dictionary = {
     },
   },
   journey: {
-    navLabel: "Tahapan perjalanan",
     rulerTitle: "Skala konseptual",
     rulerNote:
       "Skala logaritmik: setiap langkah sepuluh kali lipat dari yang di bawahnya, sehingga seluruh rentang skala kosmis muat pada satu sumbu.",
     widthLabel: "Lebar layar",
     lightCrossing: "Cahaya menyeberanginya dalam",
-    progress: {
-      visited: "sudah dibuka",
-    },
     progressBar: {
       label: "Kemajuan perjalanan",
       reset: "Setel ulang kemajuan",
-      done: "Kemajuan dihapus.",
     },
     landmarks: {
       moonOrbit: "orbit Bulan",
