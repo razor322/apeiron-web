@@ -5,6 +5,7 @@
 
 export type SceneHandle = {
   render: (progress: number, timeSeconds: number) => void;
+  hitTest: (x: number, y: number) => string | null;
   destroy: () => void;
 };
 
@@ -246,7 +247,7 @@ export function createScene(canvas: HTMLCanvasElement, labels?: SceneLabels): Sc
   // No 2D context (or no canvas): the CSS gradient + star fallback behind the
   // canvas stays visible, so the journey still renders. Nothing to animate.
   if (!context) {
-    return { render: () => {}, destroy: () => {} };
+    return { render: () => {}, hitTest: () => null, destroy: () => {} };
   }
   const ctx = context;
 
@@ -258,6 +259,10 @@ export function createScene(canvas: HTMLCanvasElement, labels?: SceneLabels): Sc
 
   let cw = 0;
   let ch = 0;
+
+  // Click targets rebuilt each frame from what is actually drawn: a planet dot,
+  // a nearby star, or the broad galaxy field. Cleared at the top of render.
+  let hits: { slug: string; x: number; y: number; r: number }[] = [];
 
   function resize() {
     const d = Math.min(window.devicePixelRatio || 1, q.dprCap);
@@ -287,6 +292,7 @@ export function createScene(canvas: HTMLCanvasElement, labels?: SceneLabels): Sc
   function render(progress: number, t: number) {
     // Hidden tab: skip all drawing work. The last frame stays on screen.
     if (document.hidden) return;
+    hits = [];
     const e = exponentAt(progress);
     const W = 10 ** e;
     const S = Math.min(cw, ch);
@@ -336,6 +342,7 @@ export function createScene(canvas: HTMLCanvasElement, labels?: SceneLabels): Sc
     // deep-field of galaxies.
     const gwA = smooth(17.5, 20, e) * (1 - smooth(22.5, 24.5, e));
     if (gwA > 0.01) {
+      hits.push({ slug: "galaxy", x: cw / 2, y: ch / 2, r: Math.min(cw, ch) * 0.3 });
       const R = 1.2e21 * ppm * 0.55;
       const gx = cw / 2;
       const gy = ch / 2;
@@ -418,6 +425,7 @@ export function createScene(canvas: HTMLCanvasElement, labels?: SceneLabels): Sc
       for (const ns of NEARBY_STARS) {
         const x = ns.x * cw;
         const y = ns.y * ch;
+        hits.push({ slug: "star", x, y, r: 26 });
         const glow = ctx.createRadialGradient(x, y, 0, x, y, ns.r * 7);
         glow.addColorStop(0, ns.warm ? "rgba(255,224,175,0.9)" : "rgba(220,232,255,0.9)");
         glow.addColorStop(0.3, ns.warm ? "rgba(255,200,140,0.3)" : "rgba(190,210,255,0.28)");
@@ -525,6 +533,7 @@ export function createScene(canvas: HTMLCanvasElement, labels?: SceneLabels): Sc
       for (const pl of PLANETS) {
         const q = project(pl.a * Math.cos(pl.ang), pl.a * Math.sin(pl.ang));
         const pr = Math.max(pl.r * ppm, 1.3);
+        hits.push({ slug: "planet", x: q[0], y: q[1], r: Math.max(pr, 8) });
         ctx.globalAlpha = plA * 0.9;
         ctx.fillStyle = "#CFCBC2";
         ctx.beginPath();
@@ -762,6 +771,16 @@ export function createScene(canvas: HTMLCanvasElement, labels?: SceneLabels): Sc
 
   return {
     render,
+    hitTest(x: number, y: number) {
+      let best: { slug: string; d: number } | null = null;
+      for (const h of hits) {
+        const dx = x - h.x;
+        const dy = y - h.y;
+        const d = Math.sqrt(dx * dx + dy * dy);
+        if (d <= h.r && (!best || d < best.d)) best = { slug: h.slug, d };
+      }
+      return best ? best.slug : null;
+    },
     destroy: () => window.removeEventListener("resize", onResize),
   };
 }

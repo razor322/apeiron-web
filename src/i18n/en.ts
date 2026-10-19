@@ -460,6 +460,10 @@ export const en = {
       heading: "The eight planets",
       intro: "Each world bound to the Sun. Open one to see its size, distance, and pace.",
     },
+    cosmos: {
+      heading: "Where to next",
+      intro: "The field is full of galaxies. Open any of these to keep exploring.",
+    },
     progressBar: {
       label: "Journey progress",
       reset: "Reset progress",

@@ -462,6 +462,10 @@ export const id: Dictionary = {
       heading: "Delapan planet",
       intro: "Tiap dunia yang terikat Matahari. Buka satu untuk melihat ukuran, jarak, dan kecepatannya.",
     },
+    cosmos: {
+      heading: "Ke mana selanjutnya",
+      intro: "Medan ini penuh galaksi. Buka salah satunya untuk terus menjelajah.",
+    },
     progressBar: {
       label: "Kemajuan perjalanan",
       reset: "Setel ulang kemajuan",

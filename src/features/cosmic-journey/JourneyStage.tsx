@@ -6,6 +6,7 @@ import { DataLabel } from "@/components/ui/DataLabel";
 import { SourceLink } from "@/components/ui/SourceLink";
 import { JourneyStageDef, readCopy } from "./stages";
 import { PlanetRow } from "./PlanetRow";
+import { CosmosGrid } from "./CosmosGrid";
 
 type JourneyStageProps = {
   stage: JourneyStageDef;
@@ -127,6 +128,10 @@ export function JourneyStage({
 
       {stage.id === "solar-system" ? (
         <PlanetRow locale={locale} dict={dict} className="mt-8 max-w-[34rem]" />
+      ) : null}
+
+      {stage.id === "universe" ? (
+        <CosmosGrid locale={locale} dict={dict} className="mt-8 max-w-[34rem]" />
       ) : null}
     </section>
   );

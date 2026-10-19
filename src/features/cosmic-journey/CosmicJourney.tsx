@@ -117,6 +117,17 @@ export function CosmicJourney({ dict, locale }: { dict: Dictionary; locale: Loca
         <canvas
           ref={canvasRef}
           aria-hidden="true"
+          onClick={(event) => {
+            const rect = event.currentTarget.getBoundingClientRect();
+            const slug = sceneRef.current?.hitTest(
+              event.clientX - rect.left,
+              event.clientY - rect.top,
+            );
+            if (slug) {
+              const href = slug === "planet" ? "planet" : slug;
+              window.location.assign(`/${locale}/explore/${href}`);
+            }
+          }}
           className="absolute inset-0 h-full w-full"
         />
         <div
