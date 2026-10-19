@@ -6,7 +6,6 @@ import { STAGES, readCopy, type JourneyStageDef } from "./stages";
 import { getJourneyImage } from "./journey-images";
 import { JourneyStage } from "./JourneyStage";
 import { JourneyProgress } from "./JourneyProgress";
-import { JourneySummary } from "./JourneySummary";
 import { ScaleRuler } from "./ScaleRuler";
 
 // The calm (reduced-motion) journey: a plain, single-column set of cards, one per
@@ -33,7 +32,6 @@ export function CalmJourney({
         {STAGES.map((stage) => (
           <CalmStage key={stage.id} stage={stage} dict={dict} />
         ))}
-        <JourneySummary dict={dict} />
         <div className="pb-28 pt-8">
           <ScaleRuler exponent={STAGES[activeIndex]?.exponent ?? 0} dict={dict} />
         </div>

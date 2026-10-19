@@ -464,14 +464,6 @@ export const en = {
       label: "Reset progress",
       done: "Progress cleared.",
     },
-    summary: {
-      heading: "Your journey",
-      ordersLine: "You crossed {orders} orders of magnitude, from a point of light to the edge of the observable universe.",
-      stagesLine: "{visited} of {total} stages opened.",
-      factsHeading: "What you saw along the way",
-      complete: "You opened every stage. That is the whole scale of the cosmos, end to end.",
-      incomplete: "Open the stages you have not reached yet to complete the scale.",
-    },
     landmarks: {
       moonOrbit: "Moon's orbit",
       earthOrbit: "Earth's orbit",

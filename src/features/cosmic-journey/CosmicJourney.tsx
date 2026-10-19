@@ -8,7 +8,6 @@ import { useJourneyProgress } from "./use-journey-progress";
 import { JourneyStage } from "./JourneyStage";
 import { CalmJourney } from "./CalmJourney";
 import { JourneyProgress } from "./JourneyProgress";
-import { JourneySummary } from "./JourneySummary";
 import { ScaleRuler } from "./ScaleRuler";
 import { ScaleReadout } from "./ScaleReadout";
 import { getCalm, subscribeCalm } from "@/lib/motion-preference";
@@ -167,9 +166,6 @@ export function CosmicJourney({ dict, locale }: { dict: Dictionary; locale: Loca
           className="absolute bottom-6 left-1/2 z-20 -translate-x-1/2 rounded-full border border-[color:var(--line)] bg-void/70 px-3 py-1.5 backdrop-blur"
         />
       </div>
-      <section className="relative z-10 mx-auto w-full max-w-3xl px-6 py-[16vh]">
-        <JourneySummary dict={dict} />
-      </section>
     </div>
   );
 }
