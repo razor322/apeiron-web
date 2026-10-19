@@ -31,7 +31,11 @@ export function CalmJourney({
           <CalmStage key={stage.id} stage={stage} dict={dict} />
         ))}
         <div className="pb-28 pt-8">
-          <ScaleRuler exponent={STAGES[activeIndex]?.exponent ?? 0} dict={dict} />
+          <ScaleRuler
+            exponent={STAGES[activeIndex]?.exponent ?? 0}
+            activeStageId={STAGES[activeIndex]?.id}
+            dict={dict}
+          />
         </div>
       </div>
       <JourneyProgressBar

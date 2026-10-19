@@ -129,6 +129,7 @@ export function CosmicJourney({ dict, locale }: { dict: Dictionary; locale: Loca
         <ScaleRuler
           progressRef={progressRef}
           exponent={STAGES[activeIndex]?.exponent ?? 0}
+          activeStageId={STAGES[activeIndex]?.id}
           dict={dict}
           className="absolute right-[clamp(18px,2.4vw,30px)] top-1/2 z-10 hidden w-44 -translate-y-1/2 text-right md:block"
         />

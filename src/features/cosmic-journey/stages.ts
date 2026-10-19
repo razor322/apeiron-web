@@ -106,6 +106,10 @@ export const STAGES: JourneyStageDef[] = [
 
 export const MAX_EXPONENT = 27;
 
+// The five stages that carry a real object and a name, used to label the ruler.
+// The hero, the mid transition, and the outro are typographic and stay unlabelled.
+export const NAMED_STAGES = STAGES.filter((stage) => stage.kind === "content");
+
 // The stage that owns a scroll fraction, by its [start, end] range. The last
 // stage claims the final frame so progress 1 never falls through.
 export function activeStageIndex(progress: number): number {

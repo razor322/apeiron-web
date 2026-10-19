@@ -2,13 +2,16 @@
 
 import { useEffect, useRef, type MutableRefObject } from "react";
 import type { Dictionary } from "@/i18n/en";
-import { MAX_EXPONENT, readCopy } from "./stages";
+import { MAX_EXPONENT, NAMED_STAGES, readCopy } from "./stages";
 import { exponentAtProgress } from "./exponent";
 
 type ScaleRulerProps = {
   progressRef?: MutableRefObject<number>;
   exponent: number;
   dict: Dictionary;
+  // The stage the reader is in, when known (calm motion). Full motion leaves it
+  // undefined and the marker follows the scrubbed progress instead.
+  activeStageId?: string;
   className?: string;
 };
 
@@ -21,15 +24,6 @@ function superscript(n: number): string {
     .join("");
 }
 
-// Named landmarks on the ruler, at the order of magnitude they sit at, so the
-// abstract exponents gain meaning: the Moon's orbit, Earth's orbit, Neptune's
-// orbit. Keys resolve to dict copy.
-const LANDMARKS: { key: string; exponent: number }[] = [
-  { key: "journey.landmarks.moonOrbit", exponent: 8.89 },
-  { key: "journey.landmarks.earthOrbit", exponent: 11.48 },
-  { key: "journey.landmarks.neptuneOrbit", exponent: 12.95 },
-];
-
 // The signature element: one vertical logarithmic ruler, present through every
 // stage, with a single glowing amber marker that travels outward. Logarithmic
 // because the journey spans many orders of magnitude, and only a log scale holds
@@ -38,27 +32,25 @@ const LANDMARKS: { key: string; exponent: number }[] = [
 // The marker and the 10^x readout are driven from the progress ref in a rAF loop
 // (writing style/textContent directly), so they glide with the scroll instead of
 // stepping once per stage.
-export function ScaleRuler({ progressRef, exponent, dict, className = "" }: ScaleRulerProps) {
+export function ScaleRuler({ progressRef, exponent, dict, activeStageId, className = "" }: ScaleRulerProps) {
   const ticks = Array.from({ length: MAX_EXPONENT + 1 }, (_, i) => i);
   const markerRef = useRef<HTMLSpanElement | null>(null);
   const expRef = useRef<HTMLParagraphElement | null>(null);
 
   useEffect(() => {
-    // No ref (reduced motion): the marker sits at the active stage's exponent.
     if (!progressRef) {
-      if (markerRef.current) {
-        markerRef.current.style.bottom = `${Math.min(100, (exponent / MAX_EXPONENT) * 100)}%`;
-      }
-      if (expRef.current) expRef.current.textContent = `10${superscript(exponent)} m`;
+      const e = activeStageId
+        ? NAMED_STAGES.find((s) => s.id === activeStageId)?.exponent ?? exponent
+        : exponent;
+      if (markerRef.current) markerRef.current.style.bottom = `${Math.min(100, (e / MAX_EXPONENT) * 100)}%`;
+      if (expRef.current) expRef.current.textContent = `10${superscript(e)} m`;
       return;
     }
     let raf = 0;
     let lastExp = -1;
     const tick = () => {
       const e = exponentAtProgress(progressRef.current);
-      if (markerRef.current) {
-        markerRef.current.style.bottom = `${Math.min(100, (e / MAX_EXPONENT) * 100)}%`;
-      }
+      if (markerRef.current) markerRef.current.style.bottom = `${Math.min(100, (e / MAX_EXPONENT) * 100)}%`;
       const whole = Math.floor(e);
       if (whole !== lastExp && expRef.current) {
         expRef.current.textContent = `10${superscript(e)} m`;
@@ -68,7 +60,7 @@ export function ScaleRuler({ progressRef, exponent, dict, className = "" }: Scal
     };
     raf = requestAnimationFrame(tick);
     return () => cancelAnimationFrame(raf);
-  }, [progressRef, exponent]);
+  }, [progressRef, exponent, activeStageId]);
 
   return (
     <div className={className}>
@@ -90,18 +82,18 @@ export function ScaleRuler({ progressRef, exponent, dict, className = "" }: Scal
         })}
         <span className="absolute inset-y-0 right-0 w-px bg-[color:var(--line)]" />
 
-        {LANDMARKS.map((landmark) => {
-          const active = Math.abs(landmark.exponent - exponent) < 0.8;
+        {NAMED_STAGES.map((stage) => {
+          const active = stage.id === activeStageId;
           return (
             <span
-              key={landmark.key}
-              aria-hidden="true"
+              key={stage.id}
+              data-active={active ? "true" : undefined}
               className={`absolute right-4 -translate-y-1/2 whitespace-nowrap font-sans text-[11px] transition-colors ${
                 active ? "text-amber" : "text-dust"
               }`}
-              style={{ bottom: `${(landmark.exponent / MAX_EXPONENT) * 100}%` }}
+              style={{ bottom: `${(stage.exponent / MAX_EXPONENT) * 100}%` }}
             >
-              {readCopy(dict, landmark.key)}
+              {readCopy(dict, stage.label)}
             </span>
           );
         })}
