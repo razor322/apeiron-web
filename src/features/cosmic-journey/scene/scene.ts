@@ -93,9 +93,7 @@ const KEYFRAMES: [number, number][] = [
   [0, 0.3],
   [0.07, 0.3],
   [0.17, 5.2],
-  [0.22, 9.5],
-  [0.26, 9.5],
-  [0.3, 7.2],
+  [0.28, 7.2],
   [0.38, 7.2],
   [0.5, 9.2],
   [0.57, 9.2],
@@ -522,28 +520,6 @@ export function createScene(canvas: HTMLCanvasElement, labels?: SceneLabels): Sc
       }
     }
 
-    // Earth's orbit seen from outside: a brief context view as the zoom opens
-    // onto the Earth stage, so the reader sees where Earth sits before the
-    // camera descends to the surface.
-    const eoA = smooth(8.6, 9.2, e) * (1 - smooth(9.6, 10.2, e)) * localFade;
-    if (eoA > 0.01) {
-      ctx.save();
-      ctx.globalAlpha = eoA * 0.5;
-      ctx.strokeStyle = "rgba(232,228,220,1)";
-      ctx.lineWidth = 1;
-      ctx.beginPath();
-      ctx.arc(sx, sy, AU * ppm, 0, TAU);
-      ctx.stroke();
-      ctx.globalAlpha = eoA;
-      const ep = project(AU, 0);
-      ctx.fillStyle = "#8FB0E8";
-      ctx.beginPath();
-      ctx.arc(ep[0], ep[1], Math.max(RE * ppm, 2), 0, TAU);
-      ctx.fill();
-      const name = labels?.stars["journey.landmarks.earthOrbit"];
-      if (name) label(name, ep[0] + 7, ep[1] - 7, eoA * 0.8, "#9A9CA6");
-      ctx.restore();
-    }
     const plA = smooth(11.6, 12.4, e) * localFade;
     if (plA > 0.01) {
       for (const pl of PLANETS) {
@@ -604,32 +580,47 @@ export function createScene(canvas: HTMLCanvasElement, labels?: SceneLabels): Sc
       ctx.restore();
     }
 
-    // Moon.
-    const mA = smooth(8, 8.6, e) * (1 - smooth(10, 10.8, e)) * localFade;
+    // Moon: shown while the Earth stage is on screen, so the surface view is not
+    // an Earth with no companion. While Earth is a small disc the Moon orbits on
+    // a faint ring; once the surface fills the frame the ring is meaningless, so
+    // the Moon is drawn beside the globe instead.
+    const mA = smooth(6.8, 7.4, e) * (1 - smooth(9.5, 10.4, e)) * localFade;
     if (mA > 0.01) {
-      const mp = project(AU + LM * Math.cos(0.35), LM * Math.sin(0.35));
-      const mr = LM * ppm;
-      if (mr < 20000) {
-        ctx.strokeStyle = `rgba(232,228,220,${0.14 * mA})`;
-        ctx.lineWidth = 1;
+      if (Rpx > 2000) {
+        const mx = ex + Rpx * 0.62;
+        const my = ey - Rpx * 0.18;
+        ctx.save();
+        ctx.globalAlpha = mA;
+        ctx.fillStyle = "#CFCBC2";
         ctx.beginPath();
-        ctx.arc(ex, ey, mr, 0, TAU);
+        ctx.arc(mx, my, Math.max(Rpx * 0.045, 5), 0, TAU);
+        ctx.fill();
+        ctx.restore();
+      } else {
+        const mp = project(AU + LM * Math.cos(0.35), LM * Math.sin(0.35));
+        const mr = LM * ppm;
+        if (mr < 20000) {
+          ctx.strokeStyle = `rgba(232,228,220,${0.14 * mA})`;
+          ctx.lineWidth = 1;
+          ctx.beginPath();
+          ctx.arc(ex, ey, mr, 0, TAU);
+          ctx.stroke();
+        }
+        ctx.save();
+        ctx.strokeStyle = `rgba(232,228,220,${0.28 * mA})`;
+        ctx.setLineDash([2, 5]);
+        ctx.beginPath();
+        ctx.moveTo(ex, ey);
+        ctx.lineTo(mp[0], mp[1]);
         ctx.stroke();
+        ctx.restore();
+        ctx.globalAlpha = mA;
+        ctx.fillStyle = "#CFCBC2";
+        ctx.beginPath();
+        ctx.arc(mp[0], mp[1], Math.max(RM * ppm, 1.7), 0, TAU);
+        ctx.fill();
+        ctx.globalAlpha = 1;
       }
-      ctx.save();
-      ctx.strokeStyle = `rgba(232,228,220,${0.28 * mA})`;
-      ctx.setLineDash([2, 5]);
-      ctx.beginPath();
-      ctx.moveTo(ex, ey);
-      ctx.lineTo(mp[0], mp[1]);
-      ctx.stroke();
-      ctx.restore();
-      ctx.globalAlpha = mA;
-      ctx.fillStyle = "#CFCBC2";
-      ctx.beginPath();
-      ctx.arc(mp[0], mp[1], Math.max(RM * ppm, 1.7), 0, TAU);
-      ctx.fill();
-      ctx.globalAlpha = 1;
     }
 
     // Earth: a disc while small, the horizon filling the frame while large. It
