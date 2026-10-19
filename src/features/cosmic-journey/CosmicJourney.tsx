@@ -58,6 +58,7 @@ export function CosmicJourney({ dict, locale }: { dict: Dictionary; locale: Loca
       "journey.stars.sirius": readCopy(dict, "journey.stars.sirius"),
       "journey.stars.barnard": readCopy(dict, "journey.stars.barnard"),
       "journey.stars.others": readCopy(dict, "journey.stars.others"),
+      "journey.landmarks.earthOrbit": readCopy(dict, "journey.landmarks.earthOrbit"),
     };
     (async () => {
       const mod = await import("./scene/scene");

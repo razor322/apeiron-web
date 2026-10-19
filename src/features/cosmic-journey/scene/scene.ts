@@ -93,7 +93,9 @@ const KEYFRAMES: [number, number][] = [
   [0, 0.3],
   [0.07, 0.3],
   [0.17, 5.2],
-  [0.28, 7.2],
+  [0.22, 9.5],
+  [0.26, 9.5],
+  [0.3, 7.2],
   [0.38, 7.2],
   [0.5, 9.2],
   [0.57, 9.2],
@@ -518,6 +520,29 @@ export function createScene(canvas: HTMLCanvasElement, labels?: SceneLabels): Sc
         ctx.arc(sx, sy, rp, 0, TAU);
         ctx.stroke();
       }
+    }
+
+    // Earth's orbit seen from outside: a brief context view as the zoom opens
+    // onto the Earth stage, so the reader sees where Earth sits before the
+    // camera descends to the surface.
+    const eoA = smooth(8.6, 9.2, e) * (1 - smooth(9.6, 10.2, e)) * localFade;
+    if (eoA > 0.01) {
+      ctx.save();
+      ctx.globalAlpha = eoA * 0.5;
+      ctx.strokeStyle = "rgba(232,228,220,1)";
+      ctx.lineWidth = 1;
+      ctx.beginPath();
+      ctx.arc(sx, sy, AU * ppm, 0, TAU);
+      ctx.stroke();
+      ctx.globalAlpha = eoA;
+      const ep = project(AU, 0);
+      ctx.fillStyle = "#8FB0E8";
+      ctx.beginPath();
+      ctx.arc(ep[0], ep[1], Math.max(RE * ppm, 2), 0, TAU);
+      ctx.fill();
+      const name = labels?.stars["journey.landmarks.earthOrbit"];
+      if (name) label(name, ep[0] + 7, ep[1] - 7, eoA * 0.8, "#9A9CA6");
+      ctx.restore();
     }
     const plA = smooth(11.6, 12.4, e) * localFade;
     if (plA > 0.01) {
