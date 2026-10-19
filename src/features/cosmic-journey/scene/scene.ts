@@ -386,6 +386,8 @@ export function createScene(canvas: HTMLCanvasElement, labels?: SceneLabels): Sc
       ctx.fill();
 
       ctx.restore();
+      const galName = labels?.stars["journey.stages.galaxy.label"];
+      if (galName) label(galName, gx + R * 0.6, gy - R * 0.5, gwA * 0.8, "#9A9CA6");
     }
 
     // Nearby stars: the Sun's neighbourhood. Proxima Centauri and a few bright
@@ -398,7 +400,7 @@ export function createScene(canvas: HTMLCanvasElement, labels?: SceneLabels): Sc
       for (const ns of NEARBY_STARS) {
         const x = ns.x * cw;
         const y = ns.y * ch;
-        hits.push({ slug: "star", x, y, r: 26 });
+        hits.push({ slug: `star-${ns.key.split(".").pop()}`, x, y, r: 26 });
         const glow = ctx.createRadialGradient(x, y, 0, x, y, ns.r * 7);
         glow.addColorStop(0, ns.warm ? "rgba(255,224,175,0.9)" : "rgba(220,232,255,0.9)");
         glow.addColorStop(0.3, ns.warm ? "rgba(255,200,140,0.3)" : "rgba(190,210,255,0.28)");
@@ -470,6 +472,7 @@ export function createScene(canvas: HTMLCanvasElement, labels?: SceneLabels): Sc
     if (sunA > 0.01) {
       const rc = Math.max(RS * ppm, 1.8);
       const rg = rc * 3.5 + 14;
+      hits.push({ slug: "sun", x: sx, y: sy, r: Math.max(rc + 8, 24) });
       ctx.save();
       ctx.globalAlpha = sunA;
       const g = ctx.createRadialGradient(sx, sy, 0, sx, sy, rg);
@@ -485,6 +488,8 @@ export function createScene(canvas: HTMLCanvasElement, labels?: SceneLabels): Sc
       ctx.arc(sx, sy, rc, 0, TAU);
       ctx.fill();
       ctx.restore();
+      const sunName = labels?.stars["journey.objects.sun"];
+      if (sunName) label(sunName, sx + 12, sy - 12, sunA * 0.8, "#9A9CA6");
     }
 
     // Orbit rings and planets.
@@ -506,13 +511,14 @@ export function createScene(canvas: HTMLCanvasElement, labels?: SceneLabels): Sc
       for (const pl of PLANETS) {
         const q = project(pl.a * Math.cos(pl.ang), pl.a * Math.sin(pl.ang));
         const pr = Math.max(pl.r * ppm, 1.3);
-        hits.push({ slug: "planet", x: q[0], y: q[1], r: Math.max(pr, 8) });
+        hits.push({ slug: `planet-${pl.n.toLowerCase()}`, x: q[0], y: q[1], r: Math.max(pr, 10) });
         ctx.globalAlpha = plA * 0.9;
         ctx.fillStyle = "#CFCBC2";
         ctx.beginPath();
         ctx.arc(q[0], q[1], pr, 0, TAU);
         ctx.fill();
-        if (pl.lab) label(pl.n, q[0] + 7, q[1] - 7, plA * 0.8, "#9A9CA6");
+        const pname = labels?.stars[`explore.planets.${pl.n.toLowerCase()}.name`];
+        if (pname) label(pname, q[0] + 8, q[1] - 8, plA * 0.85, "#B8B4AC");
 
         // Iconic natural satellites: a faint orbit ring and a small dot, so the
         // planets read as systems, not single dots.

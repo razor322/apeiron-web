@@ -1,10 +1,11 @@
 "use client";
 
-import { useEffect, useRef, useSyncExternalStore } from "react";
+import { useEffect, useRef, useState, useSyncExternalStore } from "react";
 import { useRouter } from "next/navigation";
 import type { Dictionary } from "@/i18n/en";
 import type { Locale } from "@/i18n/config";
 import { STAGES, readCopy } from "./stages";
+import { PLANETS } from "@/features/explorer/planets";
 import { useJourneyProgress } from "./use-journey-progress";
 import { JourneyStage } from "./JourneyStage";
 import { CalmJourney } from "./CalmJourney";
@@ -12,6 +13,8 @@ import { ScaleRuler } from "./ScaleRuler";
 import { ScaleReadout } from "./ScaleReadout";
 import { getCalm, subscribeCalm } from "@/lib/motion-preference";
 import { useTrackStage } from "@/lib/journey-progress";
+import { ObjectHoverCard } from "./ObjectHoverCard";
+import { getJourneyObject, slugForId } from "./journey-objects";
 import type { SceneHandle } from "./scene/scene";
 
 // Opacity of a stage panel while scrubbing, keyed to the stage's own scroll
@@ -44,6 +47,7 @@ export function CosmicJourney({ dict, locale }: { dict: Dictionary; locale: Loca
 
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
   const sceneRef = useRef<SceneHandle | null>(null);
+  const [hover, setHover] = useState<{ id: string; x: number; y: number } | null>(null);
   // One wrapper per stage, so the scroll loop can set opacity/pointer-events on
   // the DOM directly instead of re-rendering React every frame.
   const panelRefs = useRef<(HTMLDivElement | null)[]>([]);
@@ -60,7 +64,12 @@ export function CosmicJourney({ dict, locale }: { dict: Dictionary; locale: Loca
       "journey.stars.sirius": readCopy(dict, "journey.stars.sirius"),
       "journey.stars.barnard": readCopy(dict, "journey.stars.barnard"),
       "journey.stars.others": readCopy(dict, "journey.stars.others"),
+      "journey.objects.sun": readCopy(dict, "journey.objects.sun"),
+      "journey.stages.galaxy.label": readCopy(dict, "journey.stages.galaxy.label"),
     };
+    for (const p of PLANETS) {
+      starLabels[`explore.planets.${p.slug}.name`] = readCopy(dict, `explore.planets.${p.slug}.name`);
+    }
     (async () => {
       const mod = await import("./scene/scene");
       if (cancelled || !canvasRef.current) return;
@@ -121,16 +130,33 @@ export function CosmicJourney({ dict, locale }: { dict: Dictionary; locale: Loca
           aria-hidden="true"
           onClick={(event) => {
             const rect = event.currentTarget.getBoundingClientRect();
-            const slug = sceneRef.current?.hitTest(
+            const id = sceneRef.current?.hitTest(
               event.clientX - rect.left,
               event.clientY - rect.top,
             );
-            if (slug) {
-              router.push(`/${locale}/explore/${slug}`);
+            if (id) {
+              router.push(`/${locale}/explore/${slugForId(id)}`);
             }
           }}
+          onMouseMove={(event) => {
+            const rect = event.currentTarget.getBoundingClientRect();
+            const x = event.clientX - rect.left;
+            const y = event.clientY - rect.top;
+            const id = sceneRef.current?.hitTest(x, y);
+            setHover(id ? { id, x, y } : null);
+          }}
+          onMouseLeave={() => setHover(null)}
           className="absolute inset-0 h-full w-full"
         />
+        {hover ? (
+          <ObjectHoverCard
+            object={getJourneyObject(hover.id)}
+            x={hover.x}
+            y={hover.y}
+            locale={locale}
+            dict={dict}
+          />
+        ) : null}
         <div
           className="pointer-events-none absolute inset-x-0 bottom-0 h-[52vh]"
           style={{
