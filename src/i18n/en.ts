@@ -456,6 +456,10 @@ export const en = {
       "A logarithmic scale: each step is ten times the one below, so the whole range of cosmic scale fits on a single axis.",
     widthLabel: "Screen width",
     lightCrossing: "Light crosses it in",
+    planets: {
+      heading: "The eight planets",
+      intro: "Each world bound to the Sun. Open one to see its size, distance, and pace.",
+    },
     progressBar: {
       label: "Journey progress",
       reset: "Reset progress",

@@ -1,13 +1,16 @@
 import type { CSSProperties } from "react";
 import type { Dictionary } from "@/i18n/en";
+import type { Locale } from "@/i18n/config";
 import { getFact } from "@/features/cosmic-facts/facts";
 import { DataLabel } from "@/components/ui/DataLabel";
 import { SourceLink } from "@/components/ui/SourceLink";
 import { JourneyStageDef, readCopy } from "./stages";
+import { PlanetRow } from "./PlanetRow";
 
 type JourneyStageProps = {
   stage: JourneyStageDef;
   dict: Dictionary;
+  locale: Locale;
   style?: CSSProperties;
   ariaHidden?: boolean;
   className?: string;
@@ -20,6 +23,7 @@ type JourneyStageProps = {
 export function JourneyStage({
   stage,
   dict,
+  locale,
   style,
   ariaHidden,
   className = "",
@@ -119,6 +123,10 @@ export function JourneyStage({
             ))}
           </div>
         </details>
+      ) : null}
+
+      {stage.id === "solar-system" ? (
+        <PlanetRow locale={locale} dict={dict} className="mt-8 max-w-[34rem]" />
       ) : null}
     </section>
   );

@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import type { Dictionary } from "@/i18n/en";
+import type { Locale } from "@/i18n/config";
 import { STAGES, readCopy, type JourneyStageDef } from "./stages";
 import { getJourneyImage } from "./journey-images";
 import { JourneyStage } from "./JourneyStage";
@@ -13,10 +14,12 @@ import { ScaleRuler } from "./ScaleRuler";
 // no canvas. Completable by ordinary scroll and keyboard.
 export function CalmJourney({
   dict,
+  locale,
   activeIndex,
   sky,
 }: {
   dict: Dictionary;
+  locale: Locale;
   activeIndex: number;
   sky: React.ReactNode;
 }) {
@@ -28,7 +31,7 @@ export function CalmJourney({
       </div>
       <div className="relative z-10 mx-auto w-full max-w-3xl px-6">
         {STAGES.map((stage) => (
-          <CalmStage key={stage.id} stage={stage} dict={dict} />
+          <CalmStage key={stage.id} stage={stage} dict={dict} locale={locale} />
         ))}
         <div className="pb-28 pt-8">
           <ScaleRuler
@@ -42,7 +45,15 @@ export function CalmJourney({
   );
 }
 
-function CalmStage({ stage, dict }: { stage: JourneyStageDef; dict: Dictionary }) {
+function CalmStage({
+  stage,
+  dict,
+  locale,
+}: {
+  stage: JourneyStageDef;
+  dict: Dictionary;
+  locale: Locale;
+}) {
   const image = getJourneyImage(stage.id);
   const [failed, setFailed] = useState(false);
   const showImage = image && !failed;
@@ -66,7 +77,7 @@ function CalmStage({ stage, dict }: { stage: JourneyStageDef; dict: Dictionary }
           />
         </JourneyParallax>
       ) : null}
-      <JourneyStage stage={stage} dict={dict} />
+      <JourneyStage stage={stage} dict={dict} locale={locale} />
       {showImage ? (
         <p className="font-sans text-xs text-dust">
           {image!.credit}{" "}

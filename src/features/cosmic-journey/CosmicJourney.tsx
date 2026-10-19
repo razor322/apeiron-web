@@ -103,7 +103,7 @@ export function CosmicJourney({ dict, locale }: { dict: Dictionary; locale: Loca
   if (reduced) {
     // Reduced path: a plain card per stage with a real image, no pin, no scrub,
     // no canvas animation. Completable by plain scroll and keyboard.
-    return <CalmJourney dict={dict} activeIndex={activeIndex} sky={sky} />;
+    return <CalmJourney dict={dict} locale={locale} activeIndex={activeIndex} sky={sky} />;
   }
 
   // Motion path: one fixed stage viewport pinned by sticky, the tall wrapper
@@ -155,7 +155,7 @@ export function CosmicJourney({ dict, locale }: { dict: Dictionary; locale: Loca
                 style={{ opacity: 0, pointerEvents: "none" }}
                 className={position}
               >
-                <JourneyStage stage={stage} dict={dict} />
+                <JourneyStage stage={stage} dict={dict} locale={locale} />
               </div>
             );
           })}

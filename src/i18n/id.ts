@@ -458,6 +458,10 @@ export const id: Dictionary = {
       "Skala logaritmik: setiap langkah sepuluh kali lipat dari yang di bawahnya, sehingga seluruh rentang skala kosmis muat pada satu sumbu.",
     widthLabel: "Lebar layar",
     lightCrossing: "Cahaya menyeberanginya dalam",
+    planets: {
+      heading: "Delapan planet",
+      intro: "Tiap dunia yang terikat Matahari. Buka satu untuk melihat ukuran, jarak, dan kecepatannya.",
+    },
     progressBar: {
       label: "Kemajuan perjalanan",
       reset: "Setel ulang kemajuan",
