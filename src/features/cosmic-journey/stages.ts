@@ -1,3 +1,7 @@
+import { MAX_EXPONENT } from "./exponent";
+
+export { MAX_EXPONENT };
+
 export type StageKind = "hero" | "mid" | "content" | "outro";
 
 export type JourneyStageDef = {
@@ -106,8 +110,6 @@ export const STAGES: JourneyStageDef[] = [
     exponent: 27,
   },
 ];
-
-export const MAX_EXPONENT = 27;
 
 // The five stages that carry a real object and a name, used to label the ruler.
 // The hero, the mid transition, and the outro are typographic and stay unlabelled.

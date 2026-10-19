@@ -3,6 +3,8 @@
 // code never blocks first paint. Everything here is decorative (the canvas is
 // aria-hidden); the accessible story lives in the DOM text panels.
 
+import { exponentAtProgress } from "../exponent";
+
 export type SceneHandle = {
   render: (progress: number, timeSeconds: number) => void;
   hitTest: (x: number, y: number) => string | null;
@@ -86,38 +88,6 @@ const PLANETS: Planet[] = [
     moons: [{ n: "Triton", d: 3.5476e8, r: 1.35e6, ang: 0.9, lab: true }],
   },
 ];
-
-// Screen width, in metres, as a function of scroll progress. The first ten
-// keyframes mirror the prototype's journey curve (Earth to Proxima); the last
-// three carry the zoom on out to the Milky Way and the observable universe.
-const KEYFRAMES: [number, number][] = [
-  [0, 0.3],
-  [0.07, 0.3],
-  [0.17, 5.2],
-  [0.28, 7.2],
-  [0.38, 7.2],
-  [0.5, 9.2],
-  [0.57, 9.2],
-  [0.68, 11.3],
-  [0.74, 11.3],
-  [0.86, 13.05],
-  [0.9, 13.05],
-  [0.94, 21],
-  [0.97, 27],
-  [1, 27],
-];
-
-function exponentAt(progress: number): number {
-  for (let i = 0; i < KEYFRAMES.length - 1; i++) {
-    const [p0, e0] = KEYFRAMES[i]!;
-    const [p1, e1] = KEYFRAMES[i + 1]!;
-    if (progress <= p1) {
-      const t = clamp((progress - p0) / (p1 - p0));
-      return e0 + (e1 - e0) * (t * 0.35 + t * t * (3 - 2 * t) * 0.65);
-    }
-  }
-  return KEYFRAMES[KEYFRAMES.length - 1]![1];
-}
 
 function seeded(seed: number): () => number {
   let a = seed;
@@ -293,7 +263,7 @@ export function createScene(canvas: HTMLCanvasElement, labels?: SceneLabels): Sc
     // Hidden tab: skip all drawing work. The last frame stays on screen.
     if (document.hidden) return;
     hits = [];
-    const e = exponentAt(progress);
+    const e = exponentAtProgress(progress);
     const W = 10 ** e;
     const S = Math.min(cw, ch);
     const ppm = S / W;
