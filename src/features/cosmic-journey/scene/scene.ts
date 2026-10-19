@@ -493,7 +493,9 @@ export function createScene(canvas: HTMLCanvasElement, labels?: SceneLabels): Sc
     }
 
     // Orbit rings and planets.
-    const orbA = 0.11 * smooth(11, 12, e) * localFade;
+    // Orbit rings: visible across the whole Solar System stage, not only at its
+    // end, so the planets read as circling one star.
+    const orbA = 0.22 * smooth(9.5, 11, e) * localFade;
     if (orbA > 0.004) {
       ctx.strokeStyle = `rgba(232,228,220,${orbA})`;
       ctx.lineWidth = 1;
