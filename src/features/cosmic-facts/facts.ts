@@ -60,7 +60,7 @@ export const COSMIC_FACTS: CosmicFact[] = [
     title: "Where the Sun sits in the Milky Way",
     displayValue: "about halfway out",
     summary:
-      "Earth is located along one of the Milky Way's spiral arms, about halfway from the centre of the galaxy. The Milky Way is a spiral galaxy whose disk spans more than 100,000 light-years.",
+      "Earth is located along one of the Milky Way's spiral arms, about halfway from the centre of the galaxy.",
     scaleStage: "galaxy",
     confidenceType: "approximate",
     sourceName: "NASA Science",

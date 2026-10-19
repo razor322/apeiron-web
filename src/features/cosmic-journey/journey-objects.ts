@@ -37,8 +37,12 @@ export function getJourneyObject(id: string): JourneyObject | undefined {
   return JOURNEY_OBJECTS.find((o) => o.id === id);
 }
 
-// A canvas id to a route under /explore.
+// A canvas id to a route under /explore. Named objects have an href; an
+// unnamed nearby star (a `star-` id with no entry) still routes to the star
+// category rather than a wrong planet.
 export function slugForId(id: string): string {
   const object = getJourneyObject(id);
-  return object ? object.href : "planet";
+  if (object) return object.href;
+  if (id.startsWith("star-")) return "star";
+  return "planet";
 }
