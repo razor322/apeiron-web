@@ -60,13 +60,23 @@ export const STAGES: JourneyStageDef[] = [
     exponent: 7,
   },
   {
+    id: "moon",
+    label: "journey.stages.moon.label",
+    ariaLabel: "journey.stages.moon.aria",
+    figureKey: "journey.stages.moon.figure",
+    kind: "content",
+    factIds: ["earth-moon-distance"],
+    range: [0.34, 0.46],
+    exponent: 8.89,
+  },
+  {
     id: "solar-system",
     label: "journey.stages.solar-system.label",
     ariaLabel: "journey.stages.solar-system.aria",
     figureKey: "journey.stages.solar-system.figure",
     kind: "content",
     factIds: ["sunlight-earth", "sun-neptune-light"],
-    range: [0.4, 0.58],
+    range: [0.46, 0.6],
     exponent: 12,
   },
   {
@@ -76,7 +86,7 @@ export const STAGES: JourneyStageDef[] = [
     figureKey: "journey.stages.star.figure",
     kind: "content",
     factIds: ["proxima-distance"],
-    range: [0.58, 0.76],
+    range: [0.6, 0.76],
     exponent: 16,
   },
   {

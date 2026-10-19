@@ -502,6 +502,14 @@ export const id: Dictionary = {
         headline: "Lebar Bumi. Seluruh dunia yang kamu kenal ada di permukaannya.",
         body: "Setiap kota, setiap lautan, setiap orang yang pernah hidup berada di permukaannya.",
       },
+      moon: {
+        label: "Bulan",
+        aria: "Orbit Bulan",
+        figure: "384.400 km",
+        headline: "Jarak ke Bulan. Bumi sudah menjadi titik.",
+        body: "Sekitar 30 kali lebar Bumi. Hanya dua belas manusia yang pernah berjalan di sana.",
+        youAreHere: "Bumi, kamu di sini",
+      },
       "solar-system": {
         label: "Tata Surya",
         aria: "Tata Surya",

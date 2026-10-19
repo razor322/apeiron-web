@@ -610,6 +610,20 @@ export function createScene(canvas: HTMLCanvasElement, labels?: SceneLabels): Sc
         ctx.arc(mp[0], mp[1], Math.max(RM * ppm, 1.7), 0, TAU);
         ctx.fill();
         ctx.globalAlpha = 1;
+
+        const hereName = labels?.stars["journey.stages.moon.youAreHere"];
+        if (hereName) {
+          ctx.save();
+          ctx.globalAlpha = mA * 0.7;
+          ctx.strokeStyle = "#E8A15B";
+          ctx.lineWidth = 1;
+          ctx.beginPath();
+          ctx.moveTo(ex + 6, ey + 6);
+          ctx.lineTo(ex + 30, ey + 30);
+          ctx.stroke();
+          label(hereName, ex + 34, ey + 34, mA, "#E8A15B");
+          ctx.restore();
+        }
       }
     }
 

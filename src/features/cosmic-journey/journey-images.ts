@@ -39,6 +39,13 @@ export const JOURNEY_IMAGES: Record<string, AstronomyMedia> = {
     "NASA",
     "Earth, the Blue Marble, showing oceans and swirling cloud systems.",
   ),
+  moon: media(
+    "as11-42-6179",
+    "medium",
+    "The Moon",
+    "NASA",
+    "The Moon seen as a dark disc from the Apollo 11 spacecraft during translunar coast.",
+  ),
   "solar-system": media(
     "PIA12365",
     "orig",

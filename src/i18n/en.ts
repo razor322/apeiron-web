@@ -500,6 +500,14 @@ export const en = {
         headline: "The width of Earth. The whole world you know sits on its surface.",
         body: "Every city, every ocean, every person who has ever lived rests on its surface.",
       },
+      moon: {
+        label: "The Moon",
+        aria: "The Moon's orbit",
+        figure: "384,400 km",
+        headline: "The distance to the Moon. Earth has become a point.",
+        body: "About 30 times the width of Earth. Only twelve people have ever walked there.",
+        youAreHere: "Earth, you are here",
+      },
       "solar-system": {
         label: "Solar System",
         aria: "The Solar System",

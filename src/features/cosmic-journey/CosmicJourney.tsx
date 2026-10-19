@@ -66,6 +66,7 @@ export function CosmicJourney({ dict, locale }: { dict: Dictionary; locale: Loca
       "journey.stars.others": readCopy(dict, "journey.stars.others"),
       "journey.objects.sun": readCopy(dict, "journey.objects.sun"),
       "journey.stages.galaxy.label": readCopy(dict, "journey.stages.galaxy.label"),
+      "journey.stages.moon.youAreHere": readCopy(dict, "journey.stages.moon.youAreHere"),
     };
     for (const p of PLANETS) {
       starLabels[`explore.planets.${p.slug}.name`] = readCopy(dict, `explore.planets.${p.slug}.name`);

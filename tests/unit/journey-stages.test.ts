@@ -12,6 +12,7 @@ describe("journey stages", () => {
     const content = STAGES.filter((s) => s.kind === "content" || s.kind === "outro");
     expect(content.map((s) => s.id)).toEqual([
       "earth",
+      "moon",
       "solar-system",
       "star",
       "galaxy",
