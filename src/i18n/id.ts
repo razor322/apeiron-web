@@ -466,13 +466,8 @@ export const id: Dictionary = {
       heading: "Ke mana selanjutnya",
       intro: "Medan ini penuh galaksi. Buka salah satunya untuk terus menjelajah.",
     },
-    progressBar: {
-      label: "Kemajuan perjalanan",
-      reset: "Setel ulang kemajuan",
-    },
     landmarks: {
       moonOrbit: "orbit Bulan",
-      earthOrbit: "orbit Bumi",
       neptuneOrbit: "orbit Neptunus",
     },
     stars: {

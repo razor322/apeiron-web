@@ -464,13 +464,8 @@ export const en = {
       heading: "Where to next",
       intro: "The field is full of galaxies. Open any of these to keep exploring.",
     },
-    progressBar: {
-      label: "Journey progress",
-      reset: "Reset progress",
-    },
     landmarks: {
       moonOrbit: "Moon's orbit",
-      earthOrbit: "Earth's orbit",
       neptuneOrbit: "Neptune's orbit",
     },
     stars: {
