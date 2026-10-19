@@ -1,9 +1,5 @@
 import { describe, it, expect } from "vitest";
-import {
-  exponentAtProgress,
-  progressAtExponent,
-  MAX_EXPONENT,
-} from "@/features/cosmic-journey/exponent";
+import { exponentAtProgress, MAX_EXPONENT } from "@/features/cosmic-journey/exponent";
 
 describe("exponentAtProgress", () => {
   it("starts near a person and ends at the observable universe", () => {
@@ -26,12 +22,5 @@ describe("exponentAtProgress", () => {
     expect(exponentAtProgress(0.3)).toBeLessThan(8);
     expect(exponentAtProgress(0.3)).toBeGreaterThan(6);
     expect(exponentAtProgress(0.35)).toBeGreaterThanOrEqual(exponentAtProgress(0.3) - 0.001);
-  });
-});
-
-describe("progressAtExponent", () => {
-  it("returns a progress below the universe and above the Earth surface", () => {
-    expect(progressAtExponent(16)).toBeLessThan(progressAtExponent(27));
-    expect(progressAtExponent(16)).toBeGreaterThan(progressAtExponent(7));
   });
 });

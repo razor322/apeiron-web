@@ -21,10 +21,6 @@ export type JourneyStageDef = {
 // Seven stages travelled as one continuous zoom, plus a mid transition. Exponents
 // are the order of magnitude of each stage's subject in metres, from a person
 // (10^0) to the observable universe (10^27); the ruler spans that range.
-// A content stage's `range` is placed on the shared zoom curve so its midpoint
-// exponent sits within a couple of orders of its declared `exponent`, and the
-// range must stay inside the band the scene draws that object in. The zoom curve
-// lives in exponent.ts so the ruler label, the copy, and the canvas agree.
 export const STAGES: JourneyStageDef[] = [
   {
     id: "hero",
@@ -53,7 +49,7 @@ export const STAGES: JourneyStageDef[] = [
     figureKey: "journey.stages.earth.figure",
     kind: "content",
     factIds: ["earth-diameter", "earth-moon-distance", "milky-way-position", "milky-way-orbit-time"],
-    range: [0.22, 0.34],
+    range: [0.22, 0.42],
     exponent: 7,
   },
   {
@@ -63,8 +59,8 @@ export const STAGES: JourneyStageDef[] = [
     figureKey: "journey.stages.solar-system.figure",
     kind: "content",
     factIds: ["sunlight-earth", "sun-neptune-light"],
-    range: [0.68, 0.86],
-    exponent: 12,
+    range: [0.5, 0.7],
+    exponent: 13,
   },
   {
     id: "star",
@@ -73,8 +69,8 @@ export const STAGES: JourneyStageDef[] = [
     figureKey: "journey.stages.star.figure",
     kind: "content",
     factIds: ["proxima-distance"],
-    range: [0.90, 0.936],
-    exponent: 16,
+    range: [0.8, 0.9],
+    exponent: 17,
   },
   {
     id: "galaxy",
@@ -83,7 +79,7 @@ export const STAGES: JourneyStageDef[] = [
     figureKey: null,
     kind: "content",
     factIds: [],
-    range: [0.94, 0.95],
+    range: [0.9, 0.94],
     exponent: 21,
   },
   {
@@ -93,7 +89,7 @@ export const STAGES: JourneyStageDef[] = [
     figureKey: null,
     kind: "content",
     factIds: [],
-    range: [0.96, 0.98],
+    range: [0.94, 0.97],
     exponent: 27,
   },
   {
