@@ -8,6 +8,7 @@ import { createEarth } from "./bodies/earth";
 import { createRings, type RingView } from "./rings";
 import { createAsteroidBelt, type AsteroidBelt } from "./asteroid-belt";
 import { createKuiperBelt, type KuiperBelt } from "./kuiper-belt";
+import { applyMoonStep, createMoons, MOONS } from "./moons";
 import {
   proceduralTexture,
   type ProceduralKind,
@@ -108,6 +109,8 @@ export class SolarSystem {
   private readonly sunLight: THREE.PointLight;
   private readonly bodyViews: BodyView[] = [];
   private readonly ringViews: { view: RingView; tilt: THREE.Group }[] = [];
+  private readonly moonGroups: THREE.Group[] = [];
+  private readonly moonViews: { def: (typeof MOONS)[number]; pivot: THREE.Group }[] = [];
   private readonly asteroidBelt: AsteroidBelt;
   private readonly kuiperBelt: KuiperBelt;
   private readonly scratch = new THREE.Vector3();
@@ -192,6 +195,7 @@ export class SolarSystem {
         this.bodyViews.push(view);
         this.scene.add(view.group);
         this.attachRings(def, view);
+        this.attachMoons(def, view);
         continue;
       }
       const recipe = PROCEDURAL[def.id];
@@ -207,6 +211,7 @@ export class SolarSystem {
       this.bodyViews.push(view);
       this.scene.add(view.group);
       this.attachRings(def, view);
+      this.attachMoons(def, view);
     }
     // The belts share the scene's sim time; the asteroid belt moves on the GPU,
     // the Kuiper hint only fades with distance and never needs a per-frame write.
@@ -256,8 +261,7 @@ export class SolarSystem {
   }
 
   toggleMoons(on: boolean): void {
-    void on;
-    // Stub: moon visibility lands with the bodies in a later task.
+    for (const group of this.moonGroups) group.visible = on;
   }
 
   toggleLabels(on: boolean): void {
@@ -319,6 +323,8 @@ export class SolarSystem {
       applyBodyStep(view, this.simTime, this.scratch);
     }
 
+    applyMoonStep(this.moonViews, this.simTime, this.scratch);
+
     this.asteroidBelt.update(this.simTime);
 
     // The ring shader needs the planet's world centre each frame; the tilt
@@ -366,6 +372,21 @@ export class SolarSystem {
     if (!rings) return;
     view.tilt.add(rings.mesh);
     this.ringViews.push({ view: rings, tilt: view.tilt });
+  }
+
+  // Moons live inside the planet's tilt group, so each orbits in the tilted
+  // equatorial plane. The group carries every satellite for that planet and
+  // starts hidden; toggleMoons flips the whole set at once.
+  private attachMoons(def: BodyDef, view: BodyView): void {
+    const defs = MOONS.filter((m) => m.parentId === def.id);
+    if (defs.length === 0) return;
+    const group = createMoons(defs, def.displayRadius);
+    view.tilt.add(group);
+    this.moonGroups.push(group);
+    for (const pivot of group.children) {
+      const moonDef = defs.find((m) => m.id === pivot.name);
+      if (moonDef) this.moonViews.push({ def: moonDef, pivot: pivot as THREE.Group });
+    }
   }
 
   private applyQuality(q: Quality): void {
