@@ -166,8 +166,14 @@ export class SolarSystem {
 
   private readonly onResize = () => this.resize();
 
-  constructor(canvas: HTMLCanvasElement, opts?: { quality?: Quality }) {
+  private readonly labelFor: (id: BodyId) => string;
+
+  constructor(
+    canvas: HTMLCanvasElement,
+    opts?: { quality?: Quality; labelFor?: (id: BodyId) => string },
+  ) {
     this.canvas = canvas;
+    this.labelFor = opts?.labelFor ?? ((id) => id);
 
     const context = canvas.getContext("webgl2") ?? canvas.getContext("webgl");
     if (!context) {
@@ -290,7 +296,7 @@ export class SolarSystem {
     for (const { id, object } of this.labelBodies) {
       const element = document.createElement("div");
       const def = bodyById(id as BodyId);
-      element.textContent = def ? def.id : id;
+      element.textContent = def ? this.labelFor(def.id) : id;
       element.style.color = "#e6e8ef";
       element.style.fontSize = "11px";
       element.style.letterSpacing = "0.08em";

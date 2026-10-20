@@ -197,6 +197,27 @@ export const en = {
     fallbackNote: "This device cannot draw the 3D view, so the planets are listed below.",
     listHeading: "The eight planets",
     planetLabel: "Open",
+    subline:
+      "Sizes and distances are compressed so every world shares one view. The order is real; the scale is not.",
+    posterAlt: "A still diagram of the Solar System, the Sun at the centre with the planets in order.",
+    railLabel: "Bodies",
+    canvasAria:
+      "An interactive three-dimensional view of the Solar System. Choose a body from the list to focus it.",
+    info: {
+      type: "Type",
+      atmosphere: "Atmosphere",
+      distance: "Distance from the Sun",
+      orbit: "Orbital period",
+      day: "Length of day",
+      moons: "Moons",
+      temp: "Temperature",
+      learnMore: "Learn more",
+    },
+    body: {
+      sun: "The Sun",
+      ceres: "Ceres",
+      pluto: "Pluto",
+    },
     metaTitle: "Apeiron: the Solar System in 3D",
     metaDescription:
       "The Sun and the eight planets as turnable three-dimensional globes, in order from the Sun.",

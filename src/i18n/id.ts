@@ -199,6 +199,27 @@ export const id: Dictionary = {
     fallbackNote: "Perangkat ini tidak dapat menggambar tampilan 3D, jadi planetnya didaftarkan di bawah.",
     listHeading: "Delapan planet",
     planetLabel: "Buka",
+    subline:
+      "Ukuran dan jarak dikompresi agar setiap dunia muat dalam satu tampilan. Urutannya nyata; skalanya tidak.",
+    posterAlt: "Diagram diam Tata Surya, Matahari di pusat dengan planet-planet berurutan.",
+    railLabel: "Benda langit",
+    canvasAria:
+      "Tampilan tiga dimensi Tata Surya yang interaktif. Pilih benda langit dari daftar untuk memfokuskannya.",
+    info: {
+      type: "Jenis",
+      atmosphere: "Atmosfer",
+      distance: "Jarak dari Matahari",
+      orbit: "Periode orbit",
+      day: "Panjang hari",
+      moons: "Bulan",
+      temp: "Suhu",
+      learnMore: "Pelajari lebih lanjut",
+    },
+    body: {
+      sun: "Matahari",
+      ceres: "Ceres",
+      pluto: "Pluto",
+    },
     metaTitle: "Apeiron: Tata Surya dalam 3D",
     metaDescription:
       "Matahari dan delapan planet sebagai bola tiga dimensi yang bisa diputar, berurutan dari Matahari.",
