@@ -123,3 +123,8 @@ bun run lint && bun run typecheck && bun run test && bun run test:e2e && bun run
 - [ ] Integration tests for live providers, including invalid response and timeout.
 - [ ] End-to-end tests for the main journey and reduced-motion fallback.
 - [ ] Production build succeeds and environment docs exist.
+
+## Tata Surya 3D
+
+Aset tekstur statis di `public/textures` (NASA public domain / three.js MIT), disajikan dari CDN tepi Vercel. Tanpa env var tambahan, tanpa domain gambar remote. Bila GPU/WebGL absen, halaman menampilkan pesan gagal dan daftar planet. Lisensi per berkas: `public/textures/LICENSES.md`.
+

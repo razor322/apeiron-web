@@ -5,13 +5,13 @@ export default defineConfig({
   fullyParallel: true,
   reporter: "list",
   use: {
-    baseURL: "http://localhost:3000",
+    baseURL: "http://localhost:3001",
     trace: "on-first-retry",
   },
   projects: [{ name: "chromium", use: { ...devices["Desktop Chrome"] } }],
   webServer: {
-    command: "bun run dev",
-    url: "http://localhost:3000/en",
+    command: "bun run dev -- -p 3001",
+    url: "http://localhost:3001/en",
     reuseExistingServer: true,
     timeout: 120_000,
   },
