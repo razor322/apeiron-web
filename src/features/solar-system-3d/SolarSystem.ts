@@ -2,6 +2,8 @@ import * as THREE from "three";
 import { OrbitControls } from "three/addons/controls/OrbitControls.js";
 import { createSun } from "./sun";
 import { createStarfield } from "./starfield";
+import { BODIES } from "./solar-system.data";
+import { applyBodyStep, createBody, type BodyView } from "./bodies/planet";
 
 // Core Three.js scene for the solar system page: renderer, camera, loop and
 // disposal only. Task 1.1 keeps the scene empty; later tasks add the bodies,
@@ -67,6 +69,8 @@ export class SolarSystem {
 
   private readonly starfield: THREE.Points;
   private readonly sunLight: THREE.PointLight;
+  private readonly bodyViews: BodyView[] = [];
+  private readonly scratch = new THREE.Vector3();
 
   private rafId: number | null = null;
   private running = false;
@@ -135,6 +139,13 @@ export class SolarSystem {
 
     this.starfield = createStarfield();
     this.scene.add(this.starfield);
+
+    for (const def of BODIES) {
+      if (def.orbitRadius === null) continue;
+      const view = createBody(def);
+      this.bodyViews.push(view);
+      this.scene.add(view.group);
+    }
 
     if (typeof window !== "undefined") {
       window.addEventListener("resize", this.onResize);
@@ -233,6 +244,10 @@ export class SolarSystem {
     this.lastFrameMs = nowMs;
 
     this.simTime += delta * this.timeScale;
+
+    for (const view of this.bodyViews) {
+      applyBodyStep(view, this.simTime, this.scratch);
+    }
 
     // The star shell keeps the camera at its centre so stars read as infinitely
     // far and never drift as the user orbits.
