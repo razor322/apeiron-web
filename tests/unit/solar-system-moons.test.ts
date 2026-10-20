@@ -75,5 +75,11 @@ describe("moonPosition", () => {
     // Forward would move toward -Z at theta small and positive; retrograde flips
     // the sign of the angle, so it moves toward +Z.
     expect(out.z).toBeGreaterThan(0);
+
+    // Negative control: a prograde moon at the same fraction moves the other way.
+    const io = moonById("io")!;
+    const prograde = new THREE.Vector3();
+    moonPosition(io, io.orbitPeriod / 8, prograde);
+    expect(prograde.z).toBeLessThan(0);
   });
 });
