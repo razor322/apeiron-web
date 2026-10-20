@@ -1,4 +1,4 @@
-# Solar System 3D Page (GSS) Implementation Plan
+# Solar System 3D Page (GSS) Implementation Plan (ALL TASKS DONE)
 
 > **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [ ]`) syntax for tracking.
 
@@ -48,6 +48,10 @@ Task order: dependency first, then the pure modules (which carry the tests), the
 
 ### Task 1: Add the gss-lang dependency
 
+> **Status: DONE**.
+
+### Task 1: Add the gss-lang dependency
+
 **Files:**
 - Modify: `package.json`, `bun.lock`
 
@@ -55,7 +59,7 @@ Task order: dependency first, then the pure modules (which carry the tests), the
 - Consumes: nothing.
 - Produces: `gss-lang@0.0.6`, exporting `mount(canvas, scene, options?)` and `softwareRendering()`.
 
-- [ ] **Step 1: Add the dependency**
+- [x] **Step 1: Add the dependency**
 
 Run:
 
@@ -65,13 +69,13 @@ bun add gss-lang@0.0.6
 
 Expected: `gss-lang` appears in `package.json` dependencies; `bun.lock` updates.
 
-- [ ] **Step 2: Confirm the import resolves with the expected names**
+- [x] **Step 2: Confirm the import resolves with the expected names**
 
 The installed package (verified during planning) exports `mount(canvas, scene, options?)` returning a scene with `destroy()`, `pause()`, `play()`, `setProperty()`, and `softwareRendering()`. Confirm by reading `node_modules/gss-lang/lib/types/embed/index.d.ts` and expect to see both `mount` and `softwareRendering`.
 Run: `bun run typecheck`
 Expected: exit 0.
 
-- [ ] **Step 3: Commit**
+- [x] **Step 3: Commit**
 
 ```bash
 git add package.json bun.lock
@@ -79,6 +83,10 @@ git commit -m "chore: add gss-lang for the 3D solar system page"
 ```
 
 ---
+
+### Task 2: Planet data to GSS values (pure)
+
+> **Status: DONE**.
 
 ### Task 2: Planet data to GSS values (pure)
 
@@ -94,7 +102,7 @@ git commit -m "chore: add gss-lang for the 3D solar system page"
   - `SUN_GSS: { id: "sun"; radius: number; color: string }`.
   - `planetGssFor(slug: string): PlanetGss | undefined`.
 
-- [ ] **Step 1: Write the failing test**
+- [x] **Step 1: Write the failing test**
 
 ```ts
 // tests/unit/planet-gss.test.ts
@@ -135,12 +143,12 @@ describe("planet gss values", () => {
 });
 ```
 
-- [ ] **Step 2: Run to verify it fails**
+- [x] **Step 2: Run to verify it fails**
 
 Run: `bunx vitest run tests/unit/planet-gss.test.ts`
 Expected: FAIL, module not found.
 
-- [ ] **Step 3: Write the module**
+- [x] **Step 3: Write the module**
 
 ```ts
 // src/features/solar-system-3d/planet-gss.ts
@@ -207,12 +215,12 @@ export function planetGssFor(slug: string): PlanetGss | undefined {
 
 Note: if `facts[0]` is not the diameter (check the `facts()` helper and `PlanetFact.metricKey` in `planets.ts`), select the diameter fact by its metric key instead of by index, and keep the test passing.
 
-- [ ] **Step 4: Run to verify it passes**
+- [x] **Step 4: Run to verify it passes**
 
 Run: `bunx vitest run tests/unit/planet-gss.test.ts`
 Expected: PASS, 5 tests.
 
-- [ ] **Step 5: Commit**
+- [x] **Step 5: Commit**
 
 ```bash
 git add src/features/solar-system-3d/planet-gss.ts tests/unit/planet-gss.test.ts
@@ -220,6 +228,10 @@ git commit -m "feat: map planet data to GSS values"
 ```
 
 ---
+
+### Task 3: Build the GSS scene source (pure)
+
+> **Status: DONE**.
 
 ### Task 3: Build the GSS scene source (pure)
 
@@ -231,7 +243,7 @@ git commit -m "feat: map planet data to GSS values"
 - Consumes: `PLANET_GSS`, `SUN_GSS` from Task 2.
 - Produces: `buildSceneSource(): string` - a GSS stylesheet: one `@scene` block listing the Sun and the eight planets, rules that place, size, and colour each, a gentle bob `@keyframes`, and a `prefers-reduced-motion` rule that stops it.
 
-- [ ] **Step 1: Write the failing test**
+- [x] **Step 1: Write the failing test**
 
 ```ts
 // tests/unit/scene-source.test.ts
@@ -271,12 +283,12 @@ describe("scene source", () => {
 });
 ```
 
-- [ ] **Step 2: Run to verify it fails**
+- [x] **Step 2: Run to verify it fails**
 
 Run: `bunx vitest run tests/unit/scene-source.test.ts`
 Expected: FAIL, module not found.
 
-- [ ] **Step 3: Write the module**
+- [x] **Step 3: Write the module**
 
 ```ts
 // src/features/solar-system-3d/scene-source.ts
@@ -322,12 +334,12 @@ ${rules}
 
 Note: keep the stylesheet to properties GSS 0.0.6 documents (from its site: `radius`, `color`, `translate`, `animation`, `@keyframes`, `@media`). Do not add `material` or `animation-delay` unless verified live in Task 6; an invalid property would be dropped by the compiler, not caught by the unit test.
 
-- [ ] **Step 4: Run to verify it passes**
+- [x] **Step 4: Run to verify it passes**
 
 Run: `bunx vitest run tests/unit/scene-source.test.ts`
 Expected: PASS, 4 tests.
 
-- [ ] **Step 5: Commit**
+- [x] **Step 5: Commit**
 
 ```bash
 git add src/features/solar-system-3d/scene-source.ts tests/unit/scene-source.test.ts
@@ -335,6 +347,10 @@ git commit -m "feat: build the GSS scene source for the solar system"
 ```
 
 ---
+
+### Task 4: The client component and the route
+
+> **Status: DONE**.
 
 ### Task 4: The client component and the route
 
@@ -350,7 +366,7 @@ git commit -m "feat: build the GSS scene source for the solar system"
   - `SolarSystem3D({ locale, dict })` client component.
   - The `/{locale}/solar-system-3d` route.
 
-- [ ] **Step 1: Add the dictionary keys**
+- [x] **Step 1: Add the dictionary keys**
 
 In `src/i18n/en.ts`, add a `solarSystem3d` block (place it beside the other page blocks), and add `solarSystem3d` to `nav`:
 
@@ -375,7 +391,7 @@ Nav label: `solarSystem3d: "Solar System 3D"`.
 
 Mirror every key in `src/i18n/id.ts` (for example `title: "Tata Surya dalam 3D"`, `heading: "Tata Surya dalam 3D"`, `intro: "Berikut Matahari dan delapan planet, berurutan, sebagai bola yang bisa diputar. Ukurannya dikompresi agar Merkurius dan Jupiter muat dalam satu tampilan."`, `fallbackNote: "Perangkat ini tidak dapat menggambar tampilan 3D, jadi planetnya didaftarkan di bawah."`, `listHeading: "Delapan planet"`, `planetLabel: "Buka"`, `solarSystem3d: "Tata Surya 3D"`). Run `bunx vitest run tests/unit/i18n.test.ts` and expect PASS.
 
-- [ ] **Step 2: Write the client component**
+- [x] **Step 2: Write the client component**
 
 ```tsx
 // src/features/solar-system-3d/SolarSystem3D.tsx
@@ -466,7 +482,7 @@ export function SolarSystem3D({ locale, dict }: { locale: Locale; dict: Dictiona
 }
 ```
 
-- [ ] **Step 3: Write the route**
+- [x] **Step 3: Write the route**
 
 Read `src/lib/seo.ts` and `src/app/[locale]/calculators/page.tsx` first, then match the real `routeMetadata(meta, section, path)` call (the first argument is the dictionary `meta` object, not a cast).
 
@@ -522,7 +538,7 @@ export default async function SolarSystem3DPage({
 
 Note: `routeMetadata`'s `section` type only accepts a title and description; if `meta` does not carry the exact shape, follow how `calculators/page.tsx` builds its `section` and reuse that shape.
 
-- [ ] **Step 4: Write the loading skeleton**
+- [x] **Step 4: Write the loading skeleton**
 
 `Skeleton` takes only a `className` (verified during planning).
 
@@ -543,12 +559,12 @@ export default function Loading() {
 }
 ```
 
-- [ ] **Step 5: Verify**
+- [x] **Step 5: Verify**
 
 Run: `bun run typecheck ; bun run lint ; bun run build`
 Expected: exit 0 each; the build lists `/[locale]/solar-system-3d`.
 
-- [ ] **Step 6: Commit**
+- [x] **Step 6: Commit**
 
 ```bash
 git add src/features/solar-system-3d/SolarSystem3D.tsx "src/app/[locale]/solar-system-3d/page.tsx" "src/app/[locale]/solar-system-3d/loading.tsx" src/i18n/en.ts src/i18n/id.ts
@@ -559,6 +575,10 @@ git commit -m "feat: add the 3D solar system page"
 
 ### Task 5: Navbar link
 
+> **Status: DONE** (nav link committed; user's own Navbar edits left uncommitted).
+
+### Task 5: Navbar link
+
 **Files:**
 - Modify: `src/components/ui/Navbar.tsx`
 
@@ -566,7 +586,7 @@ git commit -m "feat: add the 3D solar system page"
 - Consumes: `dict.nav.solarSystem3d` (Task 4).
 - Produces: a nav link to `/{locale}/solar-system-3d`.
 
-- [ ] **Step 1: Add the link**
+- [x] **Step 1: Add the link**
 
 In `src/components/ui/Navbar.tsx`, add to the `links` array, after the Explore entry:
 
@@ -574,12 +594,12 @@ In `src/components/ui/Navbar.tsx`, add to the `links` array, after the Explore e
     { href: `/${locale}/solar-system-3d`, label: dict.nav.solarSystem3d },
 ```
 
-- [ ] **Step 2: Verify**
+- [x] **Step 2: Verify**
 
 Run: `bun run typecheck ; bun run lint ; bun run build`
 Expected: exit 0.
 
-- [ ] **Step 3: Commit (stage only the added line's file)**
+- [x] **Step 3: Commit (stage only the added line's file)**
 
 ```bash
 git add src/components/ui/Navbar.tsx
@@ -592,10 +612,14 @@ Report that `Navbar.tsx` also holds the user's own pending edits; only the added
 
 ### Task 6: Full gate and live verification
 
+> **Status: DONE** (gate 196/196, live verified at :3000).
+
+### Task 6: Full gate and live verification
+
 **Files:**
 - Modify: `docs/runbook.md` only if a note is needed.
 
-- [ ] **Step 1: Run the full gate**
+- [x] **Step 1: Run the full gate**
 
 ```powershell
 bunx vitest run
@@ -606,7 +630,7 @@ bun run build
 
 Expected: all pass.
 
-- [ ] **Step 2: Live check at port 3000**
+- [x] **Step 2: Live check at port 3000**
 
 Dev server is at http://localhost:3000. Confirm, recording each as evidence:
 
@@ -620,7 +644,7 @@ Dev server is at http://localhost:3000. Confirm, recording each as evidence:
 
 If a property in `buildSceneSource` is rejected by the GSS compiler (a console warning naming a property), remove that property from `scene-source.ts` and its test expectation, then re-run the scene.
 
-- [ ] **Step 3: Commit any doc change**
+- [x] **Step 3: Commit any doc change**
 
 ```bash
 git add docs/runbook.md
