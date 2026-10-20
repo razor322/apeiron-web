@@ -1,5 +1,7 @@
 import * as THREE from "three";
+import type { EffectComposer } from "three/addons/postprocessing/EffectComposer.js";
 import { OrbitControls } from "three/addons/controls/OrbitControls.js";
+import { createComposer, TIER_TABLE } from "./post";
 import { createSun } from "./sun";
 import { createStarfield } from "./starfield";
 import { BODIES, type BodyDef } from "./solar-system.data";
@@ -86,12 +88,6 @@ export function deviceTier(
   return "medium";
 }
 
-const TIER_PIXEL_CAP: Record<Quality, number> = {
-  low: 1,
-  medium: 1.5,
-  high: 2,
-};
-
 const OUTERMOST_ORBIT = 51;
 const CAMERA_DISTANCE = 150;
 
@@ -100,6 +96,7 @@ export class SolarSystem {
 
   private readonly canvas: HTMLCanvasElement;
   private readonly renderer: THREE.WebGLRenderer;
+  private composer: EffectComposer | null = null;
   private readonly camera: THREE.PerspectiveCamera;
   private readonly controls: OrbitControls;
   private readonly scene = new THREE.Scene();
@@ -306,6 +303,8 @@ export class SolarSystem {
 
     this.listeners.clear();
     this.controls.dispose();
+    this.composer?.dispose();
+    this.composer = null;
     disposeScene(this.scene);
     this.renderer.dispose();
   }
@@ -349,7 +348,11 @@ export class SolarSystem {
     this.starfield.position.copy(this.camera.position);
 
     this.controls.update();
-    this.renderer.render(this.scene, this.camera);
+    if (this.composer) {
+      this.composer.render();
+    } else {
+      this.renderer.render(this.scene, this.camera);
+    }
 
     this.fpsAccumulator += delta;
     this.fpsFrames += 1;
@@ -390,7 +393,24 @@ export class SolarSystem {
   }
 
   private applyQuality(q: Quality): void {
-    this.renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, TIER_PIXEL_CAP[q]));
+    this.renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, TIER_TABLE[q].pixelRatioCap));
+    this.rebuildComposer();
+  }
+
+  // Swaps the live composer for the current tier: dispose the old one and, on
+  // the tiers that bloom, build a fresh pass chain sized to the canvas. The low
+  // tier leaves composer null so the loop renders straight to the canvas.
+  private rebuildComposer(): void {
+    if (this.composer) {
+      this.composer.dispose();
+      this.composer = null;
+    }
+    const width = this.canvas.clientWidth || 1;
+    const height = this.canvas.clientHeight || 1;
+    this.composer = createComposer(this.renderer, this.scene, this.camera, this.info.tier, {
+      width,
+      height,
+    });
   }
 
   private resize(): void {
@@ -399,6 +419,7 @@ export class SolarSystem {
     this.renderer.setSize(width, height, false);
     this.camera.aspect = width / height;
     this.camera.updateProjectionMatrix();
+    this.composer?.setSize(width, height);
   }
 
   private emit(event: SolarSystemEvent, payload: unknown): void {
