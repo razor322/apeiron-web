@@ -142,10 +142,12 @@ export class SolarSystem {
   }
 
   setTimeScale(n: number): void {
+    if (this.disposed) return;
     this.timeScale = Number.isFinite(n) ? n : 0;
   }
 
   setQuality(q: Quality): void {
+    if (this.disposed) return;
     this.info.tier = q;
     this.applyQuality(q);
     this.resize();
@@ -179,7 +181,7 @@ export class SolarSystem {
     this.controls.update();
   }
 
-  on(event: SolarSystemEvent, cb: (payload: never) => void): () => void {
+  on(event: SolarSystemEvent, cb: (payload: unknown) => void): () => void {
     let set = this.listeners.get(event);
     if (!set) {
       set = new Set();
