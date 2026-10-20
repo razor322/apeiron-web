@@ -1,10 +1,20 @@
 import * as THREE from "three";
+import gsap from "gsap";
 import type { EffectComposer } from "three/addons/postprocessing/EffectComposer.js";
 import { OrbitControls } from "three/addons/controls/OrbitControls.js";
+import { CSS2DObject } from "three/addons/renderers/CSS2DRenderer.js";
 import { createComposer, TIER_TABLE } from "./post";
+import {
+  attachPicking,
+  focusDistance,
+  proxyRadius,
+  type PickProxy,
+  type PickingHandles,
+} from "./picking";
+import { createLabels, SUN_LABEL_SIN, type LabelHandles } from "./labels";
 import { createSun } from "./sun";
 import { createStarfield } from "./starfield";
-import { BODIES, type BodyDef } from "./solar-system.data";
+import { BODIES, bodyById, SCALE, type BodyDef } from "./solar-system.data";
 import { applyBodyStep, createBody, type BodyView } from "./bodies/planet";
 import { createEarth } from "./bodies/earth";
 import { createRings, type RingView } from "./rings";
@@ -115,6 +125,25 @@ export class SolarSystem {
   private earthPivot: THREE.Group | null = null;
   private readonly earthSunDir = new THREE.Vector3();
 
+  // Picking and labels. The proxy meshes are invisible hit targets (one per
+  // body) that carry the body's world position; the labels are the CSS2D
+  // overlay. Both are optional: they need a DOM, so a node build skips them.
+  private picking: PickingHandles | null = null;
+  private labels: LabelHandles | null = null;
+  private readonly pickProxies: PickProxy[] = [];
+  private readonly labelBodies: { id: string; object: THREE.Object3D }[] = [];
+  private labelsEnabled = false;
+  private orbitsEnabled = true;
+  private readonly sunGroup: THREE.Group;
+  private hoveredId: string | null = null;
+  private hoveredLine: THREE.LineLoop | null = null;
+
+  // Active focus: the body the camera is following, the tween driving the
+  // initial move, and the world offset the camera keeps once the tween ends.
+  private focusId: string | null = null;
+  private readonly focusDelta = new THREE.Vector3();
+  private focusTween: gsap.core.Tween | null = null;
+
   private rafId: number | null = null;
   private running = false;
   private disposed = false;
@@ -178,7 +207,12 @@ export class SolarSystem {
 
     const sun = createSun();
     this.sunLight = sun.light;
+    this.sunGroup = sun.group;
     this.scene.add(sun.group);
+
+    // The Sun is a pick and label target too, so it gets the same proxy and
+    // label treatment as the planets.
+    this.makeProxy("sun", SCALE.sunRadius, sun.group);
 
     this.starfield = createStarfield();
     this.scene.add(this.starfield);
@@ -191,6 +225,7 @@ export class SolarSystem {
         this.earthPivot = view.orbitPivot;
         this.bodyViews.push(view);
         this.scene.add(view.group);
+        this.registerInteractive(def, view);
         this.attachRings(def, view);
         this.attachMoons(def, view);
         continue;
@@ -207,6 +242,7 @@ export class SolarSystem {
         : createBody(def);
       this.bodyViews.push(view);
       this.scene.add(view.group);
+      this.registerInteractive(def, view);
       this.attachRings(def, view);
       this.attachMoons(def, view);
     }
@@ -217,10 +253,54 @@ export class SolarSystem {
     this.kuiperBelt = createKuiperBelt(tier);
     this.scene.add(this.kuiperBelt.points);
 
+    this.setupInteractivity();
+
     if (typeof window !== "undefined") {
       window.addEventListener("resize", this.onResize);
     }
   }
+
+  // Picking needs a DOM element and labels need a positioned parent; a node
+  // build (tests) has neither, so both are set up only when the canvas is
+  // connected. The label overlay lives inside the canvas's parent, sized to the
+  // canvas box, so it tracks the same layout.
+  private setupInteractivity(): void {
+    const canvas = this.canvas;
+    const parent = canvas.parentElement;
+    if (typeof window === "undefined" || !parent) return;
+
+    this.picking = attachPicking(this.camera, canvas, this.pickProxies, {
+      onHover: (id) => this.setHover(id),
+      onSelect: (id) => this.emit("select", id),
+    });
+    canvas.addEventListener("pointermove", this.onPointerMove);
+    canvas.addEventListener("click", this.onClick);
+
+    this.labels = createLabels(parent);
+    for (const { id, object } of this.labelBodies) {
+      const element = document.createElement("div");
+      const def = bodyById(id as BodyId);
+      element.textContent = def ? def.id : id;
+      element.style.color = "#e6e8ef";
+      element.style.fontSize = "11px";
+      element.style.letterSpacing = "0.08em";
+      element.style.textTransform = "uppercase";
+      element.style.textShadow = "0 0 6px #04050a";
+      const object3d = new CSS2DObject(element);
+      object3d.name = `label-${id}`;
+      object.add(object3d);
+      this.labels.objects.set(id, object3d);
+    }
+    this.labels.setSize(canvas.clientWidth || 1, canvas.clientHeight || 1);
+  }
+
+  private readonly onPointerMove = (event: PointerEvent): void => {
+    this.picking?.update(event.clientX, event.clientY);
+  };
+
+  private readonly onClick = (): void => {
+    this.picking?.click();
+  };
 
   start(): void {
     if (this.disposed || this.running) return;
@@ -253,8 +333,8 @@ export class SolarSystem {
   }
 
   toggleOrbits(on: boolean): void {
-    void on;
-    // Stub: orbit line visibility lands with the bodies in a later task.
+    this.orbitsEnabled = on;
+    for (const view of this.bodyViews) view.orbitLine.visible = on;
   }
 
   toggleMoons(on: boolean): void {
@@ -262,16 +342,60 @@ export class SolarSystem {
   }
 
   toggleLabels(on: boolean): void {
-    void on;
-    // Stub: label visibility lands with the bodies in a later task.
+    this.labelsEnabled = on;
   }
 
+  // Flies the camera to a body and keeps following it. `bodyById` gives the
+  // extent; `focusDistance` sizes the framing; GSAP drives the move; once it
+  // lands, `focusId` keeps the camera locked to the body each frame.
   focus(id: string): void {
-    void id;
-    // Stub: camera focus onto a body lands with the bodies in a later task.
+    if (this.disposed) return;
+    const target = this.focusTargetFor(id);
+    if (!target) return;
+
+    const def = bodyById(id as BodyId);
+    const ringExtent = def?.ringOuter !== undefined ? def.ringOuter : 0;
+    const radialExtent = (def?.displayRadius ?? 1) + ringExtent;
+    const distance = focusDistance(
+      radialExtent,
+      this.controls.minDistance,
+      this.controls.maxDistance,
+    );
+
+    this.focusId = id;
+    this.focusTween?.kill();
+
+    const worldPos = target.getWorldPosition(this.scratch).clone();
+    // Keep the camera's current viewing direction; only its distance changes,
+    // so the move reads as a push-in rather than a cut to a new angle.
+    const dir = this.camera.position.clone().sub(this.controls.target);
+    if (dir.lengthSq() < 1e-6) dir.set(0, 0.55, 1);
+    dir.normalize();
+
+    const endPos = worldPos.clone().addScaledVector(dir, distance);
+
+    const startPos = this.camera.position.clone();
+    const startTarget = this.controls.target.clone();
+    const state = { t: 0 };
+    this.focusTween = gsap.to(state, {
+      t: 1,
+      duration: 1.2,
+      ease: "power2.inOut",
+      onUpdate: () => {
+        this.camera.position.lerpVectors(startPos, endPos, state.t);
+        this.controls.target.lerpVectors(startTarget, worldPos, state.t);
+        this.controls.update();
+      },
+      onComplete: () => {
+        this.focusTween = null;
+      },
+    });
   }
 
   resetView(): void {
+    this.focusTween?.kill();
+    this.focusTween = null;
+    this.focusId = null;
     this.camera.position.set(0, CAMERA_DISTANCE * 0.55, CAMERA_DISTANCE * 0.83);
     this.controls.target.set(0, 0, 0);
     this.camera.lookAt(0, 0, 0);
@@ -302,6 +426,11 @@ export class SolarSystem {
     }
 
     this.listeners.clear();
+    this.focusTween?.kill();
+    this.picking?.dispose();
+    this.canvas.removeEventListener("pointermove", this.onPointerMove);
+    this.canvas.removeEventListener("click", this.onClick);
+    this.labels?.dispose();
     this.controls.dispose();
     this.composer?.dispose();
     this.composer = null;
@@ -347,12 +476,21 @@ export class SolarSystem {
     // far and never drift as the user orbits.
     this.starfield.position.copy(this.camera.position);
 
+    this.followFocus();
     this.controls.update();
     if (this.composer) {
       this.composer.render();
     } else {
       this.renderer.render(this.scene, this.camera);
     }
+
+    this.labels?.update({
+      scene: this.scene,
+      camera: this.camera,
+      bodies: this.labelBodies,
+      sunSinTolerance: SUN_LABEL_SIN,
+      enabled: this.labelsEnabled,
+    });
 
     this.fpsAccumulator += delta;
     this.fpsFrames += 1;
@@ -392,6 +530,66 @@ export class SolarSystem {
     }
   }
 
+  // One invisible hit proxy: a sphere parented to `parent` (the body's tilt
+  // group, or the Sun group) so it follows the body for free. It is larger than
+  // the real body when the body is tiny, so small worlds stay clickable.
+  private makeProxy(id: string, displayRadius: number, parent: THREE.Object3D): THREE.Mesh {
+    const geometry = new THREE.SphereGeometry(proxyRadius(displayRadius), 12, 12);
+    const material = new THREE.MeshBasicMaterial({ visible: false });
+    const mesh = new THREE.Mesh(geometry, material);
+    mesh.name = `pick-${id}`;
+    parent.add(mesh);
+    this.pickProxies.push({ id, mesh });
+    return mesh;
+  }
+
+  // Registers a body for picking and labelling. The proxy and the label both
+  // hang off the tilt group, which sits at the body's world centre.
+  private registerInteractive(def: BodyDef, view: BodyView): void {
+    this.makeProxy(def.id, def.displayRadius, view.tilt);
+    this.labelBodies.push({ id: def.id, object: view.tilt });
+  }
+
+  // The Object3D the camera should chase for an id: a body's tilt group, or the
+  // Sun. Returns null for an unknown id.
+  private focusTargetFor(id: string): THREE.Object3D | null {
+    if (id === "sun") return this.sunGroup;
+    const view = this.bodyViews.find((v) => v.def.id === id);
+    return view ? view.tilt : null;
+  }
+
+  // Hover: highlight the hovered body's orbit line and emit the event. Only one
+  // line is lit at a time; the previous one drops back to the base opacity.
+  private setHover(id: string | null): void {
+    if (id === this.hoveredId) return;
+    if (this.hoveredLine) {
+      (this.hoveredLine.material as THREE.LineBasicMaterial).opacity = 0.1;
+      this.hoveredLine = null;
+    }
+    this.hoveredId = id;
+    if (id) {
+      const view = this.bodyViews.find((v) => v.def.id === id);
+      if (view) {
+        (view.orbitLine.material as THREE.LineBasicMaterial).opacity = 0.6;
+        this.hoveredLine = view.orbitLine;
+      }
+    }
+    this.emit("hover", id);
+  }
+
+  // Keeps the camera locked to the focused body once the tween has landed: the
+  // body keeps orbiting, so the target and the camera both shift by the body's
+  // frame-to-frame delta. The framing distance set at focus time is preserved.
+  private followFocus(): void {
+    if (!this.focusId || this.focusTween) return;
+    const target = this.focusTargetFor(this.focusId);
+    if (!target) return;
+    const worldPos = target.getWorldPosition(this.scratch);
+    const delta = this.focusDelta.copy(worldPos).sub(this.controls.target);
+    this.controls.target.add(delta);
+    this.camera.position.add(delta);
+  }
+
   private applyQuality(q: Quality): void {
     this.renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, TIER_TABLE[q].pixelRatioCap));
     this.rebuildComposer();
@@ -420,6 +618,7 @@ export class SolarSystem {
     this.camera.aspect = width / height;
     this.camera.updateProjectionMatrix();
     this.composer?.setSize(width, height);
+    this.labels?.setSize(width, height);
   }
 
   private emit(event: SolarSystemEvent, payload: unknown): void {
