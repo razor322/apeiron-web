@@ -6,6 +6,7 @@ import { BODIES, type BodyDef } from "./solar-system.data";
 import { applyBodyStep, createBody, type BodyView } from "./bodies/planet";
 import { createEarth } from "./bodies/earth";
 import { createRings, type RingView } from "./rings";
+import { createAsteroidBelt, type AsteroidBelt } from "./asteroid-belt";
 import {
   proceduralTexture,
   type ProceduralKind,
@@ -20,7 +21,11 @@ const PROCEDURAL: Partial<Record<BodyId, { kind: ProceduralKind; colors: string[
   mercury: { kind: "rocky", colors: ["#8c8680"], opts: { seed: 2 } },
   venus: { kind: "rocky", colors: ["#e8cda0", "#f0dbb4"], opts: { seed: 5, clouds: true } },
   mars: { kind: "rocky", colors: ["#c1502e"], opts: { seed: 9, polarCaps: true } },
-  ceres: { kind: "rocky", colors: ["#8d8a85"], opts: { seed: 13 } },
+  ceres: {
+    kind: "rocky",
+    colors: ["#8d8a85"],
+    opts: { seed: 13, spot: { color: "#e9e6df", u: 0.6, v: 0.46, radius: 0.05 } },
+  },
   jupiter: {
     kind: "gas",
     colors: ["#d8b48a", "#a9825a"],
@@ -102,6 +107,7 @@ export class SolarSystem {
   private readonly sunLight: THREE.PointLight;
   private readonly bodyViews: BodyView[] = [];
   private readonly ringViews: { view: RingView; tilt: THREE.Group }[] = [];
+  private readonly asteroidBelt: AsteroidBelt;
   private readonly scratch = new THREE.Vector3();
   private earth: ReturnType<typeof createEarth> | null = null;
   private earthPivot: THREE.Group | null = null;
@@ -200,6 +206,10 @@ export class SolarSystem {
       this.scene.add(view.group);
       this.attachRings(def, view);
     }
+    // The asteroid belt moves on the GPU; it shares the scene's sim time.
+    this.asteroidBelt = createAsteroidBelt(tier);
+    this.scene.add(this.asteroidBelt.group);
+
     if (typeof window !== "undefined") {
       window.addEventListener("resize", this.onResize);
     }
@@ -229,6 +239,7 @@ export class SolarSystem {
     if (this.disposed) return;
     this.info.tier = q;
     this.applyQuality(q);
+    this.asteroidBelt.setQuality(q);
     this.resize();
     this.emit("tier", q);
   }
@@ -301,6 +312,8 @@ export class SolarSystem {
     for (const view of this.bodyViews) {
       applyBodyStep(view, this.simTime, this.scratch);
     }
+
+    this.asteroidBelt.update(this.simTime);
 
     // The ring shader needs the planet's world centre each frame; the tilt
     // group sits at the planet's position, so its world origin is the centre.
