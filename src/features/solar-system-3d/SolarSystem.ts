@@ -7,6 +7,7 @@ import { applyBodyStep, createBody, type BodyView } from "./bodies/planet";
 import { createEarth } from "./bodies/earth";
 import { createRings, type RingView } from "./rings";
 import { createAsteroidBelt, type AsteroidBelt } from "./asteroid-belt";
+import { createKuiperBelt, type KuiperBelt } from "./kuiper-belt";
 import {
   proceduralTexture,
   type ProceduralKind,
@@ -108,6 +109,7 @@ export class SolarSystem {
   private readonly bodyViews: BodyView[] = [];
   private readonly ringViews: { view: RingView; tilt: THREE.Group }[] = [];
   private readonly asteroidBelt: AsteroidBelt;
+  private readonly kuiperBelt: KuiperBelt;
   private readonly scratch = new THREE.Vector3();
   private earth: ReturnType<typeof createEarth> | null = null;
   private earthPivot: THREE.Group | null = null;
@@ -206,9 +208,12 @@ export class SolarSystem {
       this.scene.add(view.group);
       this.attachRings(def, view);
     }
-    // The asteroid belt moves on the GPU; it shares the scene's sim time.
+    // The belts share the scene's sim time; the asteroid belt moves on the GPU,
+    // the Kuiper hint only fades with distance and never needs a per-frame write.
     this.asteroidBelt = createAsteroidBelt(tier);
     this.scene.add(this.asteroidBelt.group);
+    this.kuiperBelt = createKuiperBelt(tier);
+    this.scene.add(this.kuiperBelt.points);
 
     if (typeof window !== "undefined") {
       window.addEventListener("resize", this.onResize);
@@ -240,6 +245,7 @@ export class SolarSystem {
     this.info.tier = q;
     this.applyQuality(q);
     this.asteroidBelt.setQuality(q);
+    this.kuiperBelt.setQuality(q);
     this.resize();
     this.emit("tier", q);
   }
