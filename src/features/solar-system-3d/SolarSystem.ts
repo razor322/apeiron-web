@@ -12,6 +12,7 @@ import {
   type PickingHandles,
 } from "./picking";
 import { createLabels, SUN_LABEL_SIN, type LabelHandles } from "./labels";
+import { stepTier, LOW_FPS, HIGH_FPS } from "./adaptive";
 import { createSun } from "./sun";
 import { createStarfield } from "./starfield";
 import { BODIES, bodyById, SCALE, type BodyDef } from "./solar-system.data";
@@ -154,6 +155,15 @@ export class SolarSystem {
   private fpsAccumulator = 0;
   private fpsFrames = 0;
 
+  // Adaptive quality: the probe timers the step function reads, plus the two
+  // visibility gates (canvas on screen, tab foregrounded).
+  private lowForSec = 0;
+  private highForSec = 0;
+  private sinceStepSec = 0;
+  private onScreen = true;
+  private tabVisible = true;
+  private intersectionObserver: IntersectionObserver | null = null;
+
   private readonly onResize = () => this.resize();
 
   constructor(canvas: HTMLCanvasElement, opts?: { quality?: Quality }) {
@@ -292,6 +302,26 @@ export class SolarSystem {
       this.labels.objects.set(id, object3d);
     }
     this.labels.setSize(canvas.clientWidth || 1, canvas.clientHeight || 1);
+
+    // Render only while the canvas is on screen and the tab is foregrounded.
+    // IntersectionObserver needs a real observer, so guard for it.
+    if (typeof IntersectionObserver !== "undefined") {
+      this.intersectionObserver = new IntersectionObserver((entries) => {
+        const entry = entries[entries.length - 1];
+        this.onScreen = entry ? entry.isIntersecting : true;
+      });
+      this.intersectionObserver.observe(canvas);
+    }
+    this.tabVisible = !document.hidden;
+    document.addEventListener("visibilitychange", this.onVisibilityChange);
+  }
+
+  private readonly onVisibilityChange = (): void => {
+    this.tabVisible = !document.hidden;
+  };
+
+  private get renderEnabled(): boolean {
+    return this.onScreen && this.tabVisible;
   }
 
   private readonly onPointerMove = (event: PointerEvent): void => {
@@ -430,6 +460,11 @@ export class SolarSystem {
     this.picking?.dispose();
     this.canvas.removeEventListener("pointermove", this.onPointerMove);
     this.canvas.removeEventListener("click", this.onClick);
+    this.intersectionObserver?.disconnect();
+    this.intersectionObserver = null;
+    if (typeof document !== "undefined") {
+      document.removeEventListener("visibilitychange", this.onVisibilityChange);
+    }
     this.labels?.dispose();
     this.controls.dispose();
     this.composer?.dispose();
@@ -478,19 +513,21 @@ export class SolarSystem {
 
     this.followFocus();
     this.controls.update();
-    if (this.composer) {
-      this.composer.render();
-    } else {
-      this.renderer.render(this.scene, this.camera);
-    }
+    if (this.renderEnabled) {
+      if (this.composer) {
+        this.composer.render();
+      } else {
+        this.renderer.render(this.scene, this.camera);
+      }
 
-    this.labels?.update({
-      scene: this.scene,
-      camera: this.camera,
-      bodies: this.labelBodies,
-      sunSinTolerance: SUN_LABEL_SIN,
-      enabled: this.labelsEnabled,
-    });
+      this.labels?.update({
+        scene: this.scene,
+        camera: this.camera,
+        bodies: this.labelBodies,
+        sunSinTolerance: SUN_LABEL_SIN,
+        enabled: this.labelsEnabled,
+      });
+    }
 
     this.fpsAccumulator += delta;
     this.fpsFrames += 1;
@@ -498,12 +535,44 @@ export class SolarSystem {
       this.info.fps = Math.round(this.fpsFrames / this.fpsAccumulator);
       this.fpsAccumulator = 0;
       this.fpsFrames = 0;
+      this.probeQuality(delta);
     }
     this.info.drawCalls = this.renderer.info.render.calls;
     this.info.triangles = this.renderer.info.render.triangles;
 
     this.rafId = requestAnimationFrame(this.tick);
   };
+
+  // The adaptive probe: accumulate how long the rolling average has held under
+  // or over the thresholds, hand the timers to the pure step function, and swap
+  // the tier when it says so. It runs once per half-second fps sample.
+  private probeQuality(sampleSec: number): void {
+    this.sinceStepSec += sampleSec;
+    if (this.info.fps < LOW_FPS) {
+      this.lowForSec += sampleSec;
+      this.highForSec = 0;
+    } else if (this.info.fps > HIGH_FPS) {
+      this.highForSec += sampleSec;
+      this.lowForSec = 0;
+    } else {
+      this.lowForSec = 0;
+      this.highForSec = 0;
+    }
+
+    const { tier, changed } = stepTier({
+      tier: this.info.tier,
+      avgFps: this.info.fps,
+      lowForSec: this.lowForSec,
+      highForSec: this.highForSec,
+      sinceStepSec: this.sinceStepSec,
+    });
+    if (!changed) return;
+
+    this.lowForSec = 0;
+    this.highForSec = 0;
+    this.sinceStepSec = 0;
+    this.setQuality(tier);
+  }
 
   // Rings attach to the tilt group, not the spin mesh, so the ring plane stays
   // fixed while the planet rotates inside it. The Sun sits at the origin, so
