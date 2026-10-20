@@ -197,11 +197,8 @@ export const id: Dictionary = {
     intro:
       "Berikut Matahari dan delapan planet, berurutan, sebagai bola yang bisa diputar. Ukurannya dikompresi agar Merkurius dan Jupiter muat dalam satu tampilan.",
     fallbackNote: "Perangkat ini tidak dapat menggambar tampilan 3D, jadi planetnya didaftarkan di bawah.",
-    listHeading: "Delapan planet",
-    planetLabel: "Buka",
     subline:
       "Ukuran dan jarak dikompresi agar setiap dunia muat dalam satu tampilan. Urutannya nyata; skalanya tidak.",
-    posterAlt: "Diagram diam Tata Surya, Matahari di pusat dengan planet-planet berurutan.",
     railLabel: "Benda langit",
     canvasAria:
       "Tampilan tiga dimensi Tata Surya yang interaktif. Pilih benda langit dari daftar untuk memfokuskannya.",

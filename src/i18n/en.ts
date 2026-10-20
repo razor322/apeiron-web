@@ -195,11 +195,8 @@ export const en = {
     intro:
       "What follows is the Sun and the eight planets, in order, as globes you can turn. Sizes are compressed so Mercury and Jupiter share one view.",
     fallbackNote: "This device cannot draw the 3D view, so the planets are listed below.",
-    listHeading: "The eight planets",
-    planetLabel: "Open",
     subline:
       "Sizes and distances are compressed so every world shares one view. The order is real; the scale is not.",
-    posterAlt: "A still diagram of the Solar System, the Sun at the centre with the planets in order.",
     railLabel: "Bodies",
     canvasAria:
       "An interactive three-dimensional view of the Solar System. Choose a body from the list to focus it.",

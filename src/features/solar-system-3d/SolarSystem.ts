@@ -57,8 +57,8 @@ const PROCEDURAL: Partial<Record<BodyId, { kind: ProceduralKind; colors: string[
 };
 
 // Core Three.js scene for the solar system page: renderer, camera, loop and
-// disposal only. Task 1.1 keeps the scene empty; later tasks add the bodies,
-// orbits and labels. Every body, size and orbit radius comes from
+// disposal, plus the sun, planets, Pluto, orbit lines, starfield, rings, belts,
+// moons, labels and picking. Every body, size and orbit radius comes from
 // solar-system.data.ts, which the page treats as the single source of truth.
 
 export type Quality = "low" | "medium" | "high";
