@@ -5,6 +5,35 @@ import { createStarfield } from "./starfield";
 import { BODIES } from "./solar-system.data";
 import { applyBodyStep, createBody, type BodyView } from "./bodies/planet";
 import { createEarth } from "./bodies/earth";
+import {
+  proceduralTexture,
+  type ProceduralKind,
+  type ProceduralOpts,
+} from "./bodies/procedural";
+import type { BodyId } from "./solar-system.data";
+
+// Surface recipe for every body that has no verified photographic texture. The
+// colors are the spec values; the spot positions are hand-tuned to sit on the
+// visible face rather than the seam.
+const PROCEDURAL: Partial<Record<BodyId, { kind: ProceduralKind; colors: string[]; opts?: ProceduralOpts }>> = {
+  mercury: { kind: "rocky", colors: ["#8c8680"], opts: { seed: 2 } },
+  venus: { kind: "rocky", colors: ["#e8cda0", "#f0dbb4"], opts: { seed: 5, clouds: true } },
+  mars: { kind: "rocky", colors: ["#c1502e"], opts: { seed: 9, polarCaps: true } },
+  ceres: { kind: "rocky", colors: ["#8d8a85"], opts: { seed: 13 } },
+  jupiter: {
+    kind: "gas",
+    colors: ["#d8b48a", "#a9825a"],
+    opts: { seed: 21, spot: { color: "#b8472f", u: 0.62, v: 0.62, radius: 0.1 } },
+  },
+  saturn: { kind: "gas", colors: ["#e5d3a1", "#c9b784"], opts: { seed: 27 } },
+  uranus: { kind: "icy", colors: ["#a8e3e6"], opts: { seed: 33 } },
+  neptune: {
+    kind: "gas",
+    colors: ["#3b57c9", "#27408f"],
+    opts: { seed: 39, spot: { color: "#1a2f6b", u: 0.35, v: 0.55, radius: 0.12 } },
+  },
+  pluto: { kind: "pluto", colors: ["#c9b49a"], opts: { seed: 45 } },
+};
 
 // Core Three.js scene for the solar system page: renderer, camera, loop and
 // disposal only. Task 1.1 keeps the scene empty; later tasks add the bodies,
@@ -154,11 +183,19 @@ export class SolarSystem {
         this.scene.add(view.group);
         continue;
       }
-      const view = createBody(def);
+      const recipe = PROCEDURAL[def.id];
+      const view = recipe
+        ? createBody(def, {
+            material: new THREE.MeshStandardMaterial({
+              map: proceduralTexture(recipe.kind, recipe.colors, recipe.opts),
+              roughness: 0.9,
+              metalness: 0,
+            }),
+          })
+        : createBody(def);
       this.bodyViews.push(view);
       this.scene.add(view.group);
     }
-
     if (typeof window !== "undefined") {
       window.addEventListener("resize", this.onResize);
     }
