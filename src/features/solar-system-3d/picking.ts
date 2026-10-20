@@ -40,13 +40,16 @@ export function focusDistance(
 // the camera is within `tan` of the Sun's. `tan` is the sine of the angular
 // radius of the Sun's occluding disc as seen from the camera, widened a touch
 // so the label pops out just before the body would be fully covered.
+const scratchToBody = new THREE.Vector3();
+const scratchToSun = new THREE.Vector3();
+
 export function isBehindSun(
   bodyPos: THREE.Vector3,
   cameraPos: THREE.Vector3,
   sinTolerance: number,
 ): boolean {
-  const toBody = bodyPos.clone().sub(cameraPos);
-  const toSun = new THREE.Vector3(0, 0, 0).sub(cameraPos);
+  const toBody = scratchToBody.subVectors(bodyPos, cameraPos);
+  const toSun = scratchToSun.copy(cameraPos).negate();
   const bodyDist = toBody.length();
   const sunDist = toSun.length();
   if (bodyDist === 0 || sunDist === 0) return false;
