@@ -39,7 +39,7 @@ export function asteroidCounts(quality: Quality): number {
 }
 
 // Maps a uniform sample t in [0, 1) to an orbit radius across the belt. The
-// shape folds the sample toward the centre (radius 17), so more rocks sit near
+// shape folds the sample toward the belt centre, so more rocks sit near
 // the middle of the band than at its edges.
 export function beltRadius(t: number): number {
   const centre = (SCALE.beltInner + SCALE.beltOuter) / 2;

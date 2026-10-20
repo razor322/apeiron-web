@@ -99,8 +99,8 @@ export function deviceTier(
   return "medium";
 }
 
-const OUTERMOST_ORBIT = 51;
-const CAMERA_DISTANCE = 150;
+const OUTERMOST_ORBIT = 71;
+const CAMERA_DISTANCE = 190;
 
 export class SolarSystem {
   readonly info: SolarSystemInfo;
@@ -193,7 +193,7 @@ export class SolarSystem {
 
     this.camera = new THREE.PerspectiveCamera(45, width / height, 0.1, 2000);
     // High three quarter view: lifted above the ecliptic and pulled back far
-    // enough that the outermost orbit (51 units) still fits with margin.
+    // enough that the outermost planet orbit (71 units) still fits with margin.
     this.camera.position.set(0, CAMERA_DISTANCE * 0.55, CAMERA_DISTANCE * 0.83);
     this.camera.lookAt(0, 0, 0);
 
@@ -203,7 +203,7 @@ export class SolarSystem {
     this.controls.enablePan = false;
     // Closer than the Sun surface (radius 3.5) plus margin.
     this.controls.minDistance = 5;
-    this.controls.maxDistance = 160;
+    this.controls.maxDistance = 260;
     this.controls.target.set(0, 0, 0);
 
     const tier =

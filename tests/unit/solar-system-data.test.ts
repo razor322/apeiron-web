@@ -12,10 +12,10 @@ describe("SCALE", () => {
     expect(SCALE).toEqual({
       sunRadius: 3.5,
       earthRadius: 0.5,
-      beltInner: 15,
-      beltOuter: 19,
-      kuiperInner: 47,
-      kuiperOuter: 58,
+      beltInner: 19,
+      beltOuter: 25,
+      kuiperInner: 74,
+      kuiperOuter: 88,
     });
   });
 });
@@ -95,7 +95,7 @@ describe("BODIES", () => {
 
   it("uses the exact scene values the spec fixes", () => {
     expect(bodyById("ceres")?.displayRadius).toBeCloseTo(0.12, 6);
-    expect(bodyById("ceres")?.orbitRadius).toBeCloseTo(17.0, 6);
+    expect(bodyById("ceres")?.orbitRadius).toBeCloseTo(21.0, 6);
     expect(bodyById("ceres")?.orbitPeriod).toBeCloseTo(45, 6);
     expect(bodyById("ceres")?.color).toBe("#8d8a85");
     expect(bodyById("saturn")?.ringInner).toBeCloseTo(1.67, 6);
@@ -120,15 +120,15 @@ describe("BODIES", () => {
     }> = [
       { id: "sun", displayRadius: 3.5, orbitRadius: null, orbitPeriod: null, spinPeriod: 120, axialTiltDeg: 7.25, inclinationDeg: 0, startAngleDeg: 0 },
       { id: "mercury", displayRadius: 0.31, orbitRadius: 6.0, orbitPeriod: 8, spinPeriod: 60, axialTiltDeg: 0.03, inclinationDeg: 7.0, startAngleDeg: 20 },
-      { id: "venus", displayRadius: 0.49, orbitRadius: 8.0, orbitPeriod: 14, spinPeriod: 90, axialTiltDeg: 177.4, inclinationDeg: 3.4, startAngleDeg: 130 },
-      { id: "earth", displayRadius: 0.5, orbitRadius: 10.0, orbitPeriod: 20, spinPeriod: 10, axialTiltDeg: 23.4, inclinationDeg: 0, startAngleDeg: 250 },
-      { id: "mars", displayRadius: 0.36, orbitRadius: 12.5, orbitPeriod: 30, spinPeriod: 10, axialTiltDeg: 25.2, inclinationDeg: 1.85, startAngleDeg: 60 },
-      { id: "ceres", displayRadius: 0.12, orbitRadius: 17.0, orbitPeriod: 45, spinPeriod: 45, axialTiltDeg: 4, inclinationDeg: 10.6, startAngleDeg: 285 },
-      { id: "jupiter", displayRadius: 1.66, orbitRadius: 24.0, orbitPeriod: 60, spinPeriod: 6, axialTiltDeg: 3.1, inclinationDeg: 1.3, startAngleDeg: 200 },
-      { id: "saturn", displayRadius: 1.51, orbitRadius: 32.0, orbitPeriod: 90, spinPeriod: 7, axialTiltDeg: 26.7, inclinationDeg: 2.5, startAngleDeg: 310 },
-      { id: "uranus", displayRadius: 1.0, orbitRadius: 39.0, orbitPeriod: 130, spinPeriod: 9, axialTiltDeg: 97.8, inclinationDeg: 0.77, startAngleDeg: 100 },
-      { id: "neptune", displayRadius: 0.98, orbitRadius: 45.0, orbitPeriod: 170, spinPeriod: 8, axialTiltDeg: 28.3, inclinationDeg: 1.77, startAngleDeg: 40 },
-      { id: "pluto", displayRadius: 0.22, orbitRadius: 51.0, orbitPeriod: 210, spinPeriod: 45, axialTiltDeg: 122.5, inclinationDeg: 17.2, startAngleDeg: 160 },
+      { id: "venus", displayRadius: 0.49, orbitRadius: 9.0, orbitPeriod: 14, spinPeriod: 90, axialTiltDeg: 177.4, inclinationDeg: 3.4, startAngleDeg: 130 },
+      { id: "earth", displayRadius: 0.5, orbitRadius: 12.0, orbitPeriod: 20, spinPeriod: 10, axialTiltDeg: 23.4, inclinationDeg: 0, startAngleDeg: 250 },
+      { id: "mars", displayRadius: 0.36, orbitRadius: 16.0, orbitPeriod: 30, spinPeriod: 10, axialTiltDeg: 25.2, inclinationDeg: 1.85, startAngleDeg: 60 },
+      { id: "ceres", displayRadius: 0.12, orbitRadius: 21.0, orbitPeriod: 45, spinPeriod: 45, axialTiltDeg: 4, inclinationDeg: 10.6, startAngleDeg: 285 },
+      { id: "jupiter", displayRadius: 1.66, orbitRadius: 31.0, orbitPeriod: 60, spinPeriod: 6, axialTiltDeg: 3.1, inclinationDeg: 1.3, startAngleDeg: 200 },
+      { id: "saturn", displayRadius: 1.51, orbitRadius: 46.0, orbitPeriod: 90, spinPeriod: 7, axialTiltDeg: 26.7, inclinationDeg: 2.5, startAngleDeg: 310 },
+      { id: "uranus", displayRadius: 1.0, orbitRadius: 56.0, orbitPeriod: 130, spinPeriod: 9, axialTiltDeg: 97.8, inclinationDeg: 0.77, startAngleDeg: 100 },
+      { id: "neptune", displayRadius: 0.98, orbitRadius: 64.0, orbitPeriod: 170, spinPeriod: 8, axialTiltDeg: 28.3, inclinationDeg: 1.77, startAngleDeg: 40 },
+      { id: "pluto", displayRadius: 0.22, orbitRadius: 71.0, orbitPeriod: 210, spinPeriod: 45, axialTiltDeg: 122.5, inclinationDeg: 17.2, startAngleDeg: 160 },
     ];
     for (const row of table) {
       const b = bodyById(row.id);

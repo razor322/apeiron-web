@@ -28,14 +28,15 @@ describe("beltRadius", () => {
     }
   });
 
-  it("is denser near 17 than at the band edges", () => {
+  it("is denser near the band centre than at the band edges", () => {
+    const centre = (SCALE.beltInner + SCALE.beltOuter) / 2;
     const n = 20000;
     let near = 0;
     let edges = 0;
     for (let i = 0; i < n; i += 1) {
       const t = (i + 0.5) / n;
       const r = beltRadius(t);
-      if (Math.abs(r - 17) < 1) near += 1;
+      if (Math.abs(r - centre) < 1) near += 1;
       else if (r < SCALE.beltInner + 1 || r > SCALE.beltOuter - 1) edges += 1;
     }
     expect(near).toBeGreaterThan(edges);
