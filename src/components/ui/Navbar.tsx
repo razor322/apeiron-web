@@ -25,6 +25,7 @@ export function Navbar({ locale, dict, children }: NavbarProps) {
   const links = [
     { href: `/${locale}`, label: dict.nav.home },
     { href: `/${locale}/explore`, label: dict.nav.explore },
+    { href: `/${locale}/solar-system-3d`, label: dict.nav.solarSystem3d },
     { href: `/${locale}/cosmos-today`, label: dict.nav.cosmosToday },
     { href: `/${locale}/calculators`, label: dict.nav.calculators },
     { href: `/${locale}/about`, label: dict.nav.about },
