@@ -106,27 +106,3 @@ export function sampleRingStrip(kind: RingKind, u: number): RingSample {
 
   return { rgb: band.color, alpha };
 }
-
-// Draw the strip into a width by 1 canvas. The seam-free row is what the ring
-// mesh samples; in the browser the texture is built here, and the offline
-// script writes the same pixels to a PNG.
-export function buildRingStripCanvas(kind: RingKind, width = 2048): HTMLCanvasElement {
-  const canvas = document.createElement("canvas");
-  canvas.width = width;
-  canvas.height = 1;
-  const ctx = canvas.getContext("2d");
-  if (!ctx) {
-    throw new Error("2D canvas context unavailable");
-  }
-  const image = ctx.createImageData(width, 1);
-  for (let x = 0; x < width; x += 1) {
-    const { rgb, alpha } = sampleRingStrip(kind, x / (width - 1));
-    const i = x * 4;
-    image.data[i] = Math.round(rgb[0] * 255);
-    image.data[i + 1] = Math.round(rgb[1] * 255);
-    image.data[i + 2] = Math.round(rgb[2] * 255);
-    image.data[i + 3] = Math.round(alpha * 255);
-  }
-  ctx.putImageData(image, 0, 0);
-  return canvas;
-}
