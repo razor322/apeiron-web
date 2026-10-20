@@ -5,6 +5,7 @@ export const id: Dictionary = {
     home: "Beranda",
     explore: "Jelajah",
     cosmosToday: "Cosmos Hari Ini",
+    solarSystem3d: "Tata Surya 3D",
     calculators: "Kalkulator",
     about: "Tentang",
     label: "Navigasi utama",
@@ -187,6 +188,20 @@ export const id: Dictionary = {
     apodUrl: "https://apod.nasa.gov",
     recentHeading: "Gambar terbaru",
     videoLabel: "Video",
+  },
+  solarSystem3d: {
+    title: "Tata Surya dalam 3D",
+    description:
+      "Matahari dan delapan planet sebagai bola tiga dimensi yang bisa diputar. Ukurannya dikompresi agar muat dalam satu tampilan; warnanya adalah rona planet yang familier.",
+    heading: "Tata Surya dalam 3D",
+    intro:
+      "Berikut Matahari dan delapan planet, berurutan, sebagai bola yang bisa diputar. Ukurannya dikompresi agar Merkurius dan Jupiter muat dalam satu tampilan.",
+    fallbackNote: "Perangkat ini tidak dapat menggambar tampilan 3D, jadi planetnya didaftarkan di bawah.",
+    listHeading: "Delapan planet",
+    planetLabel: "Buka",
+    metaTitle: "Apeiron: Tata Surya dalam 3D",
+    metaDescription:
+      "Matahari dan delapan planet sebagai bola tiga dimensi yang bisa diputar, berurutan dari Matahari.",
   },
   explore: {
     heading: "Jelajah",

@@ -3,6 +3,7 @@ export const en = {
     home: "Home",
     explore: "Explore",
     cosmosToday: "Cosmos Today",
+    solarSystem3d: "Solar System 3D",
     calculators: "Calculators",
     about: "About",
     label: "Main navigation",
@@ -185,6 +186,20 @@ export const en = {
     apodUrl: "https://apod.nasa.gov",
     recentHeading: "Recent images",
     videoLabel: "Video",
+  },
+  solarSystem3d: {
+    title: "The Solar System in 3D",
+    description:
+      "The Sun and the eight planets as three-dimensional globes you can turn. Sizes are compressed to fit one view; colours are the planets' familiar tints.",
+    heading: "The Solar System in 3D",
+    intro:
+      "What follows is the Sun and the eight planets, in order, as globes you can turn. Sizes are compressed so Mercury and Jupiter share one view.",
+    fallbackNote: "This device cannot draw the 3D view, so the planets are listed below.",
+    listHeading: "The eight planets",
+    planetLabel: "Open",
+    metaTitle: "Apeiron: the Solar System in 3D",
+    metaDescription:
+      "The Sun and the eight planets as turnable three-dimensional globes, in order from the Sun.",
   },
   explore: {
     heading: "Explore",
