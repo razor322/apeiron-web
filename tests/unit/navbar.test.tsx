@@ -15,6 +15,7 @@ describe("Navbar", () => {
       expect([
         "/en",
         "/en/explore",
+        "/en/solar-system-3d",
         "/en/cosmos-today",
         "/en/calculators",
         "/en/about",
