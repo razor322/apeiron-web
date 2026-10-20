@@ -2,9 +2,10 @@ import * as THREE from "three";
 import { OrbitControls } from "three/addons/controls/OrbitControls.js";
 import { createSun } from "./sun";
 import { createStarfield } from "./starfield";
-import { BODIES } from "./solar-system.data";
+import { BODIES, type BodyDef } from "./solar-system.data";
 import { applyBodyStep, createBody, type BodyView } from "./bodies/planet";
 import { createEarth } from "./bodies/earth";
+import { createRings, type RingView } from "./rings";
 import {
   proceduralTexture,
   type ProceduralKind,
@@ -100,6 +101,7 @@ export class SolarSystem {
   private readonly starfield: THREE.Points;
   private readonly sunLight: THREE.PointLight;
   private readonly bodyViews: BodyView[] = [];
+  private readonly ringViews: { view: RingView; tilt: THREE.Group }[] = [];
   private readonly scratch = new THREE.Vector3();
   private earth: ReturnType<typeof createEarth> | null = null;
   private earthPivot: THREE.Group | null = null;
@@ -181,6 +183,7 @@ export class SolarSystem {
         this.earthPivot = view.orbitPivot;
         this.bodyViews.push(view);
         this.scene.add(view.group);
+        this.attachRings(def, view);
         continue;
       }
       const recipe = PROCEDURAL[def.id];
@@ -195,6 +198,7 @@ export class SolarSystem {
         : createBody(def);
       this.bodyViews.push(view);
       this.scene.add(view.group);
+      this.attachRings(def, view);
     }
     if (typeof window !== "undefined") {
       window.addEventListener("resize", this.onResize);
@@ -298,6 +302,13 @@ export class SolarSystem {
       applyBodyStep(view, this.simTime, this.scratch);
     }
 
+    // The ring shader needs the planet's world centre each frame; the tilt
+    // group sits at the planet's position, so its world origin is the centre.
+    for (const { view, tilt } of this.ringViews) {
+      tilt.getWorldPosition(view.uniforms.uPlanetCenter.value);
+      view.uniforms.uSunWorld.value.set(0, 0, 0);
+    }
+
     if (this.earth && this.earthPivot) {
       // The Sun sits at the origin, so the light direction at Earth is simply
       // the unit vector from Earth back to the origin.
@@ -327,6 +338,16 @@ export class SolarSystem {
 
     this.rafId = requestAnimationFrame(this.tick);
   };
+
+  // Rings attach to the tilt group, not the spin mesh, so the ring plane stays
+  // fixed while the planet rotates inside it. The Sun sits at the origin, so
+  // its world position is the constant the shader reads.
+  private attachRings(def: BodyDef, view: BodyView): void {
+    const rings = createRings(def, def.displayRadius);
+    if (!rings) return;
+    view.tilt.add(rings.mesh);
+    this.ringViews.push({ view: rings, tilt: view.tilt });
+  }
 
   private applyQuality(q: Quality): void {
     this.renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, TIER_PIXEL_CAP[q]));

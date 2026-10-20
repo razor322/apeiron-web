@@ -79,7 +79,7 @@ export function sampleRingStrip(kind: RingKind, u: number): RingSample {
   const uc = clamp01(u);
   const bands = TABLES[kind];
 
-  let band = bands[bands.length - 1];
+  let band: Band = bands[0]!;
   for (const b of bands) {
     if (uc >= b.start && uc < b.end) {
       band = b;
