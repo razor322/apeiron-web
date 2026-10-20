@@ -184,11 +184,11 @@ export const BODIES: BodyDef[] = [
     displayRadius: 0.12,
     orbitRadius: 17.0,
     orbitPeriod: 45,
-    spinPeriod: 9 * 3600,
+    spinPeriod: 45,
     spinRetrograde: false,
     axialTiltDeg: 4,
     inclinationDeg: 10.6,
-    startAngleDeg: 200,
+    startAngleDeg: 285,
     color: "#8d8a85",
     copy: {
       type: "Planet kerdil, di sabuk asteroid",

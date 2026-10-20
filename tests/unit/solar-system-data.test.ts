@@ -106,4 +106,45 @@ describe("BODIES", () => {
     expect(bodyById("earth")?.id).toBe("earth");
     expect(bodyById("nope" as BodyId)).toBeUndefined();
   });
+
+  it("pins the spec table for every body", () => {
+    const table: Array<{
+      id: BodyId;
+      displayRadius: number;
+      orbitRadius: number | null;
+      orbitPeriod: number | null;
+      spinPeriod: number;
+      axialTiltDeg: number;
+      inclinationDeg: number;
+      startAngleDeg: number;
+    }> = [
+      { id: "sun", displayRadius: 3.5, orbitRadius: null, orbitPeriod: null, spinPeriod: 120, axialTiltDeg: 7.25, inclinationDeg: 0, startAngleDeg: 0 },
+      { id: "mercury", displayRadius: 0.31, orbitRadius: 6.0, orbitPeriod: 8, spinPeriod: 60, axialTiltDeg: 0.03, inclinationDeg: 7.0, startAngleDeg: 20 },
+      { id: "venus", displayRadius: 0.49, orbitRadius: 8.0, orbitPeriod: 14, spinPeriod: 90, axialTiltDeg: 177.4, inclinationDeg: 3.4, startAngleDeg: 130 },
+      { id: "earth", displayRadius: 0.5, orbitRadius: 10.0, orbitPeriod: 20, spinPeriod: 10, axialTiltDeg: 23.4, inclinationDeg: 0, startAngleDeg: 250 },
+      { id: "mars", displayRadius: 0.36, orbitRadius: 12.5, orbitPeriod: 30, spinPeriod: 10, axialTiltDeg: 25.2, inclinationDeg: 1.85, startAngleDeg: 60 },
+      { id: "ceres", displayRadius: 0.12, orbitRadius: 17.0, orbitPeriod: 45, spinPeriod: 45, axialTiltDeg: 4, inclinationDeg: 10.6, startAngleDeg: 285 },
+      { id: "jupiter", displayRadius: 1.66, orbitRadius: 24.0, orbitPeriod: 60, spinPeriod: 6, axialTiltDeg: 3.1, inclinationDeg: 1.3, startAngleDeg: 200 },
+      { id: "saturn", displayRadius: 1.51, orbitRadius: 32.0, orbitPeriod: 90, spinPeriod: 7, axialTiltDeg: 26.7, inclinationDeg: 2.5, startAngleDeg: 310 },
+      { id: "uranus", displayRadius: 1.0, orbitRadius: 39.0, orbitPeriod: 130, spinPeriod: 9, axialTiltDeg: 97.8, inclinationDeg: 0.77, startAngleDeg: 100 },
+      { id: "neptune", displayRadius: 0.98, orbitRadius: 45.0, orbitPeriod: 170, spinPeriod: 8, axialTiltDeg: 28.3, inclinationDeg: 1.77, startAngleDeg: 40 },
+      { id: "pluto", displayRadius: 0.22, orbitRadius: 51.0, orbitPeriod: 210, spinPeriod: 45, axialTiltDeg: 122.5, inclinationDeg: 17.2, startAngleDeg: 160 },
+    ];
+    for (const row of table) {
+      const b = bodyById(row.id);
+      expect(b, `missing ${row.id}`).toBeDefined();
+      expect(b!.displayRadius).toBeCloseTo(row.displayRadius, 6);
+      expect(b!.orbitRadius).toBe(row.orbitRadius);
+      expect(b!.orbitPeriod).toBe(row.orbitPeriod);
+      expect(b!.spinPeriod).toBe(row.spinPeriod);
+      expect(b!.axialTiltDeg).toBeCloseTo(row.axialTiltDeg, 6);
+      expect(b!.inclinationDeg).toBeCloseTo(row.inclinationDeg, 6);
+      expect(b!.startAngleDeg).toBe(row.startAngleDeg);
+    }
+  });
+
+  it("gives every body a distinct start angle", () => {
+    const angles = BODIES.map((b) => b.startAngleDeg);
+    expect(new Set(angles).size).toBe(angles.length);
+  });
 });
