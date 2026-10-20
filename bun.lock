@@ -5,6 +5,7 @@
       "name": "apeiron-scaffold",
       "dependencies": {
         "gsap": "^3.15.0",
+        "gss-lang": "0.0.6",
         "next": "16.4.1",
         "react": "19.3.0",
         "react-dom": "19.3.0",
@@ -397,6 +398,8 @@
 
     "@vitest/spy": ["@vitest/spy@5.0.4", "https://registry.npmmirror.com/@vitest/spy/-/spy-5.0.4.tgz", {}, "sha512-MZKk/gSkm2q+ICobMxCpH1mA+cCAWm8WV7UhxlqGjq/sJ3AGc1BqFOs5CRVXxH78wQtme9q/NAAgBquj4AcyMw=="],
 
+    "@webgpu/types": ["@webgpu/types@0.1.74", "https://registry.npmmirror.com/@webgpu/types/-/types-0.1.74.tgz", {}, "sha512-lgiI4hbuLcI9unnm2cL/tvCaQU45dp0xcLWJh5uB/9MBGvIA4F8XIk7nSiBeg+K4xWGYwgZKn80LmERI5CxoTA=="],
+
     "acorn": ["acorn@8.19.0", "https://registry.npmmirror.com/acorn/-/acorn-8.19.0.tgz", { "bin": { "acorn": "bin/acorn" } }, "sha512-oJlA3XiRm7Cyk6qFD2Jn8ak9B7jSy0qy00ADO3+8dpT0LSjFihQYv4C02LFCSYJV3Q37xYwwRy5m+IpIiUzqWw=="],
 
     "acorn-jsx": ["acorn-jsx@5.3.2", "https://registry.npmmirror.com/acorn-jsx/-/acorn-jsx-5.3.2.tgz", { "peerDependencies": { "acorn": "^6.0.0 || ^7.0.0 || ^8.0.0" } }, "sha512-rq9s+JNhf0IChjtDXxllJ7g41oZk5SlXtp0LHwyA5cejwn7vKmKp4pPri6YEePv2PU65sAsegbXtIinmDFDXgQ=="],
@@ -640,6 +643,8 @@
     "graceful-fs": ["graceful-fs@4.2.11", "https://registry.npmmirror.com/graceful-fs/-/graceful-fs-4.2.11.tgz", {}, "sha512-RbJ5/jmFcNNCcDV5o9eTnBLJ/HszWV0P73bc+Ff4nS/rJj+YaS6IGyiOL0VoBYX+l1Wrl3k63h/KrH+nhJ0XvQ=="],
 
     "gsap": ["gsap@3.15.0", "https://registry.npmmirror.com/gsap/-/gsap-3.15.0.tgz", {}, "sha512-dMW4CWBTUK1AEEDeZc1g4xpPGIrSf9fJF960qbTZmN/QwZIWY5wgliS6JWl9/25fpTGJrMRtSjGtOmPnfjZB+A=="],
+
+    "gss-lang": ["gss-lang@0.0.6", "https://registry.npmmirror.com/gss-lang/-/gss-lang-0.0.6.tgz", { "dependencies": { "@webgpu/types": "^0.1.74" }, "peerDependencies": { "vite": ">=5" }, "optionalPeers": ["vite"] }, "sha512-cAOX1YiADlVZ9c65HOOehIrjNp2i7j+d+n26AeZwpvifD9tR9tV8WveZAaFNQL+TQ+t3R5iDoyr6xM/eSmXdSA=="],
 
     "has-bigints": ["has-bigints@1.1.0", "https://registry.npmmirror.com/has-bigints/-/has-bigints-1.1.0.tgz", {}, "sha512-R3pbpkcIqv2Pm3dUwgjclDRVmWpTJW2DcMzcIhEXEx1oh/CEMObMm3KLmRJOdvhM7o4uQBnwr8pzRK2sJWIqfg=="],
 
