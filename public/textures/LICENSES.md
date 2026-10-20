@@ -25,8 +25,8 @@ NASA material is generally not copyrighted; see https://www.nasa.gov/nasa-brand-
 - Textured (equirectangular map shipped in this folder, mapped onto the globe): Earth, Moon.
 - Procedural (no verified, cleanly licensed equirectangular NASA map reachable at build time): Sun, Mercury, Venus, Mars, Jupiter, Saturn, Uranus, Neptune, Pluto. Each uses `proceduralTexture(kind, colors)` with the exact colours from `solar-system.data.ts`. Mars ships `mars_1k.jpg` (a 1552x1552 globe photo, not an equirectangular map, so unsuitable as a sphere texture); it is kept for the info card or poster and Mars renders procedurally. If a suitable NASA equirectangular map is verified later, drop the file here, extend this table, and wire the body to it.
 
-## Regenerating the ring strips
+## Ring strips
 
-`scripts/generate-ring-strip.ts` writes `ring-saturn.png`, `ring-uranus.png` and
-`ring-neptune.png` here from the ring tables in the plan. Those strips are
-procedurally generated (no external license).
+The planet rings are built at runtime from a procedural `DataTexture` in
+`src/features/solar-system-3d/shaderstrips.ts` (the `sampleRingStrip` table), so
+no ring image file is shipped. Nothing to license.
