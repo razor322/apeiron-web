@@ -26,6 +26,15 @@ describe("scene source", () => {
     expect(src).toContain("animation: none");
   });
 
+  it("bobs each planet in place, keeping its own x in the keyframe", () => {
+    for (const p of PLANET_GSS) {
+      expect(src).toContain(`@keyframes bob-${p.slug}`);
+      // The bob keyframe must carry the planet's own x so the float moves it up
+      // and down rather than sliding it toward the centre.
+      expect(src).toContain(`translate: ${p.x} 1.5 0`);
+    }
+  });
+
   it("is balanced (equal open and close braces)", () => {
     const open = (src.match(/{/g) ?? []).length;
     const close = (src.match(/}/g) ?? []).length;
