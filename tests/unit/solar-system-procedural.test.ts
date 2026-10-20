@@ -40,7 +40,7 @@ describe("buildProceduralImageData", () => {
       const [r, g, b] = rowAverage(img, y);
       distinct.add(`${Math.round(r / 4)}|${Math.round(g / 4)}|${Math.round(b / 4)}`);
     }
-    expect(distinct.size).toBeGreaterThan(1);
+    expect(distinct.size).toBeGreaterThan(3);
   });
 
   it("marks a bright heart region on Pluto", () => {
