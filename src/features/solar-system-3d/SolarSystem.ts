@@ -1,5 +1,7 @@
 import * as THREE from "three";
 import { OrbitControls } from "three/addons/controls/OrbitControls.js";
+import { createSun } from "./sun";
+import { createStarfield } from "./starfield";
 
 // Core Three.js scene for the solar system page: renderer, camera, loop and
 // disposal only. Task 1.1 keeps the scene empty; later tasks add the bodies,
@@ -63,6 +65,9 @@ export class SolarSystem {
   private readonly scene = new THREE.Scene();
   private readonly listeners = new Map<SolarSystemEvent, Set<(payload: unknown) => void>>();
 
+  private readonly starfield: THREE.Points;
+  private readonly sunLight: THREE.PointLight;
+
   private rafId: number | null = null;
   private running = false;
   private disposed = false;
@@ -120,6 +125,16 @@ export class SolarSystem {
     this.info = { tier, fps: 0, drawCalls: 0, triangles: 0 };
     this.applyQuality(tier);
     this.resize();
+
+    this.scene.background = new THREE.Color("#04050a");
+    this.scene.add(new THREE.AmbientLight("#0a0d18", 0.35));
+
+    const sun = createSun();
+    this.sunLight = sun.light;
+    this.scene.add(sun.group);
+
+    this.starfield = createStarfield();
+    this.scene.add(this.starfield);
 
     if (typeof window !== "undefined") {
       window.addEventListener("resize", this.onResize);
@@ -206,6 +221,7 @@ export class SolarSystem {
 
     this.listeners.clear();
     this.controls.dispose();
+    disposeScene(this.scene);
     this.renderer.dispose();
   }
 
@@ -217,6 +233,10 @@ export class SolarSystem {
     this.lastFrameMs = nowMs;
 
     this.simTime += delta * this.timeScale;
+
+    // The star shell keeps the camera at its centre so stars read as infinitely
+    // far and never drift as the user orbits.
+    this.starfield.position.copy(this.camera.position);
 
     this.controls.update();
     this.renderer.render(this.scene, this.camera);
@@ -256,3 +276,21 @@ export class SolarSystem {
 // Referenced so the outermost orbit constant stays documented next to the
 // camera distance it sizes; later tasks place bodies against it.
 export const SCENE_OUTERMOST_ORBIT = OUTERMOST_ORBIT;
+
+// One walk over the graph releasing every geometry, material and texture. GPU
+// resources are not garbage collected with the JS objects, so a page teardown
+// would leak them without this.
+function disposeScene(scene: THREE.Scene): void {
+  scene.traverse((object) => {
+    const mesh = object as THREE.Mesh;
+    if (mesh.geometry) mesh.geometry.dispose();
+    const material = (mesh as { material?: THREE.Material | THREE.Material[] }).material;
+    if (!material) return;
+    for (const m of Array.isArray(material) ? material : [material]) {
+      for (const value of Object.values(m)) {
+        if (value instanceof THREE.Texture) value.dispose();
+      }
+      m.dispose();
+    }
+  });
+}
