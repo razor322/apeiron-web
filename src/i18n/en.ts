@@ -203,6 +203,15 @@ export const en = {
     railLabel: "Bodies",
     canvasAria:
       "An interactive three-dimensional view of the Solar System. Choose a body from the list to focus it.",
+    controls: {
+      play: "Play",
+      pause: "Pause",
+      speed: "Speed",
+      showOrbits: "Show orbits",
+      showMoons: "Show moons",
+      showLabels: "Show labels",
+      resetView: "Reset view",
+    },
     info: {
       type: "Type",
       atmosphere: "Atmosphere",

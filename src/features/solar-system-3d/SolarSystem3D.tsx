@@ -46,6 +46,11 @@ export function SolarSystem3D({ locale, dict }: { locale: Locale; dict: Dictiona
 
   const [status, setStatus] = useState<Status>("loading");
   const [selected, setSelected] = useState<BodyId | null>(null);
+  const [playing, setPlaying] = useState(true);
+  const [speed, setSpeed] = useState(1);
+  const [showOrbits, setShowOrbits] = useState(true);
+  const [showMoons, setShowMoons] = useState(false);
+  const [showLabels, setShowLabels] = useState(false);
 
   const nameFor = useCallback((id: BodyId) => bodyName(dict, id), [dict]);
 
@@ -88,6 +93,22 @@ export function SolarSystem3D({ locale, dict }: { locale: Locale; dict: Dictiona
     if (scene) fn(scene);
   }, []);
 
+  const togglePlay = useCallback(() => {
+    setPlaying((prev) => {
+      const next = !prev;
+      withScene((scene) => (next ? scene.start() : scene.pause()));
+      return next;
+    });
+  }, [withScene]);
+
+  const onSpeed = useCallback(
+    (value: number) => {
+      setSpeed(value);
+      withScene((scene) => scene.setTimeScale(value));
+    },
+    [withScene],
+  );
+
   const onSelect = useCallback(
     (id: BodyId) => {
       setSelected(id);
@@ -95,6 +116,32 @@ export function SolarSystem3D({ locale, dict }: { locale: Locale; dict: Dictiona
     },
     [withScene],
   );
+
+  const orbitsToggle = useCallback(() => {
+    setShowOrbits((prev) => {
+      const next = !prev;
+      withScene((scene) => scene.toggleOrbits(next));
+      return next;
+    });
+  }, [withScene]);
+  const moonsToggle = useCallback(() => {
+    setShowMoons((prev) => {
+      const next = !prev;
+      withScene((scene) => scene.toggleMoons(next));
+      return next;
+    });
+  }, [withScene]);
+  const labelsToggle = useCallback(() => {
+    setShowLabels((prev) => {
+      const next = !prev;
+      withScene((scene) => scene.toggleLabels(next));
+      return next;
+    });
+  }, [withScene]);
+  const onReset = useCallback(() => {
+    setSelected(null);
+    withScene((scene) => scene.resetView());
+  }, [withScene]);
 
   const selectedDef = useMemo(
     () => (selected ? BODIES.find((b) => b.id === selected) : undefined),
@@ -126,6 +173,21 @@ export function SolarSystem3D({ locale, dict }: { locale: Locale; dict: Dictiona
               </div>
             ) : null}
           </div>
+
+          <Controls
+            dict={dict}
+            playing={playing}
+            speed={speed}
+            showOrbits={showOrbits}
+            showMoons={showMoons}
+            showLabels={showLabels}
+            onTogglePlay={togglePlay}
+            onSpeed={onSpeed}
+            onToggleOrbits={orbitsToggle}
+            onToggleMoons={moonsToggle}
+            onToggleLabels={labelsToggle}
+            onReset={onReset}
+          />
         </div>
 
         <div className="flex flex-col gap-6 lg:w-72">
@@ -154,6 +216,97 @@ export function SolarSystem3D({ locale, dict }: { locale: Locale; dict: Dictiona
         </div>
       </div>
     </div>
+  );
+}
+
+function Controls({
+  dict,
+  playing,
+  speed,
+  showOrbits,
+  showMoons,
+  showLabels,
+  onTogglePlay,
+  onSpeed,
+  onToggleOrbits,
+  onToggleMoons,
+  onToggleLabels,
+  onReset,
+}: {
+  dict: Dictionary;
+  playing: boolean;
+  speed: number;
+  showOrbits: boolean;
+  showMoons: boolean;
+  showLabels: boolean;
+  onTogglePlay: () => void;
+  onSpeed: (value: number) => void;
+  onToggleOrbits: () => void;
+  onToggleMoons: () => void;
+  onToggleLabels: () => void;
+  onReset: () => void;
+}) {
+  const t = dict.solarSystem3d.controls;
+  return (
+    <div className="flex flex-wrap items-center gap-x-4 gap-y-3 font-sans text-sm text-starlight">
+      <button
+        type="button"
+        onClick={onTogglePlay}
+        aria-pressed={playing}
+        className="min-h-11 rounded-sm border border-[color:var(--line)] px-4 transition-colors hover:border-amber hover:text-amber"
+      >
+        {playing ? t.pause : t.play}
+      </button>
+
+      <label className="flex items-center gap-2 text-dust">
+        <span>{t.speed}</span>
+        <input
+          type="range"
+          min={0}
+          max={3}
+          step={0.25}
+          value={speed}
+          onChange={(e) => onSpeed(Number(e.target.value))}
+          aria-label={t.speed}
+          className="h-11 w-32 accent-[color:var(--color-amber)]"
+        />
+      </label>
+
+      <Toggle label={t.showOrbits} on={showOrbits} onToggle={onToggleOrbits} />
+      <Toggle label={t.showMoons} on={showMoons} onToggle={onToggleMoons} />
+      <Toggle label={t.showLabels} on={showLabels} onToggle={onToggleLabels} />
+
+      <button
+        type="button"
+        onClick={onReset}
+        className="min-h-11 rounded-sm border border-[color:var(--line)] px-4 transition-colors hover:border-amber hover:text-amber"
+      >
+        {t.resetView}
+      </button>
+    </div>
+  );
+}
+
+function Toggle({
+  label,
+  on,
+  onToggle,
+}: {
+  label: string;
+  on: boolean;
+  onToggle: () => void;
+}) {
+  return (
+    <button
+      type="button"
+      onClick={onToggle}
+      aria-pressed={on}
+      className={`min-h-11 rounded-sm border px-4 transition-colors ${
+        on ? "border-amber text-amber" : "border-[color:var(--line)] hover:border-amber"
+      }`}
+    >
+      {label}
+    </button>
   );
 }
 

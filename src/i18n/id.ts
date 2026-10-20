@@ -205,6 +205,15 @@ export const id: Dictionary = {
     railLabel: "Benda langit",
     canvasAria:
       "Tampilan tiga dimensi Tata Surya yang interaktif. Pilih benda langit dari daftar untuk memfokuskannya.",
+    controls: {
+      play: "Putar",
+      pause: "Jeda",
+      speed: "Kecepatan",
+      showOrbits: "Tampilkan orbit",
+      showMoons: "Tampilkan bulan",
+      showLabels: "Tampilkan label",
+      resetView: "Atur ulang tampilan",
+    },
     info: {
       type: "Jenis",
       atmosphere: "Atmosfer",
