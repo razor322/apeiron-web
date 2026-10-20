@@ -4,6 +4,7 @@ import { createSun } from "./sun";
 import { createStarfield } from "./starfield";
 import { BODIES } from "./solar-system.data";
 import { applyBodyStep, createBody, type BodyView } from "./bodies/planet";
+import { createEarth } from "./bodies/earth";
 
 // Core Three.js scene for the solar system page: renderer, camera, loop and
 // disposal only. Task 1.1 keeps the scene empty; later tasks add the bodies,
@@ -71,6 +72,9 @@ export class SolarSystem {
   private readonly sunLight: THREE.PointLight;
   private readonly bodyViews: BodyView[] = [];
   private readonly scratch = new THREE.Vector3();
+  private earth: ReturnType<typeof createEarth> | null = null;
+  private earthPivot: THREE.Group | null = null;
+  private readonly earthSunDir = new THREE.Vector3();
 
   private rafId: number | null = null;
   private running = false;
@@ -142,6 +146,14 @@ export class SolarSystem {
 
     for (const def of BODIES) {
       if (def.orbitRadius === null) continue;
+      if (def.id === "earth") {
+        this.earth = createEarth(new THREE.TextureLoader());
+        const view = createBody(def, { spin: this.earth.group });
+        this.earthPivot = view.orbitPivot;
+        this.bodyViews.push(view);
+        this.scene.add(view.group);
+        continue;
+      }
       const view = createBody(def);
       this.bodyViews.push(view);
       this.scene.add(view.group);
@@ -247,6 +259,16 @@ export class SolarSystem {
 
     for (const view of this.bodyViews) {
       applyBodyStep(view, this.simTime, this.scratch);
+    }
+
+    if (this.earth && this.earthPivot) {
+      // The Sun sits at the origin, so the light direction at Earth is simply
+      // the unit vector from Earth back to the origin.
+      this.earthSunDir
+        .copy(this.earthPivot.position)
+        .multiplyScalar(-1)
+        .normalize();
+      this.earth.update(this.earthSunDir, this.simTime);
     }
 
     // The star shell keeps the camera at its centre so stars read as infinitely

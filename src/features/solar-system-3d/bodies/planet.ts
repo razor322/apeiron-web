@@ -81,7 +81,7 @@ function flatteningFor(def: BodyDef): number {
 }
 
 export type BodyAppearance = {
-  material: THREE.Material;
+  material?: THREE.Material;
   spin?: THREE.Object3D;
 };
 
