@@ -53,12 +53,19 @@ export const JOURNEY_IMAGES: Record<string, AstronomyMedia> = {
     "NASA/JPL",
     "A montage of the planets of the Solar System.",
   ),
-  star: media(
+  sun: media(
     "PIA26681",
     "medium",
     "The Sun",
     "NASA/JPL-Caltech",
     "The Sun, a sphere of glowing plasma.",
+  ),
+  star: media(
+    "PIA04204",
+    "orig",
+    "A nearby star",
+    "NASA/JPL-Caltech",
+    "The bright star Altair seen against the dark of space.",
   ),
   galaxy: media(
     "PIA20970",
