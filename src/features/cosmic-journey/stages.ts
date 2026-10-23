@@ -56,7 +56,7 @@ export const STAGES: JourneyStageDef[] = [
     figureKey: "journey.stages.earth.figure",
     kind: "content",
     factIds: ["earth-diameter", "earth-moon-distance", "milky-way-position", "milky-way-diameter", "galactic-centre-distance", "milky-way-orbit-time"],
-    range: [0.2, 0.34],
+    range: [0.2, 0.32],
     exponent: 7,
   },
   {
@@ -66,8 +66,18 @@ export const STAGES: JourneyStageDef[] = [
     figureKey: "journey.stages.moon.figure",
     kind: "content",
     factIds: ["earth-moon-distance"],
-    range: [0.34, 0.46],
+    range: [0.32, 0.42],
     exponent: 8.89,
+  },
+  {
+    id: "sun",
+    label: "journey.stages.sun.label",
+    ariaLabel: "journey.stages.sun.aria",
+    figureKey: "journey.stages.sun.figure",
+    kind: "content",
+    factIds: ["sunlight-earth"],
+    range: [0.42, 0.5],
+    exponent: 11,
   },
   {
     id: "solar-system",
@@ -75,8 +85,8 @@ export const STAGES: JourneyStageDef[] = [
     ariaLabel: "journey.stages.solar-system.aria",
     figureKey: "journey.stages.solar-system.figure",
     kind: "content",
-    factIds: ["sunlight-earth", "sun-neptune-light"],
-    range: [0.46, 0.6],
+    factIds: ["sun-neptune-light"],
+    range: [0.5, 0.6],
     exponent: 12,
   },
   {
@@ -86,7 +96,7 @@ export const STAGES: JourneyStageDef[] = [
     figureKey: "journey.stages.star.figure",
     kind: "content",
     factIds: ["proxima-distance"],
-    range: [0.6, 0.76],
+    range: [0.66, 0.78],
     exponent: 16,
   },
   {
@@ -96,7 +106,7 @@ export const STAGES: JourneyStageDef[] = [
     figureKey: null,
     kind: "content",
     factIds: [],
-    range: [0.76, 0.9],
+    range: [0.78, 0.9],
     exponent: 21,
   },
   {

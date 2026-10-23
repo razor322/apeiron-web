@@ -13,6 +13,7 @@ describe("journey stages", () => {
     expect(content.map((s) => s.id)).toEqual([
       "earth",
       "moon",
+      "sun",
       "solar-system",
       "star",
       "galaxy",

@@ -4,17 +4,15 @@ import { cached } from "@/lib/cache/ttl-cache";
 import { logProvider, timeProvider } from "@/lib/astronomy/log";
 
 // NASA EPIC (Earth Polychromatic Imaging Camera), natural-colour Earth images
-// from the DSCOVR spacecraft at L1. Requires the app API key. Source:
+// from the DSCOVR spacecraft at L1. The public host serves both metadata and
+// archive images without an API key. Source:
 // https://epic.gsfc.nasa.gov/about/api
-const EPIC_BASE = "https://api.nasa.gov/EPIC";
+const EPIC_BASE = "https://epic.gsfc.nasa.gov";
 const PROVIDER = "nasa-epic";
 const TTL_MS = 6 * 60 * 60 * 1000;
 
 function buildUrl(): string {
-  const key = process.env.NASA_API_KEY ?? "DEMO_KEY";
-  const url = new URL(`${EPIC_BASE}/api/natural`);
-  url.searchParams.set("api_key", key);
-  return url.toString();
+  return `${EPIC_BASE}/api/natural`;
 }
 
 // The archive URL is derived from the capture date, not returned by the list.
@@ -23,8 +21,7 @@ function archiveUrl(meta: EpicImage): string {
   const yyyy = d.getUTCFullYear();
   const mm = String(d.getUTCMonth() + 1).padStart(2, "0");
   const dd = String(d.getUTCDate()).padStart(2, "0");
-  const key = process.env.NASA_API_KEY ?? "DEMO_KEY";
-  return `${EPIC_BASE}/archive/natural/${yyyy}/${mm}/${dd}/png/${meta.image}.png?api_key=${key}`;
+  return `${EPIC_BASE}/archive/natural/${yyyy}/${mm}/${dd}/png/${meta.image}.png`;
 }
 
 export async function fetchEarthToday(limit = 6): Promise<AstronomyMedia[]> {
