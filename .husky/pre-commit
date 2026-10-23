@@ -1,0 +1,8 @@
+#!/bin/sh
+MAX_FILES=3
+STAGED_FILE_COUNT=$(git diff --cached --name-only | grep -c . || true)
+if [ "$STAGED_FILE_COUNT" -gt "$MAX_FILES" ]; then
+  echo "Error: too many files in commit ($STAGED_FILE_COUNT files)."
+  echo "Maximum $MAX_FILES files per commit. Split it, or use: git commit --no-verify"
+  exit 1
+fi
