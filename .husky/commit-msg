@@ -4,9 +4,9 @@ FIRST_LINE=$(head -n 1 "$COMMIT_MSG_FILE")
 if echo "$FIRST_LINE" | grep -qE '^Merge '; then
   exit 0
 fi
-BODY_LINE_COUNT=$(sed '1,2d' "$COMMIT_MSG_FILE" | grep -c . || true)
+BODY_LINE_COUNT=$(sed '1,2d' "$COMMIT_MSG_FILE" | grep -c .)
 if [ "$BODY_LINE_COUNT" -gt 3 ]; then
   echo "Error: maximum 3 non-empty body lines allowed."
   exit 1
 fi
-commitlint --edit "$1"
+./node_modules/.bin/commitlint --edit "$1"
