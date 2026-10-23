@@ -550,12 +550,19 @@ export const en = {
         body: "About 30 times the width of Earth. Only twelve people have ever walked there.",
         youAreHere: "Earth, you are here",
       },
+      sun: {
+        label: "The Sun",
+        aria: "The Sun",
+        figure: "8:20",
+        headline: "The minutes and seconds sunlight needs to reach us.",
+        body: "About 149.6 million km, and almost all of it is empty.",
+      },
       "solar-system": {
         label: "Solar System",
         aria: "The Solar System",
-        figure: "8:20",
-        headline: "The minutes and seconds sunlight needs to reach us.",
-        body: "About 149.6 million km, and almost all of it is empty. Eight planets, one star, and a void far larger than all of them. One of those specks is home.",
+        figure: "4.2 h",
+        headline: "The hours light needs to cross from the Sun to Neptune.",
+        body: "Eight planets, one star, and a void far larger than all of them. One of those specks is home.",
       },
       star: {
         label: "Nearest star",

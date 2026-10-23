@@ -552,12 +552,19 @@ export const id: Dictionary = {
         body: "Sekitar 30 kali lebar Bumi. Hanya dua belas manusia yang pernah berjalan di sana.",
         youAreHere: "Bumi, kamu di sini",
       },
+      sun: {
+        label: "Matahari",
+        aria: "Matahari",
+        figure: "8:20",
+        headline: "Menit dan detik yang dibutuhkan cahaya Matahari untuk sampai ke sini.",
+        body: "Sekitar 149,6 juta km, dan hampir seluruhnya hampa.",
+      },
       "solar-system": {
         label: "Tata Surya",
         aria: "Tata Surya",
-        figure: "8:20",
-        headline: "Menit dan detik yang dibutuhkan cahaya Matahari untuk sampai ke sini.",
-        body: "Sekitar 149,6 juta km, dan hampir seluruhnya hampa. Delapan planet, satu bintang, dan ruang kosong yang jauh lebih luas dari semuanya. Salah satu noktah itu adalah rumahmu.",
+        figure: "4,2 jam",
+        headline: "Waktu tempuh cahaya dari Matahari ke Neptunus.",
+        body: "Delapan planet, satu bintang, dan ruang kosong yang jauh lebih luas dari semuanya. Salah satu noktah itu adalah rumahmu.",
       },
       star: {
         label: "Bintang terdekat",
